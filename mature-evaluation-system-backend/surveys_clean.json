@@ -1,0 +1,3328 @@
+[
+{
+  "model": "surveys.surveytemplate",
+  "pk": 4,
+  "fields": {
+    "survey_type": "teacher",
+    "title": "中小学校教师数据素养及数据应用效果调查问卷",
+    "description": "尊敬的老师：\n您好！为深入了解您所在学校教师数据素养的整体发展现状，以及各位教师对学校数据应用成效的主观评价，特设计《中小学校教师数据素养及数据应用效果调查问卷》，诚邀您根据实际情况进行填写。\n此次调查严格遵循专业伦理与规范要求，确保您的个人隐私得到充分保护。您的回答无对错之分，请放心填写。\n衷心感谢您的支持与参与！",
+    "is_active": true,
+    "created_at": "2025-10-28T09:28:50.174Z",
+    "updated_at": "2025-10-28T09:28:50.174Z"
+  }
+},
+{
+  "model": "surveys.surveytemplate",
+  "pk": 5,
+  "fields": {
+    "survey_type": "student",
+    "title": "中小学校学生数据素养及数据应用效果调查问卷",
+    "description": "尊敬的同学：\n您好！为深入了解您所在学校学生数据素养的整体发展现状，以及各位同学对学校数据应用成效的主观评价，特设计《中小学校学生数据素养及数据应用效果调查问卷》，诚邀您根据实际情况进行填写。\n此次调查严格遵循专业伦理与规范要求，确保您的个人隐私得到充分保护。您的回答无对错之分，请放心填写。\n衷心感谢您的支持与参与！",
+    "is_active": true,
+    "created_at": "2025-10-28T09:28:50.292Z",
+    "updated_at": "2025-10-28T09:28:50.292Z"
+  }
+},
+{
+  "model": "surveys.surveytemplate",
+  "pk": 6,
+  "fields": {
+    "survey_type": "manager",
+    "title": "中小学校管理者数据素养及数据资产意识调查问卷",
+    "description": "尊敬的老师：\n您好！为深入了解您所在学校管理者的数据素养及数据资产意识的整体发展现状，特设计《中小学校管理者数据素养及数据资产意识调查问卷》，诚邀您根据实际情况进行填写。\n此次调查严格遵循专业伦理与规范要求，确保您的个人隐私得到充分保护。您的回答无对错之分，请放心填写。\n衷心感谢您的支持与参与！",
+    "is_active": true,
+    "created_at": "2025-10-28T09:28:50.403Z",
+    "updated_at": "2025-10-28T09:28:50.403Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 193,
+  "fields": {
+    "template": 4,
+    "question_text": "您的性别：",
+    "question_type": "single_choice",
+    "options": [
+      "男",
+      "女"
+    ],
+    "score_rule": null,
+    "order": 1,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.177Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 233,
+  "fields": {
+    "template": 5,
+    "question_text": "您的性别：",
+    "question_type": "single_choice",
+    "options": [
+      "男",
+      "女"
+    ],
+    "score_rule": null,
+    "order": 1,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.295Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 267,
+  "fields": {
+    "template": 6,
+    "question_text": "您的性别：",
+    "question_type": "single_choice",
+    "options": [
+      "男",
+      "女"
+    ],
+    "score_rule": null,
+    "order": 1,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.406Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 194,
+  "fields": {
+    "template": 4,
+    "question_text": "您的年龄：",
+    "question_type": "single_choice",
+    "options": [
+      "30岁及以下",
+      "31-40岁",
+      "41-50岁",
+      "51岁及以上"
+    ],
+    "score_rule": null,
+    "order": 2,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.180Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 234,
+  "fields": {
+    "template": 5,
+    "question_text": "所处学段：",
+    "question_type": "single_choice",
+    "options": [
+      "小学",
+      "初中",
+      "高中"
+    ],
+    "score_rule": null,
+    "order": 2,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.298Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 268,
+  "fields": {
+    "template": 6,
+    "question_text": "您的年龄：",
+    "question_type": "single_choice",
+    "options": [
+      "30岁及以下",
+      "31-40岁",
+      "41-50岁",
+      "51岁及以上"
+    ],
+    "score_rule": null,
+    "order": 2,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.409Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 195,
+  "fields": {
+    "template": 4,
+    "question_text": "所教学段：",
+    "question_type": "single_choice",
+    "options": [
+      "小学",
+      "初中",
+      "高中"
+    ],
+    "score_rule": null,
+    "order": 3,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.183Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 235,
+  "fields": {
+    "template": 5,
+    "question_text": "学校所在地区：",
+    "question_type": "single_choice",
+    "options": [
+      "城市",
+      "城乡结合部",
+      "乡村"
+    ],
+    "score_rule": null,
+    "order": 3,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.301Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 269,
+  "fields": {
+    "template": 6,
+    "question_text": "您担任学校管理工作的年限：",
+    "question_type": "single_choice",
+    "options": [
+      "1年以下",
+      "1-5年",
+      "6-10年",
+      "11-15年",
+      "16-20年",
+      "21-25年",
+      "26-30年",
+      "30年以上"
+    ],
+    "score_rule": null,
+    "order": 3,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.412Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 196,
+  "fields": {
+    "template": 4,
+    "question_text": "学校所在地区：",
+    "question_type": "single_choice",
+    "options": [
+      "城市",
+      "城乡结合部",
+      "乡村"
+    ],
+    "score_rule": null,
+    "order": 4,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.185Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 236,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够注意到学习过程中产生的各类数据（如成绩、学习时间、错题等）。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 4,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.306Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 270,
+  "fields": {
+    "template": 6,
+    "question_text": "您的学校性质：",
+    "question_type": "single_choice",
+    "options": [
+      "小学",
+      "初中",
+      "九年一贯",
+      "完全中学",
+      "高中",
+      "十二年一贯制学校"
+    ],
+    "score_rule": null,
+    "order": 4,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.416Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 197,
+  "fields": {
+    "template": 4,
+    "question_text": "所教学科：",
+    "question_type": "single_choice",
+    "options": [
+      "语文",
+      "数学",
+      "英语",
+      "物理",
+      "化学",
+      "生物",
+      "政治",
+      "历史",
+      "地理",
+      "体育",
+      "音乐",
+      "美术",
+      "信息技术",
+      "其他"
+    ],
+    "score_rule": null,
+    "order": 5,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.188Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 237,
+  "fields": {
+    "template": 5,
+    "question_text": "我具有主动使用数据来发现问题、改进学习方法和提高学习效率的意识。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 5,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.309Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 271,
+  "fields": {
+    "template": 6,
+    "question_text": "学校所在地区：",
+    "question_type": "single_choice",
+    "options": [
+      "城市",
+      "城乡结合部",
+      "乡村"
+    ],
+    "score_rule": null,
+    "order": 5,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.419Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 198,
+  "fields": {
+    "template": 4,
+    "question_text": "我对教育数据具有一定洞察力和判断力。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 6,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.192Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 238,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够以严谨认真的态度对待和使用教育数据。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 6,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.312Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 272,
+  "fields": {
+    "template": 6,
+    "question_text": "您的职务是：",
+    "question_type": "single_choice",
+    "options": [
+      "校长",
+      "副校长",
+      "教务主任",
+      "德育主任",
+      "教研主任",
+      "年级主任",
+      "其他"
+    ],
+    "score_rule": null,
+    "order": 6,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.421Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 199,
+  "fields": {
+    "template": 4,
+    "question_text": "我具有主动使用教育数据解决教学问题的意识。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 7,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.194Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 239,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够尝试将学习活动（如背单词、写作业等）转化为数据来记录和分析。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 7,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.315Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 273,
+  "fields": {
+    "template": 6,
+    "question_text": "我具备识别教育管理工作中关键数据的敏感性。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 7,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.424Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 200,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够以严谨认真的态度对待和使用教育数据。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 8,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.197Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 240,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够将学习数据与学习现象（如成绩波动等）联系起来，并发现原因或优化方法。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 8,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.318Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 274,
+  "fields": {
+    "template": 6,
+    "question_text": "我具有主动运用具有数据解决学校教育教学或治理问题的意识。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 8,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.426Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 201,
+  "fields": {
+    "template": 4,
+    "question_text": "我认识到数据在教育教学中具有重要作用和价值。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 9,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.200Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 241,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够从不同角度理解和分析学习数据，发现其中潜藏的信息。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 9,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.320Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 275,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够以科学、规范、审慎的态度管理和使用教育数据。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 9,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.430Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 202,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够将学生以及自身行为以数据化的方式进行呈现。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 10,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.203Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 242,
+  "fields": {
+    "template": 5,
+    "question_text": "我遇到异常或不合理的数据时，能提出质疑并进一步思考其背后原因。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 10,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.325Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 276,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够认识到教育数据对提升学校决策质量、教学成效和治理效能等的重要价值。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 10,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.433Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 203,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够建立数据与教学现象间的联系，使用数据对教学现象进行解释和优化。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 11,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.206Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 243,
+  "fields": {
+    "template": 5,
+    "question_text": "我理解什么是教育数据，以及这些数据在学习和生活中的作用。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 11,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.329Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 277,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够将教育管理与教学行为过程数据化、结构化地呈现出来。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 11,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.436Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 204,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够从多角度分析数据，充分挖掘数据的在教育教学过程的隐藏价值。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 12,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.209Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 244,
+  "fields": {
+    "template": 5,
+    "question_text": "我知道常见的数据类型（如成绩、作业数据等）以及它们的用途。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 12,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.332Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 278,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够将数据与教育教学现象建立联系，以数据支撑问题判断与策略优化。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 12,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.439Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 205,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够对数据分析结果进行批判、质疑，并提出改进意见。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 13,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.212Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 245,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够根据需要从学校提供的平台或其它可靠渠道获取学习相关数据。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 13,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.335Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 279,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够从不同视角分析教育数据，深入挖掘其背后潜在的教育价值。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 13,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.442Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 206,
+  "fields": {
+    "template": 4,
+    "question_text": "我了解教育数据的内涵及其在教育教学中的主要应用方式。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 14,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.215Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 246,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够筛选对学习有帮助的数据，并对它们进行简单整理。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 14,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.338Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 280,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够质疑异常或偏离预期的数据结果，并探究其形成原因。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 14,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.445Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 207,
+  "fields": {
+    "template": 4,
+    "question_text": "我知道不同类型数据的分析方法及其适用情境。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 15,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.218Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 247,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够掌握基本数据处理工具（如Excel、WPS等）的操作方法。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 15,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.342Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 281,
+  "fields": {
+    "template": 6,
+    "question_text": "我了解教育数据的基本内涵及在学校管理中的主要应用方式。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 15,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.449Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 208,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够从合理渠道获取目标数据。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 16,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.220Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 248,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够将数据以图表（如柱状图、折线图等）的方式进行处理和呈现。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 16,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.345Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 282,
+  "fields": {
+    "template": 6,
+    "question_text": "我知道不同类型数据的分析方法及其适用情境。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 16,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.453Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 209,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够根据需要对数据进行筛选加工。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 17,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.223Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 249,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够对学校平台提供的图表或数据进行合理解释和判断。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 17,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.348Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 283,
+  "fields": {
+    "template": 6,
+    "question_text": "我了解国家或学校数据治理相关政策文件、标准规范或制度框架的基本内容。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 17,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.455Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 210,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够掌握基本数据处理工具（如Excel、WPS、SPSS等）的操作方法。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 18,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.226Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 250,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够对自己使用学习数据的过程进行反思，并判断是否有效帮助了学习。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 18,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.352Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 284,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够确定教育决策所需的数据类型，并从合规渠道组织采集相关数据。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 18,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.459Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 211,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够使用可视化软件对数据进行可视化处理和呈现。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 19,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.230Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 251,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够和同学分享使用数据的过程或经验，从中获得学习建议或提高。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 19,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.355Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 285,
+  "fields": {
+    "template": 6,
+    "question_text": "我具备对原始数据进行筛选、清洗、整理的基本能力。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 19,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.462Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 212,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够对数据处理结果作出合理解释和推断。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 20,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.232Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 252,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够通过学习数据（如成绩、练习结果等）分析自己的学习表现。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 20,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.358Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 286,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够熟练操作基本数据处理工具（如Excel、WPS、SPSS等），用于学校管理。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 20,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.465Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 213,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够对数据使用环节进行回顾反思，评价数据使用效果。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 21,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.235Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 253,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够根据学习平台或系统给出的数据反馈调整学习计划。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 21,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.361Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 287,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够使用可视化工具（如图表、仪表板等）对教育数据进行可视化处理和呈现。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 21,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.468Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 214,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够通过教师间的数据交流相互促进。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 22,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.238Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 254,
+  "fields": {
+    "template": 5,
+    "question_text": "当遇到学习困难时，我愿意借助数据寻找解决方法。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 22,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.364Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 288,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够对数据分析结果进行合理解释，并识别其中的关键问题或发展趋势。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 22,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.472Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 215,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够在合理合法范围内与相关利益者共享数据成果。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 23,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.240Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 255,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够根据数据结果调整自己的学习方式（如背诵、练习方式等）。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 23,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.367Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 289,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够对学校或自身数据使用的各个环节进行回顾、反思，并对数据使用的效果进行系统评价。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 23,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.475Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 216,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够利用多种类型数据对学生进行多元评价。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 24,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.243Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 256,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够利用数据工具（如图表、数据平台等）更好地整理和理解学习内容。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 24,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.370Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 290,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够推动在校内建立常态化的数据沟通与反馈机制（如定期简报、例会等）。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 24,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.478Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 217,
+  "fields": {
+    "template": 4,
+    "question_text": "我具备使用数据评估教学过程和效果的能力。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 25,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.246Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 257,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够使用数据进行创新表达，比如用数据讲故事、做展示等。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 25,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.373Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 291,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够在合理、合法的范围内，与教师、学生、家长或主管部门共享相关数据成果。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 25,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.482Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 218,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够通过数据发现教学问题，或通过数据寻求问题的解决方式。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 26,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.248Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 258,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够有意识地对隐私数据进行保护。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 26,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.376Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 292,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够利用多种类型数据对学校师生发展、部门运行情况等进行多元化评价。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 26,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.484Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 219,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够根据数据处理结果调整教学行为。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 27,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.252Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 259,
+  "fields": {
+    "template": 5,
+    "question_text": "我在法律和道德允许的范围内获取和使用数据。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 27,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.379Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 293,
+  "fields": {
+    "template": 6,
+    "question_text": "我具备使用数据科学评估学校管理过程与政策实施效果的能力。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 27,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.487Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 220,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够使用数据优化课堂教学、改善教学效果。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 28,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.254Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 260,
+  "fields": {
+    "template": 5,
+    "question_text": "我能够尊重他人的数据，使用时能够注明出处。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 28,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.381Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 294,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够通过数据发现教育管理的问题，并据此分析原因、提出改进方案。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 28,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.491Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 221,
+  "fields": {
+    "template": 4,
+    "question_text": "我用数据让知识变得更有说服力、优化教学内容以及提升知识点的科学性。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 29,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.257Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 261,
+  "fields": {
+    "template": 5,
+    "question_text": "我认为学校提供了充分的数据工具与指导（如数据平台、培训讲解等），以支持我的学习。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 29,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.385Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 295,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够根据数据分析结果及时调整管理策略和日常决策行为。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 29,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.495Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 222,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够基于数据分析结果创新教学方法与策略。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 30,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.260Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 262,
+  "fields": {
+    "template": 5,
+    "question_text": "我认为学校在平台上呈现的数据（如作业成绩、测验结果等）能够真实反映我的学习情况，并帮助我改进学习行为。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 30,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.388Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 296,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够运用数据推动部门之间的协作机制优化，提高整体管理效能。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 30,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.499Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 223,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够利用数据优化教育理念与评价方式。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 31,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.263Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 263,
+  "fields": {
+    "template": 5,
+    "question_text": "我认为学校提供的学习分析报告或反馈内容清晰明确，能够帮助我了解自身的优势与不足。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 31,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.391Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 297,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够借助数据增强决策的科学性与说服力，提升学校管理水平。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 31,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.503Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 224,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够有意识地对隐私数据进行保护。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 32,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.265Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 264,
+  "fields": {
+    "template": 5,
+    "question_text": "我发现教师会根据测验、作业等数据，及时调整教学方法或内容，使我的学习更加高效。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 32,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.394Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 298,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够基于数据分析结果提出创新管理策略，推动学校制度或流程的改革与发展。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 32,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.507Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 225,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够在法律和道德允许的范围内获取和使用数据。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 33,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.269Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 265,
+  "fields": {
+    "template": 5,
+    "question_text": "我认为学校在收集和使用数据时操作规范，不影响我正常学习，也能有效保护我的隐私。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 33,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.396Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 299,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够利用数据优化管理理念和操作流程，提升教育治理质量和效率。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 33,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.510Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 226,
+  "fields": {
+    "template": 4,
+    "question_text": "我能够尊重他人的数据，使用时能够注明出处。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 34,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.271Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 266,
+  "fields": {
+    "template": 5,
+    "question_text": "我对学校整体的数据应用情况感到满意。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 34,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.399Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 300,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够在数据处理过程中自觉保护学生、教师和自身等的隐私信息。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 34,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.514Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 227,
+  "fields": {
+    "template": 4,
+    "question_text": "我认为学校当前具备较完善的数据应用支持（如平台工具、指导培训或技术帮助等），能够支撑日常教学和学习活动。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 35,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.274Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 301,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够在法律法规和职业道德允许的范围内获取、处理和使用教育数据。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 35,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.518Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 228,
+  "fields": {
+    "template": 4,
+    "question_text": "我认为学校在教学中应用数据的方式具有针对性，能够有效回应教学中的具体问题。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 36,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.277Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 302,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够尊重他人数据的知识产权，在使用或引用他人数据成果时注明来源。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 36,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.522Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 229,
+  "fields": {
+    "template": 4,
+    "question_text": "我认为学校提供的数据报告或分析结果具备较强的专业性，能为教学提供明确的解释与参考。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 37,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.280Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 303,
+  "fields": {
+    "template": 6,
+    "question_text": "我能够识别学校在教育数据使用过程中可能存在的伦理或隐私风险，并制定相应的防范与应对措施。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 37,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.525Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 230,
+  "fields": {
+    "template": 4,
+    "question_text": "我认为学校基于数据所采取的教学或管理措施成效明显，有助于提升教学效率与学生学习成效。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 38,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.283Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 304,
+  "fields": {
+    "template": 6,
+    "question_text": "我认为学校积累的各类数据是一种重要的战略资源。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 38,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.529Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 231,
+  "fields": {
+    "template": 4,
+    "question_text": "我认为学校建立了相对完善的数据应用流程（如数据分析、呈现反馈等），能持续支持教学应用。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 39,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.285Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 305,
+  "fields": {
+    "template": 6,
+    "question_text": "我认为数据资产能够为学校的教育教学、管理和决策等过程提供有力支持。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 39,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.533Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 232,
+  "fields": {
+    "template": 4,
+    "question_text": "我对学校整体的数据应用情况感到满意。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 40,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.289Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 306,
+  "fields": {
+    "template": 6,
+    "question_text": "我认为学校应加强数据资产的评估与价值挖掘，以提升数据利用效率和效能。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 40,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.537Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 307,
+  "fields": {
+    "template": 6,
+    "question_text": "我认为学校应将数据资产纳入长期发展规划，以提升教育质量和管理水平。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 41,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.540Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 308,
+  "fields": {
+    "template": 6,
+    "question_text": "我会主动探索数据资产在提升学校教学质量和管理效果的应用。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 42,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.544Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 309,
+  "fields": {
+    "template": 6,
+    "question_text": "我会引导教师和学生重视数据资产的应用，以提升全校数据应用意识与能力。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 43,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.548Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 310,
+  "fields": {
+    "template": 6,
+    "question_text": "我会合理规划数据资产的使用，确保数据服务于学校的长期发展目标。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 44,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.550Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 311,
+  "fields": {
+    "template": 6,
+    "question_text": "我会利用数据资产来支持学校的创新实践和改革探索。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 45,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.554Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 312,
+  "fields": {
+    "template": 6,
+    "question_text": "我认为数据清洗和整理有助于提高数据的准确性、完整性和一致性。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 46,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.557Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 313,
+  "fields": {
+    "template": 6,
+    "question_text": "我认为应定期检查和维护学校数据，以保障数据质量，支撑教育应用实践。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 47,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.561Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 314,
+  "fields": {
+    "template": 6,
+    "question_text": "我认为对数据进行识别与分类有助于提升数据的可用性和可解释性。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 48,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.564Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 315,
+  "fields": {
+    "template": 6,
+    "question_text": "我认为数据应用过程中应注重权限设置与管理，以确保用途可控、可追溯。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 49,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.566Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 316,
+  "fields": {
+    "template": 6,
+    "question_text": "我认为识别和防范数据应用风险，有助于提升数据使用的安全性和可控性。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 50,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.569Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 317,
+  "fields": {
+    "template": 6,
+    "question_text": "我认为学校应形成数据制度文件，以规范数据的采集、存储和使用等全过程。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 51,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.573Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 318,
+  "fields": {
+    "template": 6,
+    "question_text": "我认为学校当前具备较完善的数据应用支持（如平台工具、指导培训或技术帮助等），能够支撑日常教学和管理活动。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 52,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.576Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 319,
+  "fields": {
+    "template": 6,
+    "question_text": "我认为学校整体的数据应用覆盖了教学、学习、评价、管理等多个场景，具有明显成效。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 53,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.578Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 320,
+  "fields": {
+    "template": 6,
+    "question_text": "我认为学校已基本建立完善的数据应用过程（如数据采集、分析、呈现、反馈等），能够持续支持教学与管理优化。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 54,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.582Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 321,
+  "fields": {
+    "template": 6,
+    "question_text": "我认为学校目前的数据应用氛围良好，教师、学生和管理人员均认可数据在教育中的价值与作用。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 55,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.585Z"
+  }
+},
+{
+  "model": "surveys.surveyquestion",
+  "pk": 322,
+  "fields": {
+    "template": 6,
+    "question_text": "我对学校当前的数据应用效果总体满意。",
+    "question_type": "scale",
+    "options": [
+      "非常不符合",
+      "不符合",
+      "一般",
+      "符合",
+      "非常符合"
+    ],
+    "score_rule": {
+      "一般": 3,
+      "符合": 4,
+      "不符合": 2,
+      "非常符合": 5,
+      "非常不符合": 1
+    },
+    "order": 56,
+    "is_required": true,
+    "created_at": "2025-10-28T09:28:50.588Z"
+  }
+}
+]
