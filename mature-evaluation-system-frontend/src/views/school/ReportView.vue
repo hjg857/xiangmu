@@ -20,7 +20,7 @@
     </div>
 
     <!-- 报告内容 -->
-    <div v-else class="report-content" ref="reportContent">
+    <div v-else-if="reportData && reportData.school_name" class="report-content" ref="reportContent">
       <!-- 报告封面/标题 -->
       <div class="report-title-section">
         <h1 class="main-title">{{ reportData.school_name }}数据文化成熟度评估报告</h1>
@@ -64,7 +64,7 @@
         <div class="overview-scores">
           <div class="score-card total">
             <span class="label">学校数据文化得分</span>
-            <span class="value">{{ Math.round(reportData.total_score_percent || 0) }}分</span>
+            <span class="value">{{ reportData.total_score?.toFixed(2) }}分</span>
           </div>
           <div class="score-card level">
             <span class="label">学校数据文化等级</span>
@@ -77,8 +77,8 @@
           <div class="overview-left">
             <div class="dimension-list">
               <div class="dimension-header">
-                <span>总体概况</span>
-                <span class="total-score-badge">{{ Math.round(reportData.total_score_percent || 0) }}分</span>
+                <span >总体概况</span>
+                <span class="total-score-badge">{{ Math.round(reportData.total_score || 0) }}分</span>
                 <span class="level-badge">{{ reportData.maturity_level }}</span>
               </div>
               <div class="dimension-item" v-for="(item, key) in dimensionList" :key="key">
@@ -100,7 +100,7 @@
 
         <div class="evaluation-note">
           <h4>评估说明：</h4>
-          <p>最终计算真实得分的评分区间为[0,100]，目前分为四个等级：初始级（0~70）、成长级（70~80）、成熟级（80~90）、引领级（90~100）。</p>
+          <p>最终计算真实得分的评分区间为[0,5]，目前分为四个等级：初始级（0~1.5）、成长级（1.5~3.0）、成熟级（3.0~4.0）、创新级（4.0~5.0）。</p>
         </div>
       </section>
 
@@ -574,13 +574,17 @@
         <p class="footer-note">本报告由中小学校数据文化成熟度评估监测系统自动生成</p>
       </div>
     </div>
+    <div v-else class="loading-container">
+  <el-empty description="暂无报告数据，可能是由于评估尚未完成或计算未结束" />
+  <el-button @click="goBack">返回上一页</el-button>
+</div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getReportData } from '@/api/assessment'
+import { getReportDataDetail  } from '@/api/assessment'
 import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
 import html2canvas from 'html2canvas'
@@ -615,10 +619,10 @@ let chartInstances = []
 const dimensionScores = computed(() => reportData.value.dimension_scores || {})
 const secondaryScores = computed(() => reportData.value.secondary_scores || {})
 const observationScores = computed(() => reportData.value.observation_scores || {})
-const institutionDetails = computed(() => reportData.value.institution_details || {})
-const behaviorDetails = computed(() => reportData.value.behavior_details || {})
-const assetDetails = computed(() => reportData.value.asset_details || {})
-const technologyDetails = computed(() => reportData.value.technology_details || {})
+const institutionDetails = computed(() => reportData.value?.institution || {})
+const behaviorDetails = computed(() => reportData.value?.behavior || {})
+const assetDetails = computed(() => reportData.value?.asset || {})
+const technologyDetails = computed(() => reportData.value?.technology || {})
 
 const dimensionList = computed(() => [
   { name: '数据素养', score: dimensionScores.value.literacy },
@@ -645,21 +649,93 @@ onUnmounted(() => {
 })
 
 // 方法
+const toNum = (v, def = 0) => {
+  const n = parseFloat(v)
+  return Number.isFinite(n) ? n : def
+}
+
 const loadReportData = async (assessmentId) => {
   loading.value = true
   try {
-    const data = await getReportData(assessmentId)
-    reportData.value = data
-  } catch (error) {
-    console.error('加载报告数据失败:', error)
-    ElMessage.error(error.response?.data?.error || '加载报告数据失败')
-  } finally {
-    loading.value = false
+    const res = await getReportDataDetail(assessmentId)
+    const raw = res || {} // res 本身就是你发的那个完整对象
+
+    // 辅助工具：确保转为数字，防止后端传字符串导致图表崩溃
+    const toF = (v) => parseFloat(v || 0)
+
+    // 
+    const processedData = {
+      // 1. 基础信息
+      school_name: raw.school_name || "学校名称",
+      report_date: raw.report_date,
+      maturity_level: raw.maturity_level || "未知",
+      
+      // 2. 总分（保持5分制）
+      total_score:视觉处理(toF(raw.total_score || raw.scores?.total_score)),
+      total_score_percent: toF(raw.total_score || raw.scores?.total_score), // 模板里可能叫这个名
+
+      // 3. 五大维度得分对象（直接提取根部的 score 字段）
+      dimension_scores: {
+        literacy: toF(raw.dimension_scores.literacy),
+        institution: toF(raw.dimension_scores.institution),
+        behavior: toF(raw.dimension_scores.behavior),
+        asset: toF(raw.dimension_scores.asset),
+        technology: toF(raw.dimension_scores.technology)
+      },
+
+      // 4. 二级指标得分（如果后端没给，先用大维度分填充，保证页面文字描述有数据）
+      secondary_scores: raw.secondary_scores || {
+        A1: toF(raw.literacy_score), A2: toF(raw.literacy_score), A3: toF(raw.literacy_score),
+        B1: toF(raw.institution_score), B2: toF(raw.institution_score), B3: toF(raw.institution_score),
+        C1: toF(raw.behavior_score), C2: toF(raw.behavior_score),
+        D1: toF(raw.asset_score), D2: toF(raw.asset_score),
+        E1: toF(raw.technology_score), E2: toF(raw.technology_score)
+      },
+
+      // 5. 详情子集（直接引用原对象，方便文字描述读取）
+      institution: raw.institution_details || {},
+      behavior: raw.behavior_details || {},
+      asset: raw.asset_details || {},
+      technology: raw.technology_details || {},
+
+      // 6. 补全缺失的雷达图观测点分
+      observation_scores: raw.observation_scores || {},
+
+      // 7. 补全AI建议
+      suggestions: raw.suggestions || {
+        overall: "AI诊断建议正在生成中...",
+        literacy: "...", institution: "...", behavior: "...", asset: "...", technology: "..."
+      },
+
+      // 8. 补全参评人数
+      participant_counts: raw.participant_counts || { teacher: 0, student: 0, manager: 0 },
+
+      // 9. 平均分（5分制下默认 3.0）
+      average_scores: raw.average_scores || {
+        literacy: 3.0, institution: 3.0, behavior: 3.0, asset: 3.0, technology: 3.0
+      }
+    }
+
+    // ✅ 最终赋值给响应式变量
+    reportData.value = processedData
+
+    // 只有数据装载完毕才初始化图表
     nextTick(() => {
       initAllCharts()
     })
+  } catch (error) {
+    console.error('数据加工失败:', error)
+    ElMessage.error('报告数据加载异常')
+  } finally {
+    loading.value = false
   }
 }
+
+// 内部数值格式化辅助
+function 视觉处理(num) {
+  return parseFloat(num.toFixed(2))
+}
+
 
 const initAllCharts = () => {
   console.log('开始初始化图表...')
@@ -699,11 +775,11 @@ const initOverviewChart = () => {
     // 从后端获取平均分，如果没有则使用默认值60
     const avgScoresData = reportData.value.average_scores || {}
     const avgScores = [
-      (avgScoresData.literacy || 60).toFixed(1),
-      (avgScoresData.institution || 60).toFixed(1),
-      (avgScoresData.behavior || 60).toFixed(1),
-      (avgScoresData.asset || 60).toFixed(1),
-      (avgScoresData.technology || 60).toFixed(1)
+      (avgScoresData.literacy ?? 3.0).toFixed(1),
+      (avgScoresData.institution ?? 3.0).toFixed(1),
+      (avgScoresData.behavior ?? 3.0).toFixed(1),
+      (avgScoresData.asset ?? 3.0).toFixed(1),
+      (avgScoresData.technology ?? 3.0).toFixed(1),
     ]
 
     chart.setOption({
@@ -712,7 +788,7 @@ const initOverviewChart = () => {
       legend: { data: ['真实得分', '平均得分'], top: 40 },
       grid: { left: '3%', right: '4%', bottom: '3%', top: 80, containLabel: true },
       xAxis: { type: 'category', data: dimensions },
-      yAxis: { type: 'value', max: 100 },
+      yAxis: { type: 'value', max: 5 },
       series: [
         {
           name: '真实得分',
@@ -729,7 +805,12 @@ const initOverviewChart = () => {
           name: '平均得分',
           type: 'bar',
           data: avgScores,
-          itemStyle: { color: '#e6a23c' }
+          itemStyle: { color: '#e6a23c' },
+          label: { 
+            show: true, 
+            position: 'top',
+            formatter: (params) => params.value
+          }
         }
       ]
     })
@@ -741,11 +822,11 @@ const initOverviewChart = () => {
 // 数据素养雷达图
 const initLiteracyRadarCharts = () => {
   const indicators = [
-    { name: '数据意识与思维', max: 100 },
-    { name: '数据知识与技能', max: 100 },
-    { name: '数据评价与交流', max: 100 },
-    { name: '数据应用与创新', max: 100 },
-    { name: '数据伦理与隐私', max: 100 }
+    { name: '数据意识与思维', max: 5 },
+    { name: '数据知识与技能', max: 5 },
+    { name: '数据评价与交流', max: 5 },
+    { name: '数据应用与创新', max: 5 },
+    { name: '数据伦理与隐私', max: 5 }
   ]
 
   // 教师雷达图
@@ -869,7 +950,7 @@ const initLiteracyComparisonChart = () => {
       legend: { data: ['教师', '管理者', '学生'], top: 40 },
       grid: { left: '3%', right: '4%', bottom: '3%', top: 80, containLabel: true },
       xAxis: { type: 'category', data: categories },
-      yAxis: { type: 'value', max: 100, name: '分数(分)' },
+      yAxis: { type: 'value', max: 5, name: '分数(分)' },
       series: [
         {
           name: '教师',
@@ -948,11 +1029,11 @@ const initBehaviorBarChart = () => {
 // 数据行为效果雷达图
 const initBehaviorRadarCharts = () => {
   const indicators = [
-    { name: '数据意识与思维', max: 100 },
-    { name: '数据知识与技能', max: 100 },
-    { name: '数据评价与交流', max: 100 },
-    { name: '数据应用与创新', max: 100 },
-    { name: '数据伦理与隐私', max: 100 }
+    { name: '数据意识与思维', max: 5 },
+    { name: '数据知识与技能', max: 5 },
+    { name: '数据评价与交流', max: 5 },
+    { name: '数据应用与创新', max: 5 },
+    { name: '数据伦理与隐私', max: 5 }
   ]
 
   if (teacherEffectRadar.value) {
@@ -1033,9 +1114,9 @@ const initAssetAwarenessRadar = () => {
       title: { text: '数据资产意识雷达图', left: 'center', top: 10 },
       radar: {
         indicator: [
-          { name: '数据资产价值意识', max: 100 },
-          { name: '数据资产应用意识', max: 100 },
-          { name: '数据资产治理意识', max: 100 }
+          { name: '数据资产价值意识', max: 5 },
+          { name: '数据资产应用意识', max: 5 },
+          { name: '数据资产治理意识', max: 5 }
         ],
         radius: '60%',
         center: ['50%', '55%'],
@@ -1068,8 +1149,8 @@ const formatDate = (dateStr) => {
 }
 
 const getPerformanceText = (score) => {
-  if (score >= 80) return '表现优秀'
-  if (score >= 60) return '表现均衡'
+  if (score >= 4.5) return '表现优秀'
+  if (score >= 3.5) return '表现均衡'
   return '有待提升'
 }
 
@@ -1379,7 +1460,8 @@ const downloadPDF = async () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 500;
+  font-weight: 400;
+  font-size: 10px;
 }
 
 .total-score-badge {

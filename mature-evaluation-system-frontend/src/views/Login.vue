@@ -3,6 +3,7 @@
     <!-- 左侧：宣传区 -->
     <div class="left-panel">
       <div class="left-content">
+        <div class="accent-bar"></div>
         <h1 class="left-title">中小学数据文化</h1>
         <h1 class="left-title">成熟度评估监测系统</h1>
       </div>
@@ -225,44 +226,47 @@ onMounted(() => {
 <style scoped>
 /* 整体左右分栏 */
 .login-page {
-  min-height: 100vh;
+  height: 100vh;           /* 使用固定高度代替 min-height */
+  overflow: hidden;        /* 禁止溢出出现滚动条 */
   display: flex;
   background: #ffffff;
 }
 
 /* 左侧 */
 .left-panel {
-  flex: 1;
-  background: #E1E5EB;
+  flex: 1.2;               /* 稍微加宽左侧占比 */
+  background: #E0E6ED;
+  position: relative;      /* 为子元素绝对定位提供基准 */
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 40px 60px;
+  justify-content: flex-start;
   background-image: url('@/assets/images/login-illustration.png');
   background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;  
+  background-position: center center;
+  background-size: 80%;    /* 控制插画比例 */
 }
 
 .left-content {
   position: absolute;
-  left: 80px;              
-  top: 120px;
-  z-index: 1;
+  left: 12%;               /* 向右微调位置 */
+  top: 15%;                /* 向上微调位置 */
+  z-index: 2;
 }
-
-.left-title .t1 {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1f2d3d;
-  letter-spacing: 0.5px;
+.left-title {
+  font-size: 52px;         /* 增大字号 */
+  font-weight: 800;        /* 更加粗体 */
+  color: #lalala;
+  letter-spacing: 2px;
+  margin: 0;
+  line-height: 1.2;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-.left-title .t2 {
-  margin-top: 10px;
-  font-size: 32px;
-  font-weight: 700;
-  color: #1f2d3d;
-  letter-spacing: 0.5px;
+.left-title.secondary {
+  font-size: 40px;         /* 第二行稍微小一点或保持一致 */
+  font-weight: 400; /* 第二行用细一点的字重，形成对比 */
+  color: #409eff; /* 使用主色调 */
+  margin-top: 10px 0 0 0;
+  letter-spacing: 1px;
 }
 
 /* 插画 */
@@ -277,30 +281,31 @@ onMounted(() => {
 /* 右侧 */
 .right-panel {
   flex: 1;
-  width: auto;
-  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 60px 80px;
+  justify-content: center; /* 垂直居中内容 */
+  padding: 0 60px;
   background: #ffffff;
+  position: relative;
 }
 
 /* 登录卡片 */
 .form-card {
   width: 100%;
-  max-width: 480px;
-  padding: 200px 0;
+  max-width: 420px;
+  padding: 0;              /* 去除原来巨大的 200px 间距 */
+  margin-top: -40px;       /* 整体视觉中心微调 */
 }
 
 .form-header {
   text-align: center;
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 26px;         /* 账号登录标题稍微加大 */
+  font-weight: 700;
   color: #303133;
-  margin-bottom: 18px;
+  margin-bottom: 30px;
 }
+
 
 .form-title {
   text-align: center;
@@ -310,7 +315,7 @@ onMounted(() => {
 }
 
 .login-form :deep(.el-input__wrapper) {
-  height: 50px;
+  height: 48px;
   font-size: 16px;
 }
 
@@ -343,9 +348,11 @@ onMounted(() => {
 
 .login-btn {
   width: 100%;
-  height: 50px;
-  font-size: 18px;
+  height: 48px;
+  font-size: 16px;
   font-weight: 600;
+  border-radius: 8px;
+  margin-top: 10px;
   background: #ff9800;
   border-color: #ff9800;
 }
@@ -373,12 +380,11 @@ onMounted(() => {
   line-height: 1.5;
 }
 .copyright {
-  margin-top: auto;       
-  padding-top: 40px;
+  position: absolute;
+  bottom: 30px;            /* 固定在距离底部 30px 的位置 */
   text-align: center;
-  font-size: 16px;
-  color: #9ca3af;          
-  line-height: 1.6;
+  font-size: 14px;
+  color: #9ca3af;
 }
 
 

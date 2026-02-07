@@ -121,7 +121,17 @@
       <main class="content-area">
         <!-- 数据素养模块 -->
         <div v-if="activeModule === 'literacy'" class="module-content">
+        <div class="module-header">
           <h2 class="module-title">数据素养评价</h2>
+          <el-button 
+      type="primary" 
+      :icon="Refresh" 
+      @click="handleRefresh" 
+      :loading="refreshing"
+    >
+      刷新
+    </el-button>
+    </div>
           
           <!-- 只读模式提示 -->
           <el-alert
@@ -144,7 +154,33 @@
 
           <div class="survey-card">
             <div class="survey-header">
+            <div class="title-line">
               <h3 class="survey-title">教师数据素养调查问卷</h3>
+                  <!-- 填写提示组件 -->
+                      <el-popover
+                        placement="top-start"
+                        title="温馨提示"
+                        :width="350"
+                        trigger="hover"
+                        popper-class="custom-hint-popper"
+                      >
+                        <template #reference>
+                          <span class="hint-tag">填写提示</span>
+                        </template>
+      
+                        <!-- 弹出框的具体内容 -->
+                        <div class="hint-body">
+                          <p class="hint-text">
+我们将依据每位教师的作答结果生成个人得分，通过整合个人得分，计算出学校教师数据素养的平均水平。
+请您将此问卷链接或二维码转发给学校更多教师填写，尽可能覆盖不同学科、不同教龄的教师。参与测评的人数越多，越能客观反映学校真实水平。
+
+                          </p>
+                          <p class="hint-example">
+                            <em></em>
+                          </p>
+                        </div>
+                      </el-popover>
+              </div>
               <p class="survey-desc">34题，评估教师数据素养及数据应用效果</p>
             </div>
             
@@ -164,6 +200,7 @@
               </div>
               
               <div class="share-link-section" v-if="!isReadonly">
+                <div class="survey-display-name">{{ schoolName }}《教师数据素养调查问卷》</div>
                 <div class="share-area">
                   <div class="share-left">
                     <el-input :model-value="teacherShareUrl" readonly size="small">
@@ -222,7 +259,33 @@
 
           <div class="survey-card">
             <div class="survey-header">
+            <div class="title-line">
               <h3 class="survey-title">学生数据素养调查问卷</h3>
+              <!-- 填写提示组件 -->
+                      <el-popover
+                        placement="top-start"
+                        title="温馨提示"
+                        :width="350"
+                        trigger="hover"
+                        popper-class="custom-hint-popper"
+                      >
+                        <template #reference>
+                          <span class="hint-tag">填写提示</span>
+                        </template>
+      
+                        <!-- 弹出框的具体内容 -->
+                        <div class="hint-body">
+                          <p class="hint-text">
+我们将依据每位学生的作答结果生成个人得分，通过整合个人得分，计算出本校学生数据素养的平均水平。
+请您将此问卷链接或二维码转发给学校更多学生填写，尽可能覆盖不同年级、不同班级的学生。参与测评的人数越多，越能客观反映学校真实水平。
+
+                          </p>
+                          <p class="hint-example">
+                            <em></em>
+                          </p>
+                        </div>
+                      </el-popover>
+              </div>
               <p class="survey-desc">28题，评估学生数据素养及数据应用效果</p>
             </div>
             
@@ -242,6 +305,7 @@
               </div>
               
               <div class="share-link-section" v-if="!isReadonly">
+                <div class="survey-display-name">{{ schoolName }}《学生数据素养调查问卷》</div>
                 <div class="share-area">
                   <div class="share-left">
                     <el-input :model-value="studentShareUrl" readonly size="small">
@@ -299,7 +363,31 @@
 
           <div class="survey-card">
             <div class="survey-header">
+            <div class="title-line">
               <h3 class="survey-title">管理者数据素养调查问卷</h3>
+              <el-popover
+                        placement="top-start"
+                        title="温馨提示"
+                        :width="350"
+                        trigger="hover"
+                        popper-class="custom-hint-popper"
+                      >
+                        <template #reference>
+                          <span class="hint-tag">填写提示</span>
+                        </template>
+      
+                        <!-- 弹出框的具体内容 -->
+                        <div class="hint-body">
+                          <p class="hint-text">
+我们将依据每位管理者的作答结果生成个人得分，通过整合个人得分，计算出本校管理者数据素养的平均水平。
+请您将此问卷链接或二维码转发给学校更多管理者填写，尽可能覆盖不同管理岗位、不同管理年限的管理者。参与测评的人数越多，越能客观反映学校真实水平。
+                          </p>
+                          <p class="hint-example">
+                            <em></em>
+                          </p>
+                        </div>
+                      </el-popover>
+              </div>
               <p class="survey-desc">37题，评估管理者数据素养及数据资产意识</p>
             </div>
             
@@ -319,6 +407,7 @@
               </div>
               
               <div class="share-link-section" v-if="!isReadonly">
+                <div class="survey-display-name">{{ schoolName }}《管理者数据素养调查问卷》</div>
                 <div class="share-area">
                   <div class="share-left">
                     <el-input :model-value="managerShareUrl" readonly size="small">
@@ -413,7 +502,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, reactive } from 'vue'
+import { ref, onMounted, computed, watch, reactive, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import QRCode from 'qrcode'
@@ -433,7 +522,7 @@ import { getAssessments, createAssessment, generateReport } from '@/api/assessme
 import { getAssessmentSurveys, createSurveyInstance } from '@/api/survey'
 import SubmissionSuccess from '@/components/SubmissionSuccess.vue'
 import AssessmentProgress from '@/components/AssessmentProgress.vue'
-import { CircleCheckFilled } from '@element-plus/icons-vue'
+import { CircleCheckFilled,Refresh } from '@element-plus/icons-vue'
 
 
 const router = useRouter()
@@ -445,6 +534,33 @@ const loading = ref(true)
 const assessmentStatus = ref('draft')
 const assessmentTimes = ref({})
 
+const refreshing = ref(false)
+
+// 3. 实现刷新函数
+const handleRefresh = async () => {
+  if (!currentAssessmentId.value) return
+  
+  refreshing.value = true
+  try {
+    // 重新加载问卷实例数据（这会自动触发 refreshModuleDone）
+    await loadSurveys()
+    ElMessage({
+      message: '数据更新成功',
+      type: 'success',
+      duration: 1500,
+      grouping: true // 防止连续点击弹出多个提示
+    })
+  } catch (error) {
+    console.error('刷新失败:', error)
+    ElMessage.error('数据刷新失败，请稍后重试')
+  } finally {
+    // 为了用户体验，增加一个最小 loading 时间（300ms），防止闪烁
+    setTimeout(() => {
+      refreshing.value = false
+    }, 300)
+  }
+}
+
 const moduleDone = reactive({
   literacy: false,
   institution: false,
@@ -453,12 +569,16 @@ const moduleDone = reactive({
   technology: false
 })
 
-// sidebar 灰色样式：未完成 -> 灰色；完成 -> 正常
-const menuItemClass = (key) => ({
-  'menu-gray': !moduleDone[key],
-  'menu-done': moduleDone[key]
-})
-
+const menuItemClass = (key) => {
+  const locked = isModuleLocked(key);
+  const done = moduleDone[key];
+  
+  return {
+    'menu-locked': locked,       // 锁定的灰色且带禁用手势
+    'menu-done': done,           // 已完成的正常显示（带绿勾）
+    'menu-active': !locked && !done // 当前正在做的
+  };
+};
 /**
  * 判空工具：你这里“都填完”的核心
  * - null/undefined -> 未填
@@ -661,6 +781,7 @@ const managerInstance = ref(null)
 
 // 创建状态
 const creating = ref(false)
+let pollTimer = null
 
 // 报告生成状态
 const generatingReport = ref(false)
@@ -714,6 +835,10 @@ onMounted(async () => {
     const userInfo = JSON.parse(storedUser)
     schoolName.value = userInfo.school_name || userInfo.username || '用户'
   }
+  if (['collecting', 'analyzing'].includes(assessmentStatus.value)) {
+    generatingReport.value = true
+    startPolling()
+  }
 
   // 检查是否有 viewProgress 参数
   if (route.query.viewProgress) {
@@ -725,6 +850,10 @@ onMounted(async () => {
 
   // 加载问卷实例
   await loadSurveys()
+})
+
+onBeforeUnmount(() => {
+  stopPolling() // 离开页面务必销毁定时器
 })
 
 // 加载或创建评估记录
@@ -776,22 +905,30 @@ const loadOrCreateAssessment = async () => {
   }
 }
 
-// 切换模块
 const handleModuleSelect = (index) => {
-  activeModule.value = index
+  // 核心拦截逻辑：检查是否越级点击
+  if (isModuleLocked(index)) {
+    const prevIndex = MODULE_ORDER.indexOf(index) - 1;
+    const prevTitle = getModuleTitle(MODULE_ORDER[prevIndex]);
+    ElMessage.warning(`请先完成“${prevTitle}”模块的填写`);
+    return;
+  }
+
+  activeModule.value = index;
 
   if (currentAssessmentId.value) {
+    // 路由跳转逻辑保持不变
     if (index === 'institution') {
-      router.push(`/school/assessment/${currentAssessmentId.value}/institution`)
+      router.push(`/school/assessment/${currentAssessmentId.value}/institution`);
     } else if (index === 'behavior') {
-      router.push(`/school/assessment/${currentAssessmentId.value}/behavior`)
+      router.push(`/school/assessment/${currentAssessmentId.value}/behavior`);
     } else if (index === 'asset') {
-      router.push(`/school/assessment/${currentAssessmentId.value}/asset`)
+      router.push(`/school/assessment/${currentAssessmentId.value}/asset`);
     } else if (index === 'technology') {
-      router.push(`/school/assessment/${currentAssessmentId.value}/technology`)
+      router.push(`/school/assessment/${currentAssessmentId.value}/technology`);
     }
   }
-}
+};
 
 // 获取模块标题
 const getModuleTitle = (module) => {
@@ -899,14 +1036,19 @@ const handleLogout = () => {
   router.push('/login')
 }
 
-// 获取按钮文本
 const getActionButtonText = () => {
-  if (generatingReport.value) return '提交中...'
-  if (assessmentStatus.value === 'draft') return '提交评估'
-  return '已提交评估'
+  if (generatingReport.value) return '请求中...'
+  
+  const statusMap = {
+    'draft': '提交评估',
+    'collecting': '数据收集中...',
+    'analyzing': '智能分析中...',
+    'completed': '评估已完成'
+  }
+  return statusMap[assessmentStatus.value] || '提交评估'
 }
 
-// 提交评估（生成报告）
+// --- 3. 修改提交评估函数 ---
 const handleSubmitAssessment = async () => {
   if (!currentAssessmentId.value) {
     ElMessage.error('评估记录未加载，请刷新页面')
@@ -914,36 +1056,77 @@ const handleSubmitAssessment = async () => {
   }
 
   if (assessmentStatus.value !== 'draft') {
-    ElMessage.warning('评估已提交，请勿重复操作')
+    ElMessage.warning('评估已在处理中，请勿重复操作')
     return
   }
 
   try {
     await ElMessageBox.confirm(
-      '确认提交评估？提交后将无法修改已填写的内容。',
+      '确认提交评估？提交后将无法修改已填写的内容，系统将启动大模型进行智能分析。',
       '确认提交',
-      {
-        confirmButtonText: '确认提交',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
+      { confirmButtonText: '确认提交', cancelButtonText: '取消', type: 'warning' }
     )
-  } catch {
-    return
-  }
+  } catch { return }
 
   generatingReport.value = true
   try {
-    await generateReport(currentAssessmentId.value)
-
-    assessmentStatus.value = 'collecting'
-    assessmentTimes.value.submitted = new Date().toLocaleString()
-    showSuccessModal.value = true
+    // 调用后端 generate 接口
+    const res = await generateReport(currentAssessmentId.value)
+    
+    if (res && res.status) {
+      assessmentStatus.value = res.status
+    } else if (res && res.data && res.data.status) {
+      assessmentStatus.value = res.data.status
+    } else {
+      // 兜底方案：如果后端没回状态，既然成功了，手动设为收集中
+      assessmentStatus.value = 'collecting'
+    }
+    
+    ElMessage.success('评估已提交，系统正在处理中...')
+    
+    // ✅ 开启轮询：实时捕捉状态从 collecting -> analyzing -> completed 的变化
+    startPolling()
+    
   } catch (error) {
-    console.error('提交评估失败:', error)
-    ElMessage.error(error.response?.data?.error || '提交评估失败，请重试')
-  } finally {
+    console.error('提交失败:', error)
     generatingReport.value = false
+    ElMessage.error(error.response?.data?.error || '提交失败')
+  }
+}
+
+// --- 4. 新增轮询逻辑函数 ---
+const startPolling = () => {
+  if (pollTimer) clearInterval(pollTimer)
+  
+  pollTimer = setInterval(async () => {
+    try {
+      // 重新拉取评估列表
+      const data = await getAssessments()
+      const current = data.find(a => a.id === currentAssessmentId.value)
+      
+      if (current) {
+        // 同步最新的状态（比如从 collecting 变到了 analyzing）
+        assessmentStatus.value = current.status
+        
+        if (current.status === 'completed') {
+          // ✅ 任务彻底完成
+          stopPolling()
+          generatingReport.value = false
+          showSuccessModal.value = true // 弹出成功弹窗
+          ElMessage.success('评估分析报告已生成！')
+          await loadSurveys() // 刷新侧边栏绿勾
+        }
+      }
+    } catch (e) {
+      console.error('轮询出错:', e)
+    }
+  }, 3000) // 3秒查一次
+}
+
+const stopPolling = () => {
+  if (pollTimer) {
+    clearInterval(pollTimer)
+    pollTimer = null
   }
 }
 
@@ -955,6 +1138,17 @@ const handleViewReport = () => {
     ElMessage.warning('报告尚未生成完成')
   }
 }
+
+const MODULE_ORDER = ['literacy', 'institution', 'behavior', 'asset', 'technology'];
+
+// 判断模块是否被锁定
+const isModuleLocked = (key) => {
+  const index = MODULE_ORDER.indexOf(key);
+  if (index === 0) return false; // 第一个模块永远不锁定
+  
+  const prevKey = MODULE_ORDER[index - 1];
+  return !moduleDone[prevKey]; // 如果前一个模块没完成，则当前模块锁定
+};
 
 const handleViewProgress = () => {
   viewingProgress.value = true
@@ -1022,8 +1216,81 @@ const handleViewProgress = () => {
   transition: color 0.3s;
 }
 
+/* “填写提示” 按钮样式（图一） */
+.hint-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 10px;
+  font-size: 12px;
+  color: #409eff;
+  background-color: #ecf5ff;
+  border: 1px solid #d9ecff;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: all 0.3s;
+}
+
+.hint-trigger-btn:hover {
+  background-color: #409eff;
+  color: #ffffff;
+}
+
+/* 弹出框内部文字样式（图二） */
+.hint-body {
+  padding: 8px 4px;
+}
+
+.hint-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #303133;
+  margin-bottom: 12px;
+}
+
+.hint-example {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #909399; /* 灰色 */
+}
+
+.hint-example em {
+  font-style: italic; /* 斜体 */
+}
+
+.custom-hint-popper {
+  padding: 15px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
 .nav-item:hover {
   color: #409eff;
+}
+
+.survey-stats {
+  display: flex;
+  flex-direction: row; /* 显式强制横向 */
+  justify-content: flex-start; /* 靠左对齐 */
+  align-items: center;
+  gap: 40px;           /* 增加两项之间的间距，看起来更舒展 */
+  margin-bottom: 20px;
+  flex-wrap: nowrap;   /* 禁止在空间不足时换行 */
+}
+
+/* 确保每个统计项内部也是横向对齐 */
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap; /* 防止文字换行 */
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #606266;
+  font-weight: 500;
 }
 
 .user-dropdown {
@@ -1081,11 +1348,46 @@ const handleViewProgress = () => {
   flex: 1;
 }
 
-.assessment-menu .el-menu-item {
-  height: 52px;
-  line-height: 52px;
-  padding-left: 24px !important;
+/* 新增：问卷链接上方的学校名+书名号样式 */
+.survey-display-name {
   font-size: 15px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 2px; /* 与下方输入框的间距 */
+  padding-left: 2px;
+  line-height: 1.2;
+}
+
+.share-link-section {
+  margin-top: 16px; /* 稍微加大一点顶部间距 */
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px dashed #dcdfe6; /* 虚线框包裹，提示这是分享区 */
+}
+
+/* 状态：进行中（当前正在填写的） */
+.menu-active {
+  opacity: 1;
+  border-left: 4px solid #409eff; /* 给当前可做的模块加个左侧蓝条提示 */
+  background-color: #f0f7ff;
+}
+
+/* 修正已完成状态：不再变灰，而是保持清晰，仅靠绿勾区分 */
+.menu-done {
+  opacity: 1;
+  filter: none;
+}
+
+.assessment-menu .el-menu-item {
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+/* 覆盖 Element Plus 默认 active 样式 */
+.el-menu-item.is-active {
+  background-color: #ecf5ff !important;
+  font-weight: bold;
 }
 
 .sidebar-tip {
@@ -1136,12 +1438,32 @@ const handleViewProgress = () => {
 }
 
 .module-title {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 600;
   color: #303133;
   margin: 0 0 12px 0;
 }
 
+.module-header {
+  display: flex;
+  justify-content: space-between; /* 关键：将标题靠左，按钮靠右 */
+  align-items: center;
+  margin-bottom: 24px; /* 稍微增加下边距，让布局更舒展 */
+  width: 100%;
+}
+
+.refresh-btn {
+  padding: 10px 22px; /* 增加内边距，使按钮更厚实 */
+  font-size: 16px;    /* 增大文字字号 */
+  font-weight: 600;   /* 文字加粗 */
+  height: auto;       /* 允许高度随内容撑开 */
+}
+
+/* 增大按钮里的图标 */
+.refresh-btn :deep(.el-icon) {
+  font-size: 18px;
+  margin-right: 6px;
+}
 .module-description {
   font-size: 14px;
   color: #606266;
@@ -1179,17 +1501,65 @@ const handleViewProgress = () => {
 }
 
 .survey-header {
-  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column; /* 强制纵向排列，保证描述文字在下方 */
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.title-line {
+  display: flex;
+  align-items: center;    /* 标题与“填写提示”对齐 */
+  gap: 12px;
+  width: 100%;
+}
+
+.survey-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #303133;
+  margin: 0;              /* 移除默认间距 */
+}
+
+.survey-desc {
+  font-size: 14px;
+  color: #606266;
+  margin: 0;              /* 确保不产生额外边距 */
+  display: block;         /* 确保独占一行 */
+}
+
+/* --- 3. 填写提示小标签样式 --- */
+.hint-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 10px;
+  font-size: 12px;
+  color: #409eff;
+  background-color: #ecf5ff;
+  border: 1px solid #cfe5ff;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.hint-tag:hover {
+  background-color: #409eff;
+  color: #ffffff;
+}
+
+/* --- 4. 侧边栏锁定逻辑样式补全 --- */
+.menu-locked {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: none; /* 彻底禁止点击 */
+  filter: grayscale(1);  /* 变灰 */
 }
 
 .survey-content {
   margin-top: 16px;
-}
-
-.survey-stats {
-  display: flex;
-  gap: 24px;
-  margin-bottom: 16px;
 }
 
 .stat-item {
@@ -1217,17 +1587,13 @@ const handleViewProgress = () => {
   margin-bottom: 16px;
 }
 
-.survey-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #303133;
-  margin: 0 0 8px 0;
-}
+
 
 .survey-desc {
   font-size: 14px;
   color: #606266;
   margin: 0 0 4px 0;
+  display: block;
 }
 
 /* 未完成：整体灰一点（但不禁用点击） */
@@ -1352,85 +1718,81 @@ const handleViewProgress = () => {
   color: #67c23a !important; /* success 绿 */
 }
 
+
 /* 底部页脚 */
 /* ===== Footer（深色条，按截图）===== */
 .footer {
   margin-top: auto;
+  width: 100%;
 }
 
-/* 深色条背景 */
 .footer-bar {
-  background: #2f3d4a; /* 接近截图那种蓝灰 */
-  padding: 16px 0;
+  background: #2f3d4a; /* 深蓝灰色背景 */
+  padding: 8px 0;    /* 增加上下内边距，让比例更协调 */
 }
 
-/* 内容容器 */
 .footer-inner {
-  max-width: 1400px;
+  /* 核心：必须与 header-content 的宽度和对齐逻辑完全一致 */
+  max-width: 99%;
   margin: 0 auto;
-  padding: 0 80px;
-
+  padding: 0 20px;    /* 与 header 保持一致的左右内边距 */
+  
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  box-sizing: border-box;
 }
 
-/* 左侧区域：logo + 文案 */
 .footer-left {
   display: flex;
   align-items: center;
-  gap: 16px;
-  min-width: 0;
-  margin-left: -200px;
+  gap: 10px;
+  /* 彻底删除之前的 margin-left: -200px */
 }
 
-/* logo */
-.footer-logo {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-/* 如果你用图片logo */
-.logo-img {
-  height: 62px;
+.footer-logo .logo-img {
+  height: 80px;
   width: auto;
   display: block;
 }
 
-/* 文案两行 */
 .footer-text {
-  min-width: 0;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 16px;
-  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;      /* 标准页脚字号 */
+  line-height: 1.8;
+  text-align: left;
 }
 
 .footer-text .line {
-  white-space: nowrap;         /* 默认不换行，像截图那样一行一行 */
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap; /* 强制不换行，保持整齐 */
 }
 
-/* 右侧二维码 */
 .footer-right {
-  flex-shrink: 0;
+  /* 彻底删除之前的 margin-right: -200px */
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  margin-right: -200px;
-  height: 62px;
-  width: auto;
+}
+
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
 .footer-qrcode {
   width: 80px;
   height: 80px;
-  border-radius: 6px;
+  border-radius: 4px;
   background: #ffffff;
-  padding: 4px; /* 让二维码像“贴纸”一样 */
+  padding: 3px;
 }
+
+.qr-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
 
 .contact-info {
   display: flex;
@@ -1442,13 +1804,6 @@ const handleViewProgress = () => {
   font-size: 13px;
   color: #95a5a6;
   margin: 0;
-}
-
-.qrcode img {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  background-color: white;
 }
 
 

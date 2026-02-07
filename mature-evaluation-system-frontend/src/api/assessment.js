@@ -68,3 +68,11 @@ export function getReportData(assessmentId) {
     method: 'get'
   })
 }
+
+export function getReportDataDetail(id) {
+  return request({
+    // 确保请求的是 /report/ 接口，该接口返回计算后的分值和AI建议
+    url: `/assessments/${id}/report-detail/`, 
+    method: 'get'
+  })
+}

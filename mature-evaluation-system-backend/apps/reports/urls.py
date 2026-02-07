@@ -7,6 +7,7 @@ urlpatterns = [
 
     # 查看报告数据（用于前端展示）
     path('assessments/<int:assessment_id>/data/', views.get_report_data, name='get_report_data'),
+    path('assessments/<int:assessment_id>/report-detail/', views.get_report_data, name='get_report_data'),
 
     # 下载报告PDF
     path('assessments/<int:assessment_id>/download/', views.download_report, name='download_report'),

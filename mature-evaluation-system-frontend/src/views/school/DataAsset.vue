@@ -362,98 +362,74 @@ onBeforeUnmount(() => {
 /* ===== Footer（深色条，按截图）===== */
 .footer {
   margin-top: auto;
+  width: 100%;
 }
 
-/* 深色条背景 */
 .footer-bar {
-  background: #2f3d4a; /* 接近截图那种蓝灰 */
-  padding: 16px 0;
+  background: #2f3d4a; /* 深蓝灰色背景 */
+  padding: 8px 0;    /* 增加上下内边距，让比例更协调 */
 }
 
-/* 内容容器 */
 .footer-inner {
-  max-width: 1400px;
+  /* 核心：必须与 header-content 的宽度和对齐逻辑完全一致 */
+  max-width: 99%;
   margin: 0 auto;
-  padding: 0 80px;
-
+  padding: 0 20px;    /* 与 header 保持一致的左右内边距 */
+  
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  box-sizing: border-box;
 }
 
-/* 左侧区域：logo + 文案 */
 .footer-left {
   display: flex;
   align-items: center;
-  gap: 16px;
-  min-width: 0;
-  margin-left: -200px;
+  gap: 10px;
+  /* 彻底删除之前的 margin-left: -200px */
 }
 
-/* logo */
-.footer-logo {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-/* 如果你用图片logo */
-.logo-img {
-  height: 62px;
+.footer-logo .logo-img {
+  height: 80px;
   width: auto;
   display: block;
 }
 
-/* 文案两行 */
 .footer-text {
-  min-width: 0;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 16px;
-  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;      /* 标准页脚字号 */
+  line-height: 1.8;
+  text-align: left;
 }
 
 .footer-text .line {
-  white-space: nowrap;         /* 默认不换行，像截图那样一行一行 */
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap; /* 强制不换行，保持整齐 */
 }
 
-/* 右侧二维码 */
 .footer-right {
-  flex-shrink: 0;
+  /* 彻底删除之前的 margin-right: -200px */
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  margin-right: -200px;
-  height: 62px;
-  width: auto;
+}
+
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
 .footer-qrcode {
   width: 80px;
   height: 80px;
-  border-radius: 6px;
+  border-radius: 4px;
   background: #ffffff;
-  padding: 4px; /* 让二维码像“贴纸”一样 */
+  padding: 3px;
 }
 
-.contact-info {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.qr-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
 }
 
-.contact-info p {
-  font-size: 13px;
-  color: #95a5a6;
-  margin: 0;
-}
-
-.qrcode img {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  background-color: white;
-}
 </style>

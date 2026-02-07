@@ -65,6 +65,12 @@ const router = createRouter({
     },
     // 学校用户路由
     {
+      path: '/school/basic-info',
+      name: 'SchoolBasicInfo',
+      component: () => import('@/views/school/SchoolBasicInfo.vue'),
+      meta: { title: '基本信息采集', requiresAuth: true }
+    },
+    {
       path: '/school/dashboard',
       name: 'school-dashboard',
       component: () => import('@/views/Home.vue'),

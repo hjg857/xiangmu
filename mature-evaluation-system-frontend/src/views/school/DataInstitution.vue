@@ -44,27 +44,67 @@
         <!-- 1. 数据组织机构 -->
         <div class="section-title">1. 数据组织机构</div>
         
-        <el-form-item label="学校是否建立了数据领导小组/工作小组？" prop="has_leadership_group">
+        <el-form-item prop="has_leadership_group">
+          <template #label>
+            <div class="label-with-hint">
+              <span>学校是否建立了数据领导小组/工作小组？</span>
+              <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+                <template #reference>
+                  <span class="hint-tag">填写提示</span>
+                </template>
+                <div class="hint-body">
+                  <p class="hint-text">学校设立的统筹数据管理、应用、安全等相关工作的组织人员（领导小组或工作小组均可）。</p>
+                  <p class="hint-example"><em>示例：学校成立了由校长任组长、各部门负责人为成员的“数据治理小组”，则选择「已建立」；若学校未设立任何与数据管理相关的专项组织，则选择「未建立」。</em></p>
+                </div>
+              </el-popover>
+            </div>
+          </template>
           <el-radio-group v-model="formData.has_leadership_group">
             <el-radio :label="true">已建立</el-radio>
             <el-radio :label="false">未建立</el-radio>
           </el-radio-group>
         </el-form-item>
-
-        <el-form-item label="2020年到2025年，学校数据组织相关会议、活动开展次数？" prop="meeting_activity_count">
+        <el-form-item prop="meeting_activity_count">
+          <template #label>
+            <div class="label-with-hint">
+              <span>2020年到2025年，学校数据组织相关会议、活动开展次数？</span>
+              <el-popover placement="top-start" :width="300" trigger="hover" popper-class="custom-hint-popper">
+                <template #reference>
+                  <span class="hint-tag">填写提示</span>
+                </template>
+                <div class="hint-body">
+                  <p class="hint-text">2020年到2025年期间，由学校组织的各类数据相关会议、培训、研讨、专项活动等的总次数。</p>
+                  <p class="hint-example"><em>示例：学校2022年开展1次数据安全专项会议、2023年开展2次数据应用研讨、2024年开展3次数据素养培训，则共计6次，填写「6」。</em></p>
+                </div>
+              </el-popover>
+            </div>
+          </template>
           <el-input-number v-model="formData.meeting_activity_count" :min="0" :controls="false" />
           <span class="unit">次</span>
         </el-form-item>
-
         <!-- 2. 数据人员配备 -->
         <div class="section-title">2. 数据人员配备</div>
         
-        <el-form-item label="学校是否配备数据专职/兼职管理人员？" prop="has_data_staff">
-          <el-radio-group v-model="formData.has_data_staff">
-            <el-radio :label="true">已配备</el-radio>
-            <el-radio :label="false">未配备</el-radio>
-          </el-radio-group>
-        </el-form-item>
+        <el-form-item prop="has_data_staff">
+        <template #label>
+          <div class="label-with-hint">
+            <span>学校是否配备数据专职/兼职管理人员？</span>
+            <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+              <template #reference>
+                <span class="hint-tag">填写提示</span>
+              </template>
+              <div class="hint-body">
+                <p class="hint-text">学校设有负责数据的收集、整理、维护、分析等日常数据管理工作的专人（全职或兼职）。</p>
+                <p class="hint-example"><em>示例:学校设有1名专职数据首席官，负责全校数据管理工作，则选择「已配备」；学校校长兼职统筹全校数据管理工作，也选择「已配备」；若学校无专人负责数据管理，仅由各部门教师零散处理，则选择「未配备」。</em></p>
+              </div>
+            </el-popover>
+          </div>
+        </template>
+        <el-radio-group v-model="formData.has_data_staff">
+          <el-radio :label="true">已配备</el-radio>
+          <el-radio :label="false">未配备</el-radio>
+        </el-radio-group>
+      </el-form-item>
 
         <template v-if="formData.has_data_staff">
           <el-form-item label="学校数据专职/兼职管理人员数量？">
@@ -86,12 +126,26 @@
           </el-form-item>
         </template>
 
-        <el-form-item label="2020年到2025年，相关人员是否参与数据相关的进修或培训？" prop="has_training">
-          <el-radio-group v-model="formData.has_training">
-            <el-radio :label="true">有参与</el-radio>
-            <el-radio :label="false">未参与</el-radio>
-          </el-radio-group>
-        </el-form-item>
+        <el-form-item prop="has_training">
+        <template #label>
+          <div class="label-with-hint">
+            <span>2020年到2025年，相关人员是否参与数据相关的进修或培训？</span>
+            <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+              <template #reference>
+                <span class="hint-tag">填写提示</span>
+              </template>
+              <div class="hint-body">
+                <p class="hint-text">2020年到2025年期间 ，学校数据相关人员参加的与数据管理、数据分析、数据安全等主题相关的外部进修或校内培训。</p>
+                <p class="hint-example"><em>示例：数据管理员2023年参加了市级“数据分析”培训、2024年参加了校内“数据安全规范”培训，则选择「有参与」；若未参加任何相关进修、培训，则选择「未参与」。</em></p>
+              </div>
+            </el-popover>
+          </div>
+        </template>
+        <el-radio-group v-model="formData.has_training">
+          <el-radio :label="true">有参与</el-radio>
+          <el-radio :label="false">未参与</el-radio>
+        </el-radio-group>
+      </el-form-item>
 
         <template v-if="formData.has_training">
           <el-form-item label="2020年到2025年，学校数据人员进修或培训的次数？" prop="training_count">
@@ -117,12 +171,26 @@
         <!-- 3. 数据管理文件 -->
         <div class="section-title">3. 数据管理文件</div>
         
-        <el-form-item label="学校是否出台与数据管理制度相关的文件？" prop="has_management_doc">
-          <el-radio-group v-model="formData.has_management_doc">
-            <el-radio :label="true">已出台</el-radio>
-            <el-radio :label="false">未出台</el-radio>
-          </el-radio-group>
-        </el-form-item>
+        <el-form-item prop="has_management_doc">
+        <template #label>
+          <div class="label-with-hint">
+            <span>学校是否出台与数据管理制度相关的文件？</span>
+            <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+              <template #reference>
+                <span class="hint-tag">填写提示</span>
+              </template>
+              <div class="hint-body">
+                <p class="hint-text">学校发布的规范数据采集、存储、使用、安全、共亨等流程的正式制度性文件（如管理办法、规定。细则等）。</p>
+                <p class="hint-example"><em>示例：学校印发了《校园数据安全管理办法》《教育数据采集与共享规定》，则选择「已出台」；若未发布任何数据管理制度类文件，则选择未出台」。</em></p>
+              </div>
+            </el-popover>
+          </div>
+        </template>
+        <el-radio-group v-model="formData.has_management_doc">
+          <el-radio :label="true">已出台</el-radio>
+          <el-radio :label="false">未出台</el-radio>
+        </el-radio-group>
+      </el-form-item>
 
         <template v-if="formData.has_management_doc">
           <el-form-item label="学校出台的与数据管理相关文件的份数？">
@@ -158,12 +226,26 @@
           </el-form-item>
         </template>
 
-        <el-form-item label="学校是否出台与数据实践指导相关的文件？" prop="has_practice_doc">
-          <el-radio-group v-model="formData.has_practice_doc">
-            <el-radio :label="true">已出台</el-radio>
-            <el-radio :label="false">未出台</el-radio>
-          </el-radio-group>
-        </el-form-item>
+        <el-form-item prop="has_practice_doc">
+        <template #label>
+          <div class="label-with-hint">
+            <span>学校是否出台与数据实践指导相关的文件？</span>
+            <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+              <template #reference>
+                <span class="hint-tag">填写提示</span>
+              </template>
+              <div class="hint-body">
+                <p class="hint-text">学校发布的指导教师、各部门在教学、管理、评价等场景中具体应用数据的操作性文件（如应用指南、实施细则、操作手册等）。</p>
+                <p class="hint-example"><em>示例：学校发布了《教学数据分析与应用指南》《学生成长数据解读操作手册》，则选择「已出台」；若未发布任何数据实践指导类文件，则选择「未出台」。</em></p>
+              </div>
+            </el-popover>
+          </div>
+        </template>
+        <el-radio-group v-model="formData.has_practice_doc">
+          <el-radio :label="true">已出台</el-radio>
+          <el-radio :label="false">未出台</el-radio>
+        </el-radio-group>
+      </el-form-item>
 
         <template v-if="formData.has_practice_doc">
           <el-form-item label="学校出台的与数据实践指导相关文件的份数？">
@@ -627,98 +709,125 @@ onBeforeUnmount(() => {
 /* ===== Footer（深色条，按截图）===== */
 .footer {
   margin-top: auto;
+  width: 100%;
 }
 
-/* 深色条背景 */
 .footer-bar {
-  background: #2f3d4a; /* 接近截图那种蓝灰 */
-  padding: 16px 0;
+  background: #2f3d4a; /* 深蓝灰色背景 */
+  padding: 8px 0;    /* 增加上下内边距，让比例更协调 */
 }
 
-/* 内容容器 */
 .footer-inner {
-  max-width: 1400px;
+  /* 核心：必须与 header-content 的宽度和对齐逻辑完全一致 */
+  max-width: 99%;
   margin: 0 auto;
-  padding: 0 80px;
-
+  padding: 0 20px;    /* 与 header 保持一致的左右内边距 */
+  
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  box-sizing: border-box;
 }
 
-/* 左侧区域：logo + 文案 */
 .footer-left {
   display: flex;
   align-items: center;
-  gap: 16px;
-  min-width: 0;
-  margin-left: -200px;
+  gap: 10px;
+  /* 彻底删除之前的 margin-left: -200px */
 }
 
-/* logo */
-.footer-logo {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-/* 如果你用图片logo */
-.logo-img {
-  height: 62px;
+.footer-logo .logo-img {
+  height: 80px;
   width: auto;
   display: block;
 }
 
-/* 文案两行 */
 .footer-text {
-  min-width: 0;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 16px;
-  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;      /* 标准页脚字号 */
+  line-height: 1.8;
+  text-align: left;
 }
 
 .footer-text .line {
-  white-space: nowrap;         /* 默认不换行，像截图那样一行一行 */
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap; /* 强制不换行，保持整齐 */
 }
 
-/* 右侧二维码 */
 .footer-right {
-  flex-shrink: 0;
+  /* 彻底删除之前的 margin-right: -200px */
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  margin-right: -200px;
-  height: 62px;
-  width: auto;
+}
+
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
 .footer-qrcode {
   width: 80px;
   height: 80px;
-  border-radius: 6px;
+  border-radius: 4px;
   background: #ffffff;
-  padding: 4px; /* 让二维码像“贴纸”一样 */
+  padding: 3px;
 }
 
-.contact-info {
+.qr-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+/* 标题与提示并列的布局容器 */
+.label-with-hint {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap; /* 如果标题太长，允许提示换行 */
+  gap: 10px;
 }
 
-.contact-info p {
+/* 填写提示小标签样式 */
+.hint-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 10px;
+  font-size: 12px;
+  color: #409eff;
+  background-color: #ecf5ff;
+  border: 1px solid #cfe5ff;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap; /* 强制标签不换行 */
+  transition: all 0.2s;
+  line-height: 1.2;
+}
+
+.hint-tag:hover {
+  background-color: #409eff;
+  color: #ffffff;
+}
+
+/* 弹出框内容样式 */
+.hint-body {
+  padding: 8px 4px;
+}
+
+.hint-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #303133;
+  margin-bottom: 10px;
+}
+
+.hint-example {
   font-size: 13px;
-  color: #95a5a6;
-  margin: 0;
+  line-height: 1.5;
+  color: #909399;
 }
 
-.qrcode img {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  background-color: white;
+.hint-example em {
+  font-style: italic;
 }
 </style>

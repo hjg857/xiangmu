@@ -45,6 +45,9 @@ class School(models.Model):
     created_at = models.DateTimeField('创建时间', auto_now_add=True)
     updated_at = models.DateTimeField('更新时间', auto_now=True)
 
+    student_count = models.IntegerField("在校学生总数", default=0, null=True)
+    teacher_count = models.IntegerField("教职工总数", default=0, null=True)
+
 
     class Meta:
         db_table = 'school'

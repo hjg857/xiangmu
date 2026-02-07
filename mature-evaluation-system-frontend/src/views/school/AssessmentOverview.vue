@@ -59,7 +59,7 @@
             <div class="progress-footer">
               <div class="time-box">
                 <span>开始时间：{{ formatDate(activeAssessment.created_at) }}</span>
-                <span class="deadline">截止时间：{{ activeAssessment.deadline || '2026-06-30 18:00' }}</span>
+                <span class="deadline">截止时间：{{ getDeadline(activeAssessment.created_at) }}</span>
               </div>
               <el-button type="warning" size="large" class="continue-btn" @click="handleContinue">
                 继续评估
@@ -185,6 +185,21 @@ const assessments = ref([])
 
 const currentPage = ref(1)
 const pageSize = ref(10) // 对应你图片中显示的每页3条
+
+const getDeadline = (startTime) => {
+  if (!startTime) return ''
+  const date = new Date(startTime)
+  date.setHours(date.getHours() + 48) // 增加48小时
+  
+  // 格式化输出 YYYY-MM-DD HH:mm:ss
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  const h = String(date.getHours()).padStart(2, '0')
+  const mm = String(date.getMinutes()).padStart(2, '0')
+  const ss = String(date.getSeconds()).padStart(2, '0')
+  return `${y}-${m}-${d} ${h}:${mm}:${ss}`
+}
 
 // 2. 计算总页数
 const totalPages = computed(() => {
@@ -381,80 +396,74 @@ const formatYearMonth = (dateStr) => {
 /* ===== Footer（深色条，按截图）===== */
 .footer {
   margin-top: auto;
+  width: 100%;
 }
 
-/* 深色条背景 */
 .footer-bar {
-  background: #2f3d4a; /* 接近截图那种蓝灰 */
-  padding: 16px 0;
+  background: #2f3d4a; /* 深蓝灰色背景 */
+  padding: 8px 0;    /* 增加上下内边距，让比例更协调 */
 }
 
-/* 内容容器 */
 .footer-inner {
-  max-width: 1400px;
+  /* 核心：必须与 header-content 的宽度和对齐逻辑完全一致 */
+  max-width: 99%;
   margin: 0 auto;
-  padding: 0 80px;
-
+  padding: 0 20px;    /* 与 header 保持一致的左右内边距 */
+  
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  box-sizing: border-box;
 }
 
-/* 左侧区域：logo + 文案 */
 .footer-left {
   display: flex;
   align-items: center;
-  gap: 16px;
-  min-width: 0;
-  margin-left: -200px;
+  gap: 10px;
+  /* 彻底删除之前的 margin-left: -200px */
 }
 
-/* logo */
-.footer-logo {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-/* 如果你用图片logo */
-.logo-img {
-  height: 62px;
+.footer-logo .logo-img {
+  height: 80px;
   width: auto;
   display: block;
 }
 
-/* 文案两行 */
 .footer-text {
-  min-width: 0;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 16px;
-  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;      /* 标准页脚字号 */
+  line-height: 1.8;
+  text-align: left;
 }
 
 .footer-text .line {
-  white-space: nowrap;         /* 默认不换行，像截图那样一行一行 */
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap; /* 强制不换行，保持整齐 */
 }
 
-/* 右侧二维码 */
 .footer-right {
-  flex-shrink: 0;
+  /* 彻底删除之前的 margin-right: -200px */
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  margin-right: -200px;
-  height: 62px;
-  width: auto;
+}
+
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
 .footer-qrcode {
   width: 80px;
   height: 80px;
-  border-radius: 6px;
+  border-radius: 4px;
   background: #ffffff;
-  padding: 4px; /* 让二维码像“贴纸”一样 */
+  padding: 3px;
+}
+
+.qr-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
 }
 
 .contact-info {

@@ -242,6 +242,21 @@ def update_school_info(request):
     )
 
 
+@api_view(['POST', 'PATCH'])  # 建议支持 PATCH
+@permission_classes([IsAuthenticated])
+def update_school_info_count(request):
+    try:
+        # 获取当前登录用户的学校对象
+        school = request.user.school
+
+        # 从请求中获取数据
+        school.student_count = request.data.get('student_count', school.student_count)
+        school.teacher_count = request.data.get('teacher_count', school.teacher_count)
+
+        school.save()
+        return Response({"success": True, "message": "学校信息更新成功"})
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -682,3 +697,39 @@ def import_schools(request):
         })
     except Exception as e:
         return Response({'success': False, 'message': f'导入失败: {str(e)}'}, status=500)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def submit_collaboration(request):
+    name = request.data.get('name')
+    phone = request.data.get('phone')
+    email = request.data.get('email')
+    intent_type = request.data.get('type')
+    message = request.data.get('message')
+
+    # 构造发送给团队的邮件内容
+    subject = f"【合作咨询】来自：{name}"
+    body = f"""
+    收到新的合作咨询申请：
+
+    联系人：{name}
+    联系电话：{phone}
+    联系邮箱：{email}
+    合作意向：{intent_type}
+
+    留言内容：
+    {message}
+    """
+
+    try:
+        send_mail(
+            subject,
+            body,
+            settings.EMAIL_HOST_USER,
+            ['hjg151318@163.com'],  # 接收人
+            fail_silently=False,
+        )
+        return Response({"success": True, "message": "提交成功，我们会尽快联系您"})
+    except Exception as e:
+        return Response({"success": False, "message": str(e)}, status=500)

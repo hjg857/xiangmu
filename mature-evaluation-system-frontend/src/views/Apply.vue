@@ -1,5 +1,6 @@
 <template>
   <div class="apply-container">
+  <main class="main-content">
     <div class="apply-box">
       <!-- 头部 -->
       <div class="apply-header">
@@ -158,10 +159,39 @@
         </el-button>
       </el-form>
     </div>
+    </main>
+    <!-- 底部页脚 -->
+    <footer class="footer">
+  <div class="footer-bar">
+    <div class="footer-inner">
+      <!-- 左侧：LOGO + 文案 -->
+      <div class="footer-left">
+        <div class="footer-logo">
+          <img src="@/assets/images/ila_logo.png" class="logo-img" alt="ILA" /> 
+        </div>
 
-    <div class="footer">
-      © 2025 苏师YangTeam 版权所有
+        <div class="footer-text">
+          <div class="line">
+            Copyright © 2026 版权所有：智能学习与评价江苏省产业技术工程化中心
+          </div>
+          <div class="line">
+            邮箱：2020250606@jsnu.edu.cn　
+            地址：江苏省徐州市铜山新区上海路101号
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：二维码 -->
+      <div class="footer-right">
+        <img
+          src="@/assets/images/Official_Account1.png"
+          alt="官方公众号"
+          class="footer-qrcode"
+        />
+      </div>
     </div>
+  </div>
+</footer>
   </div>
 </template>
 
@@ -366,12 +396,22 @@ const goToLogin = () => router.push('/login')
 .apply-container {
   min-height: 100vh;
   background: #f5f7fa;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.main-content {
+  flex: 1;                /* 核心：自动占据剩余空间，将页脚顶到底部 */
+  padding: 40px 20px;     /* 恢复间距 */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .apply-box {
+  width: 100%;
   max-width: 1000px;
-  margin: 0 auto;
   background: white;
   border-radius: 8px;
   padding: 40px;
@@ -493,10 +533,77 @@ const goToLogin = () => router.push('/login')
   border-color: #fb8c00;
 }
 
+/* 底部页脚 */
+/* ===== Footer（深色条，按截图）===== */
 .footer {
-  text-align: center;
-  color: #909399;
-  font-size: 14px;
-  margin-top: 30px;
+  margin-top: 0;
+  width: 100%;
+}
+
+.footer-bar {
+  background: #2f3d4a; /* 深蓝灰色背景 */
+  padding: 8px 0;    /* 增加上下内边距，让比例更协调 */
+}
+
+.footer-inner {
+  /* 核心：必须与 header-content 的宽度和对齐逻辑完全一致 */
+  max-width: 99%;
+  margin: 0 auto;
+  padding: 0 20px;    /* 与 header 保持一致的左右内边距 */
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* 彻底删除之前的 margin-left: -200px */
+}
+
+.footer-logo .logo-img {
+  height: 80px;
+  width: auto;
+  display: block;
+}
+
+.footer-text {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;      /* 标准页脚字号 */
+  line-height: 1.8;
+  text-align: left;
+}
+
+.footer-text .line {
+  white-space: nowrap; /* 强制不换行，保持整齐 */
+}
+
+.footer-right {
+  /* 彻底删除之前的 margin-right: -200px */
+  display: flex;
+  align-items: center;
+}
+
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-qrcode {
+  width: 80px;
+  height: 80px;
+  border-radius: 4px;
+  background: #ffffff;
+  padding: 3px;
+}
+
+.qr-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
 }
 </style>

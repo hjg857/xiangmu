@@ -43,7 +43,21 @@
         <!-- 1. 数据基础设施 -->
         <div class="section-title">1. 数据基础设施</div>
         
-        <el-form-item label="学校设有独立数据中心（如独立机房等）目标标准符合GB50174-2017数据中心设计规范的相应标准准要求？">
+                <el-form-item prop="data_center_standard">
+          <template #label>
+            <div class="label-with-hint">
+              <span>学校设有独立数据中心（如独立机房等）目标标准符合GB50174-2017数据中心设计规范的相应标准准要求？</span>
+              <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+                <template #reference>
+                  <span class="hint-tag">填写提示</span>
+                </template>
+                <div class="hint-body">
+                  <p class="hint-text">学校是否拥有独立数据中心（独立机房），且该数据中心的建设标准是否符合 GB50174-2017《数据中心设计规范》的对应要求，按实际情况选择对应选项。</p>
+                  <p class="hint-example"><em>示例：学校建有独立机房且各项指标完全满足 GB50174-2017 B 级要求，则选择「完全符合」；学校有独立机房但仅部分指标符合 B 级要求，则选择「部分符合」；学校有独立机房但未达到 B 级要求，则选择「不符合」。</em></p>
+                </div>
+              </el-popover>
+            </div>
+          </template>
           <el-radio-group v-model="formData.data_center_standard" class="horizontal-radio-with-desc">
             <el-radio value="fully_compliant">
               <div class="radio-content">
@@ -66,46 +80,101 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item label="学校未设有独立数据中心，但使用专享云服务，且完全满足学校的数据应用需求？">
-          <el-radio-group v-model="formData.cloud_dedicated_service" class="horizontal-radio-with-desc">
-            <el-radio value="fully_meets">
-              <div class="radio-content">
-                <div class="radio-title">完全达到</div>
+        <el-form-item prop="cloud_dedicated_service">
+        <template #label>
+          <div class="label-with-hint">
+            <span>学校未设有独立数据中心，但使用专享云服务，且完全满足学校的数据应用需求？</span>
+            <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+              <template #reference>
+                <span class="hint-tag">填写提示</span>
+              </template>
+              <div class="hint-body">
+                <p class="hint-text">若学校无独立数据中心，需考虑学校是否使用专享云服务，且该服务是否能满足学校全部数据应用需求，按实际情况选择对应选项。</p>
+                <p class="hint-example"><em>示例：学校无独立数据中心，使用教育局统一部署的专享云服务且能满足所有数据存储、处理需求，则选择「完全达到」；仅能满足大部分数据需求则选择「部分达到」；无法满足核心数据应用需求则选择「未达到」。</em></p>
               </div>
-            </el-radio>
-            <el-radio value="partially_meets">
-              <div class="radio-content">
-                <div class="radio-title">部分达到</div>
-              </div>
-            </el-radio>
-            <el-radio value="not_meets">
-              <div class="radio-content">
-                <div class="radio-title">未达到</div>
-              </div>
-            </el-radio>
-          </el-radio-group>
-        </el-form-item>
-
-        <el-form-item label="学校数字终端配备生机比/师机比？">
-          <div class="ratio-section">
-            <div class="ratio-group">
-              <el-radio-group v-model="formData.student_device_ratio" class="horizontal-radio">
-                <el-radio value="high">生机比 ≥ 15:1</el-radio>
-                <el-radio value="medium">15:1 < 生机比 ≤ 6:1</el-radio>
-                <el-radio value="low">生机比 < 6:1</el-radio>
-              </el-radio-group>
-            </div>
-            <div class="ratio-group">
-              <el-radio-group v-model="formData.teacher_device_ratio" class="horizontal-radio">
-                <el-radio value="high">师机比 ≥ 4:1</el-radio>
-                <el-radio value="medium">1:1 < 师机比 ≤ 4:1</el-radio>
-                <el-radio value="low">师机比 < 1:1</el-radio>
-              </el-radio-group>
-            </div>
+            </el-popover>
           </div>
-        </el-form-item>
+        </template>
+        <el-radio-group v-model="formData.cloud_dedicated_service" class="horizontal-radio-with-desc">
+          <el-radio value="fully_meets">
+            <div class="radio-content">
+              <div class="radio-title">完全达到</div>
+            </div>
+          </el-radio>
+          <el-radio value="partially_meets">
+            <div class="radio-content">
+              <div class="radio-title">部分达到</div>
+            </div>
+          </el-radio>
+          <el-radio value="not_meets">
+            <div class="radio-content">
+              <div class="radio-title">未达到</div>
+            </div>
+          </el-radio>
+        </el-radio-group>
+      </el-form-item>
 
-        <el-form-item label="学校是否建设数据治理平台，如数据中台、数据交换中心等？">
+      <!-- 3. 生机比 -->
+      <el-form-item prop="student_device_ratio">
+        <template #label>
+          <div class="label-with-hint">
+            <span>学校数字终端配备生机比（学生用机数量与在校生人数之比）？</span>
+            <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+              <template #reference>
+                <span class="hint-tag">填写提示</span>
+              </template>
+              <div class="hint-body">
+                <p class="hint-text">生机比指 “学生人数：数字终端数量”，按实际计算结果选择对应区间选项（数字终端含电脑、平板等教学用智能终端）。</p>
+                <p class="hint-example"><em>示例：全校学生 1000 人、数字终端 200 台，生机比 = 5:1（＜6:1），则选择「生机比 < 6:1」。</em></p>
+              </div>
+            </el-popover>
+          </div>
+        </template>
+        <el-radio-group v-model="formData.student_device_ratio" class="horizontal-radio">
+          <el-radio value="low">生机比 < 6:1</el-radio>
+          <el-radio value="medium"> 6:1 < 生机比 ≤ 15:1</el-radio>
+          <el-radio value="high">生机比 ≥ 15:1</el-radio>
+        </el-radio-group>
+      </el-form-item>
+
+      <!-- 4. 师机比 -->
+      <el-form-item prop="teacher_device_ratio">
+        <template #label>
+          <div class="label-with-hint">
+            <span>学校数字终端配备师机比（专任教师用机数量与专任教师人数之比）？</span>
+            <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+              <template #reference>
+                <span class="hint-tag">填写提示</span>
+              </template>
+              <div class="hint-body">
+                <p class="hint-text">师机比指 “教师人数：数字终端数量”，按实际计算结果选择对应区间选项（数字终端含电脑、平板等教学用智能终端）。</p>
+                <p class="hint-example"><em>示例：全校教师 100 人、数字终端 80 台，师机比 = 1.25:1（1:1 < 师机比 ≤ 4:1），则选择「1:1 < 师机比 ≤ 4:1」。</em></p>
+              </div>
+            </el-popover>
+          </div>
+        </template>
+        <el-radio-group v-model="formData.teacher_device_ratio" class="horizontal-radio">
+          <el-radio value="low">师机比 < 1:1</el-radio>
+          <el-radio value="medium">1:1 < 师机比 ≤ 4:1</el-radio>
+          <el-radio value="high">师机比 ≥ 4:1</el-radio>
+        </el-radio-group>
+      </el-form-item>
+
+                <el-form-item prop="has_data_platform">
+          <template #label>
+            <div class="label-with-hint">
+              <span>学校是否建设数据治理平台，如数据中台、数据交换中心等？</span>
+              <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+                <template #reference>
+                  <span class="hint-tag">填写提示</span>
+                </template>
+                <div class="hint-body">
+                  <p class="hint-text">判断学校是否搭建了专门的数治理平台（含数据中台、数据交换中心、数据管理平台等。</p>
+                  <p class="hint-example"><em>示例：学校已建成校级数据中台，实现全校数据统一归集和交换，则选择「已建立」；学校未搭建任何数据治理类平台，仅零散存储数据，则选择「未建立」。</em></p>
+                </div>
+              </el-popover>
+            </div>
+          </template>
           <el-radio-group v-model="formData.has_data_platform" class="horizontal-radio-with-desc">
             <el-radio :value="true">
               <div class="radio-content">
@@ -122,41 +191,86 @@
           </el-radio-group>
         </el-form-item>
 
+
         <!-- 2. 数据安全水平 -->
         <div class="section-title">2. 数据安全水平</div>
         
-        <el-form-item label="学校部署的各类平台通过国家安保等级认定的数量？">
-          <div class="inline-inputs">
-            <span>已认定</span>
-            <el-input-number v-model="formData.security_certified_count" :min="0" :controls="false" />
-            <span>个</span>
-          </div>
-        </el-form-item>
-
-        <el-form-item label="学校部署的各类平台通过国家安保等级认定的比例？">
-          <el-radio-group v-model="formData.security_certified_ratio" class="horizontal-radio">
-            <el-radio value="low">认定比例 < 40%</el-radio>
-            <el-radio value="medium">40% < 认定比例 ≤ 80%</el-radio>
-            <el-radio value="high">认定比例 > 80%</el-radio>
-          </el-radio-group>
-        </el-form-item>
-
-        <el-form-item label="近5年，学校是否发生数据风险事件？">
-          <el-radio-group v-model="formData.has_security_incident" class="horizontal-radio-with-desc">
-            <el-radio :value="true">
-              <div class="radio-content">
-                <div class="radio-title">有发生</div>
-                <div class="radio-desc">学校发生过数据风险事件</div>
+        <el-form-item prop="security_certified_count">
+            <template #label>
+              <div class="label-with-hint">
+                <span>学校部署的各类平台通过国家安保等级认定的数量？</span>
+                <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+                  <template #reference>
+                    <span class="hint-tag">填写提示</span>
+                  </template>
+                  <div class="hint-body">
+                    <p class="hint-text">统计学校当前部署的所有信息化平台中，通过国家网络安全等级保护认证（等保认证）的平台数量。</p>
+                    <p class="hint-example"><em>示例：学校部署了教务管理平台、学生评价平台、校园安全平台共 3 个平台，其中教务管理平台和校园安全平台通过等保认证，则填写「2」；所有平台均未通过则填写「0」。</em></p>
+                  </div>
+                </el-popover>
               </div>
-            </el-radio>
-            <el-radio :value="false">
-              <div class="radio-content">
-                <div class="radio-title">未发生</div>
-                <div class="radio-desc">学校未发生过数据风险事件</div>
+            </template>
+            <div class="inline-inputs">
+              <span>已认定</span>
+              <el-input-number v-model="formData.security_certified_count" :min="0" :controls="false" />
+              <span>个</span>
+            </div>
+          </el-form-item>
+
+          <!-- 7. 安保等级认定比例 -->
+          <el-form-item prop="security_certified_ratio">
+            <template #label>
+              <div class="label-with-hint">
+                <span>学校部署的各类平台通过国家安保等级认定的比例？</span>
+                <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+                  <template #reference>
+                    <span class="hint-tag">填写提示</span>
+                  </template>
+                  <div class="hint-body">
+                    <p class="hint-text">计算 “通过国家安保等级认定的平台数量 ÷ 学校部署的所有平台总数” 的百分比，按结果选择对应区间选项。</p>
+                    <p class="hint-example"><em>示例：学校共部署 5 个平台，3 个通过等保认证（认定比例 = 60%，40% < 认定比例 ≤ 80%），则选择「40% < 认定比例 ≤ 80%」；仅 1 个通过（认定比例 = 20% < 40%），则选择「认定比例 < 40%」。</em></p>
+                  </div>
+                </el-popover>
               </div>
-            </el-radio>
-          </el-radio-group>
-        </el-form-item>
+            </template>
+            <el-radio-group v-model="formData.security_certified_ratio" class="horizontal-radio">
+              <el-radio value="low">认定比例 < 40%</el-radio>
+              <el-radio value="medium">40% < 认定比例 ≤ 80%</el-radio>
+              <el-radio value="high">认定比例 > 80%</el-radio>
+            </el-radio-group>
+          </el-form-item>
+
+          <!-- 8. 数据风险事件 -->
+          <el-form-item prop="has_security_incident">
+            <template #label>
+              <div class="label-with-hint">
+                <span>2020年到2025年，学校是否发生数据风险事件？</span>
+                <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+                  <template #reference>
+                    <span class="hint-tag">填写提示</span>
+                  </template>
+                  <div class="hint-body">
+                    <p class="hint-text">2020年到 2025 年期间， 学校是否发生过数据泄露、数据篡改、数据丢失、数据被非法访问等数据安全风险事件。</p>
+                    <p class="hint-example"><em>示例：2023 年学校发生过学生信息泄露事件，则选择「有发生」；2020-2025年期间未发生任何数据安全问题，则选择「未发生」。</em></p>
+                  </div>
+                </el-popover>
+              </div>
+            </template>
+            <el-radio-group v-model="formData.has_security_incident" class="horizontal-radio-with-desc">
+              <el-radio :value="true">
+                <div class="radio-content">
+                  <div class="radio-title">有发生</div>
+                  <div class="radio-desc">学校发生过数据风险事件</div>
+                </div>
+              </el-radio>
+              <el-radio :value="false">
+                <div class="radio-content">
+                  <div class="radio-title">未发生</div>
+                  <div class="radio-desc">学校未发生过数据风险事件</div>
+                </div>
+              </el-radio>
+            </el-radio-group>
+          </el-form-item>
       </el-form>
     </el-card>
   </div>
@@ -347,16 +461,18 @@ onBeforeUnmount(() => {
   gap: 10px;
 }
 
-.ratio-section {
-  display: flex;
-  flex-direction: column;
+:deep(.horizontal-radio) {
+  flex-direction: row;
   gap: 20px;
+  flex-wrap: wrap;
+  padding: 15px;
+  border-radius: 4px;
+  width: 100%;
 }
 
-.ratio-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* 调整只读模式下的样式，使其更清晰 */
+.el-form-item.is-disabled :deep(.el-radio__label) {
+  color: #606266;
 }
 
 .radio-content {
@@ -451,98 +567,126 @@ onBeforeUnmount(() => {
 /* ===== Footer（深色条，按截图）===== */
 .footer {
   margin-top: auto;
+  width: 100%;
 }
 
-/* 深色条背景 */
 .footer-bar {
-  background: #2f3d4a; /* 接近截图那种蓝灰 */
-  padding: 16px 0;
+  background: #2f3d4a; /* 深蓝灰色背景 */
+  padding: 8px 0;    /* 增加上下内边距，让比例更协调 */
 }
 
-/* 内容容器 */
 .footer-inner {
-  max-width: 1400px;
+  /* 核心：必须与 header-content 的宽度和对齐逻辑完全一致 */
+  max-width: 99%;
   margin: 0 auto;
-  padding: 0 80px;
-
+  padding: 0 20px;    /* 与 header 保持一致的左右内边距 */
+  
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  box-sizing: border-box;
 }
 
-/* 左侧区域：logo + 文案 */
 .footer-left {
   display: flex;
   align-items: center;
-  gap: 16px;
-  min-width: 0;
-  margin-left: -200px;
+  gap: 10px;
+  /* 彻底删除之前的 margin-left: -200px */
 }
 
-/* logo */
-.footer-logo {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-/* 如果你用图片logo */
-.logo-img {
-  height: 62px;
+.footer-logo .logo-img {
+  height: 80px;
   width: auto;
   display: block;
 }
 
-/* 文案两行 */
 .footer-text {
-  min-width: 0;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 16px;
-  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;      /* 标准页脚字号 */
+  line-height: 1.8;
+  text-align: left;
 }
 
 .footer-text .line {
-  white-space: nowrap;         /* 默认不换行，像截图那样一行一行 */
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap; /* 强制不换行，保持整齐 */
 }
 
-/* 右侧二维码 */
 .footer-right {
-  flex-shrink: 0;
+  /* 彻底删除之前的 margin-right: -200px */
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  margin-right: -200px;
-  height: 62px;
-  width: auto;
+}
+
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
 .footer-qrcode {
   width: 80px;
   height: 80px;
-  border-radius: 6px;
+  border-radius: 4px;
   background: #ffffff;
-  padding: 4px; /* 让二维码像“贴纸”一样 */
+  padding: 3px;
 }
 
-.contact-info {
+.qr-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+/* 标题与提示并列的布局容器 */
+.label-with-hint {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap; /* 如果标题太长，允许提示换行 */
+  gap: 10px;
 }
 
-.contact-info p {
+/* 填写提示小标签样式 */
+.hint-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 10px;
+  font-size: 12px;
+  color: #409eff;
+  background-color: #ecf5ff;
+  border: 1px solid #cfe5ff;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap; /* 强制标签不换行 */
+  transition: all 0.2s;
+  line-height: 1.2;
+}
+
+.hint-tag:hover {
+  background-color: #409eff;
+  color: #ffffff;
+}
+
+/* 弹出框内容样式 */
+.hint-body {
+  padding: 8px 4px;
+}
+
+.hint-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #303133;
+  margin-bottom: 10px;
+}
+
+.hint-example {
   font-size: 13px;
-  color: #95a5a6;
-  margin: 0;
+  line-height: 1.5;
+  color: #909399;
 }
 
-.qrcode img {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  background-color: white;
+.hint-example em {
+  font-style: italic;
 }
+
 </style>

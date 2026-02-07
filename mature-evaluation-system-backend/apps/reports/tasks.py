@@ -27,16 +27,20 @@ def generate_assessment_report(self, assessment_id: int):
         logger.info(f"评估 {assessment_id} 当前状态: {assessment.status}")
 
         # 创建报告服务
+        assessment.status = 'analyzing'
+        assessment.save(update_fields=['status'])
         report_service = ReportService(assessment)
         
         # 生成报告
         result = report_service.generate_report()
-        
+
+        assessment.status = 'completed'
+        assessment.completed_at = timezone.now()
+        assessment.save()
         # 如果成功，发送邮件
         if result['success']:
             logger.info(f"报告生成成功，准备发送邮件")
             report_service.send_report_email()
-        
         return result
         
     except Assessment.DoesNotExist:

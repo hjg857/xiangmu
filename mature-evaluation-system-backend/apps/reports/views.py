@@ -25,7 +25,7 @@ def generate_report(request, assessment_id):
         assessment = Assessment.objects.get(id=assessment_id)
         
         # 权限检查：只有学校用户本人或管理员可以生成报告
-        if not request.user.is_admin_user():
+        if not request.user.is_admin():
             if assessment.school.user != request.user:
                 return Response(
                     {'error': '无权限生成此评估报告'},
@@ -34,7 +34,8 @@ def generate_report(request, assessment_id):
         
         # 注意：不检查status状态，因为用户填写完数据后可能还没有提交
         # 报告生成时会自动计算得分并更新状态为completed
-
+        assessment.status = 'collecting'
+        assessment.save()
         # 触发异步任务
         task = generate_assessment_report.delay(assessment_id)
         
@@ -62,6 +63,7 @@ def generate_report(request, assessment_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_report_data(request, assessment_id):
+
     """
     获取报告数据（用于前端展示）
     如果得分还没计算，会先计算得分
@@ -102,10 +104,12 @@ def get_report_data(request, assessment_id):
             
             logger.info(f"评估 {assessment_id} 得分计算完成: 总分={scores['total_score']}")
 
+
         # 获取报告数据
         data_service = ReportDataService(assessment, scoring_service=scoring_service)
         report_data = data_service.get_all_report_data()
-        
+        print("111")
+
         # 获取AI建议（优先从数据库读取）
         if assessment.ai_suggestions:
             logger.info(f"使用已缓存的AI建议")
@@ -121,7 +125,7 @@ def get_report_data(request, assessment_id):
             assessment.ai_suggestions = suggestions
             assessment.save(update_fields=['ai_suggestions'])
             logger.info(f"AI建议已生成并保存")
-        
+
         return Response(report_data, status=status.HTTP_200_OK)
         
     except Assessment.DoesNotExist:

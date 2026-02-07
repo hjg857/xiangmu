@@ -1,3 +1,4 @@
+<template>
 <el-col :span="8">
   <el-card shadow="hover" class="survey-card">
     <div class="survey-icon teacher">
@@ -146,7 +147,7 @@
     </div>
   </el-card>
 </el-col>
-
+</template>
 
 
 <script setup>

@@ -5,7 +5,7 @@
 import logging
 from decimal import Decimal
 from typing import Dict, List, Any
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Case, When, F, FloatField
 from apps.assessments.models import Assessment, InstitutionAssessment, BehaviorAssessment, AssetAssessment, TechnologyAssessment
 from apps.surveys.models import SurveyResponse, SurveyInstance
 from apps.assessments import scoring_config as config
@@ -24,41 +24,39 @@ class ReportDataService:
             self.scoring_service = scoring_service
         else:
             self.scoring_service = ScoringService(assessment)
-    
+
     def get_average_scores(self) -> Dict[str, float]:
-        """
-        获取所有学校的平均分（百分制）
-        """
-        completed_assessments = Assessment.objects.filter(status='completed')
-        
-        if not completed_assessments.exists():
-            return {
-                'literacy': 60.0,
-                'institution': 60.0,
-                'behavior': 60.0,
-                'asset': 60.0,
-                'technology': 60.0
-            }
-            
-        aggregates = completed_assessments.aggregate(
-            avg_literacy=Avg('literacy_score'),
-            avg_institution=Avg('institution_score'),
-            avg_behavior=Avg('behavior_score'),
-            avg_asset=Avg('asset_score'),
-            avg_technology=Avg('technology_score')
+        """获取全库平均分（增加脏数据防御，确保返回五分制）"""
+        completed = Assessment.objects.filter(status='completed')
+        if not completed.exists():
+            return {k: 3.0 for k in ['literacy', 'institution', 'behavior', 'asset', 'technology']}
+
+        # 定义一个内部处理函数，防止 None 且强制限制在 0-5 之间
+        def normalize_aggregate(field_name):
+            # 逻辑：如果分数 > 5，则取其 1/20，否则取原值；如果为 None 则取 3.0
+            return Avg(
+                Case(
+                    When(**{f"{field_name}__gt": 5.0}, then=F(field_name) / 20.0),
+                    default=F(field_name),
+                    output_field=FloatField()
+                )
+            )
+
+        aggs = completed.aggregate(
+            l=normalize_aggregate('literacy_score'),
+            i=normalize_aggregate('institution_score'),
+            b=normalize_aggregate('behavior_score'),
+            a=normalize_aggregate('asset_score'),
+            t=normalize_aggregate('technology_score')
         )
-        
-        def to_percent(score):
-            if score is None:
-                return 60.0
-            return float(score) * 20  # 5分制转百分制
-            
+
+        # 格式化返回，并增加兜底值 3.0
         return {
-            'literacy': to_percent(aggregates['avg_literacy']),
-            'institution': to_percent(aggregates['avg_institution']),
-            'behavior': to_percent(aggregates['avg_behavior']),
-            'asset': to_percent(aggregates['avg_asset']),
-            'technology': to_percent(aggregates['avg_technology']),
+            'literacy': round(float(aggs['l'] or 3.0), 2),
+            'institution': round(float(aggs['i'] or 3.0), 2),
+            'behavior': round(float(aggs['b'] or 3.0), 2),
+            'asset': round(float(aggs['a'] or 3.0), 2),
+            'technology': round(float(aggs['t'] or 3.0), 2),
         }
 
     def get_all_report_data(self) -> Dict[str, Any]:
@@ -124,17 +122,13 @@ class ReportDataService:
         获取五个维度的得分（百分制，0-100分）
         数据库中存储的是5分制得分，转换为百分制：score * 20
         """
-        def to_percent(score):
-            if not score:
-                return 0.0
-            return float(score) * 20  # 5分制转百分制
 
         return {
-            'literacy': to_percent(self.assessment.literacy_score),
-            'institution': to_percent(self.assessment.institution_score),
-            'behavior': to_percent(self.assessment.behavior_score),
-            'asset': to_percent(self.assessment.asset_score),
-            'technology': to_percent(self.assessment.technology_score),
+            'literacy': self.assessment.literacy_score,
+            'institution': self.assessment.institution_score,
+            'behavior': self.assessment.behavior_score,
+            'asset': self.assessment.asset_score,
+            'technology': self.assessment.technology_score,
         }
     
     def get_secondary_scores(self) -> Dict[str, float]:
@@ -144,7 +138,7 @@ class ReportDataService:
         if not self.scoring_service.secondary_scores:
             self.scoring_service.calculate_all_scores()
         # 转换为百分制
-        return {k: v * 20 for k, v in self.scoring_service.secondary_scores.items()}
+        return {k: v  for k, v in self.scoring_service.secondary_scores.items()}
 
     def get_observation_scores(self) -> Dict[str, float]:
         """
@@ -153,7 +147,7 @@ class ReportDataService:
         if not self.scoring_service.observation_scores:
             self.scoring_service.calculate_all_scores()
         # 转换为百分制
-        return {k: v * 20 for k, v in self.scoring_service.observation_scores.items()}
+        return {k: v for k, v in self.scoring_service.observation_scores.items()}
     
     def get_participant_counts(self) -> Dict[str, int]:
         """获取各类问卷的参评人数"""
@@ -241,12 +235,16 @@ class ReportDataService:
             resource = float(asset.resource_data_volume or 0)
             service = float(asset.service_data_volume or 0)
             other = float(asset.other_data_volume or 0)
+            student_count = getattr(self.school, 'student_count', 0) or 0
+            staff_count = getattr(self.school, 'teacher_count', 0) or 0  #
             return {
                 'management_data_volume': management,
                 'resource_data_volume': resource,
                 'service_data_volume': service,
                 'other_data_volume': other,
                 'total_data_volume': management + resource + service + other,
+                'student_count': student_count,
+                'staff_count': staff_count,
             }
         except AssetAssessment.DoesNotExist:
             return {}
