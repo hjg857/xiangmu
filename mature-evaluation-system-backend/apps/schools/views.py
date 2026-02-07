@@ -727,7 +727,7 @@ def submit_collaboration(request):
             subject,
             body,
             settings.EMAIL_HOST_USER,
-            ['hjg151318@163.com'],  # 接收人
+            ['2020250606@jsnu.edu.cn'],  # 接收人
             fail_silently=False,
         )
         return Response({"success": True, "message": "提交成功，我们会尽快联系您"})
