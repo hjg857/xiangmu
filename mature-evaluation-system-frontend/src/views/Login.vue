@@ -235,7 +235,7 @@ onMounted(() => {
 /* 左侧 */
 .left-panel {
   flex: 1.2;               /* 稍微加宽左侧占比 */
-  background: #E0E6ED;
+  background: #F0F7FF;
   position: relative;      /* 为子元素绝对定位提供基准 */
   display: flex;
   align-items: center;

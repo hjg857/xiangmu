@@ -200,17 +200,26 @@
               </div>
               
               <div class="share-link-section" v-if="!isReadonly">
-                <div class="survey-display-name">{{ schoolName }}《教师数据素养调查问卷》</div>
                 <div class="share-area">
                   <div class="share-left">
-                    <el-input :model-value="teacherShareUrl" readonly size="small">
-                      <template #append>
-                        <el-button @click="copyLink(teacherShareUrl)">
-                          <el-icon><DocumentCopy /></el-icon>
-                          复制链接
-                        </el-button>
-                      </template>
-                    </el-input>
+                    <div class="input-group-custom">
+                      <el-input
+                        type="textarea"
+                        :rows="2"
+                        readonly
+                        resize="none"
+                        :model-value="`${schoolName}《教师数据素养调查问卷》\n问卷链接：${teacherShareUrl}`"
+                        class="share-textarea-custom"
+                      />
+                      <el-button 
+                        type="primary" 
+                        class="share-append-btn"
+                        @click="copyLink(`${schoolName}《教师数据素养调查问卷》\n问卷链接：${teacherShareUrl}`)"
+                      >
+                        <el-icon style="margin-right: 4px;"><DocumentCopy /></el-icon>
+                        复制
+                      </el-button>
+                    </div>
                   </div>
 
                   <div class="share-right">
@@ -225,10 +234,7 @@
                         />
                         <div v-else class="qr-placeholder">二维码生成中...</div>
 
-                        <!-- 中间学校名覆盖 -->
-                        <div class="qr-center">
-                          <span class="school-name">{{ schoolName }}</span>
-                        </div>
+                      
                       </div>
 
                       <!-- 二维码下方提示文字 -->
@@ -305,17 +311,26 @@
               </div>
               
               <div class="share-link-section" v-if="!isReadonly">
-                <div class="survey-display-name">{{ schoolName }}《学生数据素养调查问卷》</div>
                 <div class="share-area">
                   <div class="share-left">
-                    <el-input :model-value="studentShareUrl" readonly size="small">
-                      <template #append>
-                        <el-button @click="copyLink(studentShareUrl)">
-                          <el-icon><DocumentCopy /></el-icon>
-                          复制链接
-                        </el-button>
-                      </template>
-                    </el-input>
+                  <div class="input-group-custom">
+                      <el-input
+                        type="textarea"
+                        :rows="2"
+                        readonly
+                        resize="none"
+                        :model-value="`${schoolName}《学生数据素养调查问卷》\n问卷链接：${studentShareUrl}`"
+                        class="share-textarea-custom"
+                      />
+                      <el-button 
+                        type="primary" 
+                        class="share-append-btn"
+                        @click="copyLink(`${schoolName}《教师数据素养调查问卷》\n问卷链接：${studentShareUrl}`)"
+                      >
+                        <el-icon style="margin-right: 4px;"><DocumentCopy /></el-icon>
+                        复制
+                      </el-button>
+                    </div>
                   </div>
 
                   <div class="share-right">
@@ -407,17 +422,26 @@
               </div>
               
               <div class="share-link-section" v-if="!isReadonly">
-                <div class="survey-display-name">{{ schoolName }}《管理者数据素养调查问卷》</div>
                 <div class="share-area">
                   <div class="share-left">
-                    <el-input :model-value="managerShareUrl" readonly size="small">
-                      <template #append>
-                        <el-button @click="copyLink(managerShareUrl)">
-                          <el-icon><DocumentCopy /></el-icon>
-                          复制链接
-                        </el-button>
-                      </template>
-                    </el-input>
+                  <div class="input-group-custom">
+                    <el-input
+                      type="textarea"
+                      :rows="2"
+                      readonly
+                      resize="none"
+                      :model-value="`${schoolName}《管理者数据素养调查问卷》\n问卷链接：${managerShareUrl}`"
+                      class="share-textarea-custom"
+                    />
+                    <el-button 
+                      type="primary" 
+                      class="share-append-btn"
+                      @click="copyLink(`${schoolName}《管理者数据素养调查问卷》\n问卷链接：${managerShareUrl}`)"
+                    >
+                      <el-icon style="margin-right: 4px;"><DocumentCopy /></el-icon>
+                      复制
+                    </el-button>
+                  </div>
                   </div>
 
                   <div class="share-right">
@@ -738,14 +762,13 @@ const calcInstitutionDone = (data) => {
 
 // ====== 数据素养：按你规则 collected_count>0 才算完成 ======
 const calcLiteracyDone = () => {
-  // “问卷完成”=该问卷 collected_count>0
-  const teacherOk = !!teacherInstance.value && (teacherInstance.value.collected_count || 0) > 0
-  const studentOk = !!studentInstance.value && (studentInstance.value.collected_count || 0) > 0
-  const managerOk = !!managerInstance.value && (managerInstance.value.collected_count || 0) > 0
+  // 逻辑：只要实例对象不为空，说明已经点击过“生成链接”按钮
+  const teacherExists = !!teacherInstance.value
+  const studentExists = !!studentInstance.value
+  const managerExists = !!managerInstance.value
 
-  // 模块是否完成：这里用“三份都完成”
-  // 如果你想改成“任意一份完成就算模块完成”，把 && 改成 ||
-  return teacherOk && studentOk && managerOk
+  // 模块是否完成：三份问卷的链接都已生成
+  return teacherExists && studentExists && managerExists
 }
 
 // ====== 统一刷新各模块完成状态 ======
@@ -810,9 +833,81 @@ const managerQrUrl = ref('')
 const generateQr = async (text) => {
   if (!text) return ''
   try {
-    return await QRCode.toDataURL(text, { width: 128, margin: 1 })
+    // 1. 先生成原始二维码的 Base64
+    const rawQrDataUrl = await QRCode.toDataURL(text, {
+      width: 600, // 增加原始分辨率，保证合成后清晰
+      margin: 1,
+      color: {
+        dark: '#000000',
+        light: '#ffffff'
+      }
+    })
+
+    // 2. 使用 Canvas 进行合成
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const size = 600
+      canvas.width = size
+      canvas.height = size
+
+      const img = new Image()
+      img.src = rawQrDataUrl
+      img.onload = () => {
+        // A. 画背景二维码
+        ctx.drawImage(img, 0, 0, size, size)
+
+        // B. 画中心白底方块
+        const boxSize = size * 0.22 // 中心区域大小
+        const x = (size - boxSize) / 2
+        const y = (size - boxSize) / 2
+        
+        ctx.fillStyle = '#FFFFFF'
+        ctx.fillRect(x, y, boxSize, boxSize)
+        // 给白框加个细灰色边框（可选，增加精致感）
+        ctx.strokeStyle = '#eeeeee'
+        ctx.lineWidth = 2
+        ctx.strokeRect(x, y, boxSize, boxSize)
+
+        // C. 画学校名称（核心：将文字画入像素）
+        ctx.fillStyle = '#333333'
+        const fontSize = Math.floor(boxSize * 0.22) // 动态算字号
+        ctx.font = `bold ${fontSize}px "Microsoft YaHei", sans-serif`
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+
+        const name = schoolName.value || '评估系统'
+        
+        // 自动换行算法
+        const maxWidth = boxSize * 0.9
+        const chars = name.split('')
+        let line = ''
+        const lines = []
+        for (let n = 0; n < chars.length; n++) {
+          let testLine = line + chars[n]
+          if (ctx.measureText(testLine).width > maxWidth && n > 0) {
+            lines.push(line)
+            line = chars[n]
+          } else {
+            line = testLine
+          }
+        }
+        lines.push(line)
+
+        // 渲染文字
+        const displayLines = lines.slice(0, 3) // 最多3行
+        const lineHeight = fontSize * 1.2
+        const startY = size / 2 - ((displayLines.length - 1) * lineHeight) / 2
+        displayLines.forEach((content, i) => {
+          ctx.fillText(content, size / 2, startY + i * lineHeight)
+        })
+
+        // D. 输出最终合成的图片 Base64
+        resolve(canvas.toDataURL('image/png'))
+      }
+    })
   } catch (e) {
-    console.error('二维码生成失败:', e)
+    console.error('合成二维码失败:', e)
     return ''
   }
 }
@@ -1807,6 +1902,51 @@ const handleViewProgress = () => {
 }
 
 
+/* 自定义组合框容器 */
+.input-group-custom {
+  display: flex;
+  align-items: stretch; /* 确保按钮高度与文本框高度完全一致 */
+  width: 100%;
+}
+
+/* 文本框左侧样式定制 */
+.share-textarea-custom :deep(.el-textarea__inner) {
+  border-top-right-radius: 0;    /* 移除右侧圆角，与按钮对接 */
+  border-bottom-right-radius: 0;
+  padding: 8px 12px;
+  line-height: 1.6;
+  font-size: 13px;
+  background-color: #ffffff;
+  /* 解决对齐时的细微边框重叠问题 */
+  z-index: 1;
+}
+
+/* 按钮右侧样式定制 */
+.share-append-btn {
+  border-top-left-radius: 0 !important; /* 移除左侧圆角 */
+  border-bottom-left-radius: 0 !important;
+  border-left: none !important;          /* 移除左侧边框防止变粗 */
+  height: auto !important;               /* 允许高度自适应容器 */
+  padding: 0 20px !important;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* 悬停效果微调，保持边框一致性 */
+.share-textarea-custom :deep(.el-textarea__inner:focus) {
+  z-index: 3; /* 确保焦点时边框不被按钮遮挡 */
+}
+
+/* 修正 share-left 容器，确保它不产生额外的宽度溢出 */
+.share-left {
+  flex: 1;
+  min-width: 0;
+}
+
+
 /* 响应式设计 */
 @media (max-width: 1024px) {
   .main-container {
@@ -1833,5 +1973,7 @@ const handleViewProgress = () => {
   color: #909399;
   margin-top: 5px;
 }
+
+
 
 </style>

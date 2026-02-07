@@ -1,50 +1,50 @@
 <template>
   <div class="basic-info-page">
-    <!-- 顶部蓝色横幅 -->
+    <!-- 顶部深色横幅 -->
     <div class="info-banner">
       <div class="banner-content">
-        <h2>学校基本信息采集</h2>
+        <h2 class="banner-title">学校基本信息采集</h2>
         <p class="subtitle">欢迎参加中小学校数据文化成熟度评估！在开始五个维度的评估之前，请先填写学校的基础信息。</p>
         <p class="promise">请确保每部分填写的信息准确无误，这将有助于我们为您提供更精准的评估分析结果。我们郑重承诺，所有信息将严格保密，仅用于评估分析目的。</p>
       </div>
     </div>
 
-    <main class="info-main", v-loading="loading">
-      <div class="info-card">
-        <!-- 顶部流程示意图 -->
-        <div class="process-wrapper">
-          <div class="process-steps">
-            <div class="step-item active">
-              <div class="step-icon literacy"><el-icon><User /></el-icon></div>
-              <span class="step-text">数据素养</span>
-            </div>
-            <div class="step-arrow"><el-icon><ArrowRight /></el-icon></div>
-            <div class="step-item">
-              <div class="step-icon system"><el-icon><Checked /></el-icon></div>
-              <span class="step-text">数据制度</span>
-            </div>
-            <div class="step-arrow"><el-icon><ArrowRight /></el-icon></div>
-            <div class="step-item">
-              <div class="step-icon behavior"><el-icon><DataLine /></el-icon></div>
-              <span class="step-text">数据行为</span>
-            </div>
-            <div class="step-arrow"><el-icon><ArrowRight /></el-icon></div>
-            <div class="step-item">
-              <div class="step-icon asset"><el-icon><Box /></el-icon></div>
-              <span class="step-text">数据资产</span>
-            </div>
-            <div class="step-arrow"><el-icon><ArrowRight /></el-icon></div>
-            <div class="step-item">
-              <div class="step-icon tech"><el-icon><Cpu /></el-icon></div>
-              <span class="step-text">数据技术</span>
-            </div>
+    <main class="info-main" v-loading="loading">
+      <!-- 顶部流程示意图卡片 -->
+      <div class="process-card">
+        <div class="process-steps">
+          <div class="step-item active">
+            <div class="step-icon literacy"><el-icon><TrendCharts /></el-icon></div>
+            <span class="step-text">数据素养</span>
           </div>
-          <div class="process-tip">
-            温馨提示：完成基础信息填写后，系统将引导您按上述流程完成五个板块的分析评估。
+          <div class="step-arrow"><el-icon><ArrowRightBold /></el-icon></div>
+          <div class="step-item">
+            <div class="step-icon institution"><el-icon><Checked /></el-icon></div>
+            <span class="step-text">数据制度</span>
+          </div>
+          <div class="step-arrow"><el-icon><ArrowRightBold /></el-icon></div>
+          <div class="step-item">
+            <div class="step-icon behavior"><el-icon><UserFilled /></el-icon></div>
+            <span class="step-text">数据行为</span>
+          </div>
+          <div class="step-arrow"><el-icon><ArrowRightBold /></el-icon></div>
+          <div class="step-item">
+            <div class="step-icon asset"><el-icon><Coin /></el-icon></div>
+            <span class="step-text">数据资产</span>
+          </div>
+          <div class="step-arrow"><el-icon><ArrowRightBold /></el-icon></div>
+          <div class="step-item">
+            <div class="step-icon tech"><el-icon><Connection /></el-icon></div>
+            <span class="step-text">数据技术</span>
           </div>
         </div>
+        <div class="process-tip">
+          温馨提示：完成基础信息填写后，系统将引导您按上述流程完成五个板块的分析评估。
+        </div>
+      </div>
 
-        <!-- 表单区域 -->
+      <!-- 表单区域卡片 -->
+      <div class="form-card">
         <el-form 
           ref="formRef"
           :model="form" 
@@ -55,8 +55,7 @@
           <el-row :gutter="40">
             <el-col :span="12">
               <el-form-item label="学校全称">
-                <!-- 设置为 disabled，因为这是账号固有的信息 -->
-                <el-input v-model="form.school_name" disabled />
+                <el-input v-model="form.school_name" disabled placeholder="请输入公章全称" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -69,13 +68,11 @@
           <el-row :gutter="40">
             <el-col :span="12">
               <el-form-item label="所属地区">
-                <!-- 自动填充的地区，设置为只读 -->
                 <el-input v-model="form.area_display" disabled placeholder="省/市/区（县）" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="建校年份" prop="founding_year">
-                <!-- 允许填写的补充信息 -->
+              <el-form-item label="建校年份" prop="founding_year" required>
                 <el-input v-model="form.founding_year" placeholder="如：1985" />
               </el-form-item>
             </el-col>
@@ -83,32 +80,35 @@
 
           <el-row :gutter="40">
             <el-col :span="12">
-              <el-form-item label="在校学生总数" prop="student_count">
+              <el-form-item label="在校学生总数" prop="student_count" required>
                 <el-input v-model.number="form.student_count" placeholder="人数" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="教职工总数" prop="teacher_count">
+              <el-form-item label="教职工总数" prop="teacher_count" required>
                 <el-input v-model.number="form.teacher_count" placeholder="人数" />
               </el-form-item>
             </el-col>
           </el-row>
         </el-form>
-      </div>
 
-      <div class="submit-wrapper">
-        <el-button type="primary" size="large" class="start-btn" @click="handleStart">
-          开始评估
-        </el-button>
+        <div class="submit-wrapper">
+          <el-button type="primary" size="large" class="start-btn" @click="handleStart">
+            开始评估
+          </el-button>
+        </div>
       </div>
     </main>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive,onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { User, ArrowRight, DataLine, Checked, Box, Cpu } from '@element-plus/icons-vue'
+import { 
+  TrendCharts, Checked, UserFilled, Coin, Connection, 
+  ArrowRightBold 
+} from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import request from '@/api/request'
 
@@ -138,36 +138,26 @@ const typeMap = {
   'nine_year': '九年一贯制',
   'twelve_year': '十二年一贯制'
 }
+
 onMounted(async () => {
-  // 先把本地有的名字填上，避免页面完全空白
   const storedUser = JSON.parse(localStorage.getItem('user'))
   if (storedUser) {
-    form.school_name = storedUser.school_name || storedUser.username || ''
+    form.school_name = storedUser.school_name || ''
   }
 
-  // 
   try {
-    const res = await request({
-      url: '/school/info/', 
-      method: 'get'
-    })
-    
+    const res = await request({ url: '/school/info/', method: 'get' })
     if (res.data) {
       const data = res.data
-      form.school_name = data.school_name || data.name || data.full_name || form.school_name
-      // 优先使用后端返回的显示名称，没有则手动映射
+      form.school_name = data.school_name || form.school_name
       form.school_type = data.school_type_display || typeMap[data.school_type] || data.school_type
-      // 拼接地区
-      form.area_display = `${data.province} / ${data.city} / ${data.district}`
-      
-      // 如果之前填过，也可以顺便把这几个填上
+      form.area_display = `${data.province}/${data.city}/${data.district}`
       form.founding_year = data.founding_year || ''
       form.student_count = data.student_count || null
       form.teacher_count = data.teacher_count || null
     }
   } catch (error) {
-    console.error('获取学校详情失败:', error)
-    ElMessage.error('无法加载学校信息，请刷新页面')
+    ElMessage.error('无法加载学校信息')
   } finally {
     loading.value = false
   }
@@ -175,36 +165,25 @@ onMounted(async () => {
 
 const handleStart = async () => {
   if (!formRef.value) return
-  
-  // 1. 表单校验
   await formRef.value.validate(async (valid) => {
     if (valid) {
       loading.value = true
       try {
-        // 2. 调用你后端的 school/update/ 接口
-        const res = await request({
-          url: '/school/update-count/', // 👈 对应你刚才给我的后端路由
-          method: 'post',         // 对应视图里的 @api_view(['POST'])
+        await request({
+          url: '/school/update-count/',
+          method: 'post',
           data: {
             student_count: form.student_count,
             teacher_count: form.teacher_count
           }
         })
-        
-        // 3. 判断是否成功（根据后端返回结构判断，通常 res.success 或 res.data 存在即可）
-        if (res) {
-          ElMessage.success('基础信息确认成功，进入评估')
-          // 4. 跳转到正式评估导航页
-          router.push('/school/assessment')
-        }
+        ElMessage.success('基础信息确认成功，进入评估')
+        router.push('/school/assessment')
       } catch (error) {
-        console.error('保存信息失败:', error)
-        ElMessage.error(error.response?.data?.error || '服务器开小差了，请重试')
+        ElMessage.error('保存失败，请重试')
       } finally {
         loading.value = false
       }
-    } else {
-      ElMessage.warning('请检查输入内容是否完整')
     }
   })
 }
@@ -214,59 +193,60 @@ const handleStart = async () => {
 .basic-info-page {
   min-height: 100vh;
   background-color: #f0f2f5;
-  padding-bottom: 50px;
+  padding-bottom: 60px;
+  display: flex;
+  flex-direction: column;
 }
 
+/* 顶部横幅 - 深蓝色 */
 .info-banner {
-  background-color: #1e5ba0; /* 深蓝色背景 */
-  background: linear-gradient(135deg, #1e5ba0 0%, #2980b9 100%);
+  background-color: #34495e; 
   color: white;
-  padding: 60px 20px;
+  padding: 40px 20px 40px;
   text-align: left;
 }
 
 .banner-content {
-  max-width: 1000px;
+  width: 95%;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
-.banner-content h2 {
-  font-size: 28px;
+.banner-title {
+  font-size: 32px;
+  font-weight: 700;
   margin-bottom: 20px;
+  color: #fff;
 }
 
-.banner-content .subtitle {
-  font-size: 18px;
-  margin-bottom: 15px;
-  opacity: 0.9;
+.subtitle {
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: #ecf0f1;
 }
 
-.banner-content .promise {
-  font-size: 15px;
+.promise {
+  font-size: 14px;
   line-height: 1.6;
-  opacity: 0.8;
+  color: #bdc3c7;
 }
 
+/* 主体容器 */
 .info-main {
-  max-width: 1000px;
-  margin: -40px auto 0;
+  width: 95%; 
+  max-width: 1600px;
+  margin: 30px auto 0;
+  padding: 0 20px;
 }
 
-.info-card {
+/* 流程图卡片 */
+.process-card {
   background: white;
-  border-radius: 12px;
-  padding: 40px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-}
-
-/* 流程图样式 */
-.process-wrapper {
-  background-color: #f0f7ff;
-  border: 1px solid #d0e4ff;
-  border-radius: 12px;
+  border-radius: 15px;
   padding: 30px;
-  margin-bottom: 40px;
-  text-align: center;
+  margin-bottom: 25px;
+  border: 1px solid #e0e6ed;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .process-steps {
@@ -280,70 +260,94 @@ const handleStart = async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  color: #606266;
+  gap: 12px;
 }
 
 .step-icon {
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 22px;
   color: white;
-  background-color: #909399; /* 默认灰色 */
+  background-color: #2C3E50; /* 默认深灰蓝 */
 }
 
-/* 各个维度的颜色 */
-.step-icon.literacy { background-color: #1abc9c; }
-.step-icon.system { background-color: #9b59b6; }
-.step-icon.behavior { background-color: #e67e22; }
-.step-icon.asset { background-color: #5c6bc0; }
-.step-icon.tech { background-color: #26c6da; }
+/* 维度颜色还原 */
+.step-icon.literacy { background-color: #1abc9c; } /* 绿色 */
+.step-icon.institution { background-color: #9b59b6; } /* 紫色 */
+.step-icon.behavior { background-color: #f39c12; } /* 橙色 */
+.step-icon.asset { background-color: #34495e; } /* 深蓝灰 */
+.step-icon.tech { background-color: #16a085; } /* 青色 */
 
 .step-text {
   font-size: 14px;
+  color: #7f8c8d;
+}
+
+.step-item.active .step-text {
+  color: #1abc9c;
   font-weight: bold;
 }
 
 .step-arrow {
   color: #dcdfe6;
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .process-tip {
   font-size: 14px;
-  color: #409eff;
+  color: #3498db;
+  text-align: center;
+  margin-top: 10px;
 }
 
-/* 表单样式 */
+/* 表单卡片 */
+.form-card {
+  background: white;
+  border-radius: 15px;
+  padding: 40px;
+  border: 1px solid #e0e6ed;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
 .info-form :deep(.el-form-item__label) {
-  font-weight: bold;
-  color: #303133;
+  font-weight: 500;
+  color: #34495e;
+  padding-bottom: 8px;
 }
 
+/* 输入框圆角和背景还原 */
 .info-form :deep(.el-input__wrapper) {
-  height: 45px;
-  background-color: #f8f9fb;
+  height: 48px;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 1px #dcdfe6 inset;
+}
+
+.info-form :deep(.el-input.is-disabled .el-input__wrapper) {
+  background-color: #f8f9fa;
 }
 
 .submit-wrapper {
   text-align: center;
-  margin-top: 40px;
+  margin-top: 30px;
 }
 
+/* 按钮样式 */
 .start-btn {
-  width: 280px;
-  height: 50px;
-  font-size: 18px;
-  background-color: #4da1ff;
+  width: 200px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 10px;
+  background-color: #3498db;
   border: none;
-  border-radius: 8px;
 }
 
 .start-btn:hover {
-  background-color: #3d8ae5;
+  background-color: #2980b9;
 }
 </style>
