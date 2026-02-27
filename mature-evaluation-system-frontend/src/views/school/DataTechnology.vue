@@ -46,7 +46,7 @@
                 <el-form-item prop="data_center_standard">
           <template #label>
             <div class="label-with-hint">
-              <span>学校设有独立数据中心（如独立机房等）目标标准符合GB50174-2017数据中心设计规范的相应标准准要求？</span>
+              <span>学校设有独立数据中心（如独立机房等）目标标准符合GB50174-2017数据中心设计规范的相应标准要求？</span>
               <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
                   <span class="hint-tag">填写提示</span>

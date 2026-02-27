@@ -1003,10 +1003,10 @@ const initBehaviorBarChart = () => {
     chartInstances.push(chart)
 
     chart.setOption({
-      title: { text: '月度数据行为频次统计', left: 'center', top: 5 },
+      title: { text: '年度数据行为频次统计', left: 'center', top: 5 },
       tooltip: { trigger: 'axis' },
       grid: { left: '15%', right: '10%', bottom: '10%', top: 50 },
-      xAxis: { type: 'value', name: '月均频次(次)' },
+      xAxis: { type: 'value', name: '年均频次(次)' },
       yAxis: {
         type: 'category',
         data: ['管理者数据行为', '学生数据行为', '教师数据行为']

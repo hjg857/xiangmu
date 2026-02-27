@@ -421,10 +421,15 @@ class ScoringService:
         d21_raw = self._apply_range_rules(total_volume, rules['D21']['rules'])
         self.observation_scores['D21'] = self._normalize_score(d21_raw, rules['D21']['max_score'])
 
+        # D22: 人均数据资产量
+        total_people = (asset.student_count or 0) + (asset.staff_count or 0)
+        per_capita = total_volume / total_people if total_people > 0 else 0
+        d22_raw = self._apply_range_rules(per_capita, rules['D22']['rules'])
+        self.observation_scores['D22'] = self._normalize_score(d22_raw, rules['D22']['max_score'])
 
         # 计算二级指标得分
         d1_score = self._calculate_secondary_score(self.observation_scores, ['D11', 'D12', 'D13'])
-        d2_score = self._calculate_secondary_score(self.observation_scores, ['D21'])
+        d2_score = self._calculate_secondary_score(self.observation_scores, ['D21', 'D22'])
 
         self.secondary_scores['D1'] = d1_score
         self.secondary_scores['D2'] = d2_score
@@ -461,9 +466,6 @@ class ScoringService:
         # E12: 数据系统平台
         e12_raw = rules['E12']['rules'].get(tech.has_data_platform, 0)
         self.observation_scores['E12'] = self._normalize_score(e12_raw, rules['E12']['max_score'])
-
-        e13_raw = rules['E13']['rules'].get(tech.cloud_dedicated_service, 0)
-        self.observation_scores['E13'] = self._normalize_score(e13_raw, rules['E13']['max_score'])
 
         # E21: 数据安全合规与认证
         e21_raw = 0
@@ -519,21 +521,20 @@ class ScoringService:
 
     def determine_maturity_level(self, total_score: float) -> str:
         """
-        根据总分（5分制）确定成熟度等级
-        等级划分（基于5分制）:
-        - 引领级: 4.5-5.0
-        - 成熟级: 4.0-4.5
-        - 成长级: 3.5-4.0
-        - 初始级: 0-3.5
+        根据最新规则确定等级：
+        等级一：初始级 [0.0, 1.5]
+        等级二：成长级 (1.5, 3.0]
+        等级三：成熟级 (3.0, 4.0]
+        等级四：创新级 (4.0, 5.0]
         """
-        if total_score >= 4.5:
-            return 'leading'
-        elif total_score >= 4.0:
-            return 'mature'
-        elif total_score >= 3.5:
-            return 'growing'
+        if total_score > 4.0:
+            return 'leading'  # 对应“创新级/引领级”
+        elif total_score > 3.0:
+            return 'mature'  # 对应“成熟级”
+        elif total_score > 1.5:
+            return 'growing'  # 对应“成长级”
         else:
-            return 'initial'
+            return 'initial'  # 对应“初始级”
 
     def _score_documents_with_llm(self, doc_files: list, doc_type: str, 
                                    max_score: float = 20.0, institution=None) -> float:
