@@ -386,6 +386,7 @@ class ScoringService:
 
         try:
             asset = self.assessment.asset
+            school = self.school
         except:
             logger.warning("没有数据资产评估数据")
             return 0.0
@@ -422,7 +423,7 @@ class ScoringService:
         self.observation_scores['D21'] = self._normalize_score(d21_raw, rules['D21']['max_score'])
 
         # D22: 人均数据资产量
-        total_people = (asset.student_count or 0) + (asset.staff_count or 0)
+        total_people = (school.student_count or 0) + (school.teacher_count or 0)
         per_capita = total_volume / total_people if total_people > 0 else 0
         d22_raw = self._apply_range_rules(per_capita, rules['D22']['rules'])
         self.observation_scores['D22'] = self._normalize_score(d22_raw, rules['D22']['max_score'])
