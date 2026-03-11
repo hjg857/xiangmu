@@ -36,11 +36,18 @@ def create_application(request):
     print("接收到的申请数据:", request.data)
     
     serializer = AccountApplicationCreateSerializer(data=request.data)
-    
+
     if not serializer.is_valid():
         print("验证失败:", serializer.errors)
+
+        first_error = None
+        for field, errors in serializer.errors.items():
+            if isinstance(errors, list) and errors:
+                first_error = errors[0]
+                break
+
         return APIResponse.error(
-            message='提交失败，请检查表单',
+            message=first_error or '提交失败，请检查表单',
             details=serializer.errors,
             status_code=status.HTTP_400_BAD_REQUEST
         )

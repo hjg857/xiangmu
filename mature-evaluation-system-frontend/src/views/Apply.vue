@@ -134,11 +134,25 @@
             />
           </el-form-item>
 
-          <el-form-item label="电子邮箱" prop="contact_email">
+          <el-form-item prop="contact_email">
+            <template #label>
+              <span class="email-label">
+                <span>电子邮箱</span>
+                <el-tooltip
+                  content="温馨提示：一个邮箱只能申请一个账号，请勿重复申请"
+                  placement="top"
+                  effect="light"
+                >
+                  <span class="email-tip-icon">?</span>
+                </el-tooltip>
+              </span>
+            </template>
+
             <el-input
               v-model="applyForm.contact_email"
               placeholder="常用邮箱地址"
             />
+
             <div class="form-tip">
               审核通过后，系统将自动生成账号和密码并发送至此邮箱
             </div>
@@ -341,7 +355,7 @@ const handleSubmit = async () => {
         province: applyForm.province,
         city: applyForm.city,
         district: applyForm.district,
-        district_code: applyForm.districtCode, 
+        district_code: applyForm.districtCode,
         contact_name: applyForm.contact_name,
         contact_position: applyForm.contact_position,
         contact_phone: applyForm.contact_phone,
@@ -352,13 +366,18 @@ const handleSubmit = async () => {
         router.push({ name: 'apply-success', params: { id: res.data.id } })
       }
     } catch (error) {
-      ElMessage.error(error.response?.data?.error?.message || '提交失败')
+      const msg = error.response?.data?.error?.message || '提交失败'
+
+      if (msg.includes('待审批的申请') || msg.includes('已被注册')) {
+        ElMessage.warning(msg)
+      } else {
+        ElMessage.error(msg)
+      }
     } finally {
       loading.value = false
     }
   })
 }
-
 // 返回登录
 const goToLogin = () => router.push('/login')
 </script>
@@ -474,10 +493,42 @@ const goToLogin = () => router.push('/login')
   border-left: none;
 }
 
-.form-tip {
-  font-size: 12px;
+.email-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  white-space: nowrap;
+}
+
+.email-tip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #f2f3f5;
+  border: 1px solid #dcdfe6;
   color: #909399;
-  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.email-tip-icon:hover {
+  background: #e9eef3;
+  color: #606266;
+  border-color: #c0c4cc;
+}
+
+.form-tip {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #909399;
+  line-height: 1.6;
 }
 
 .agreement-text {

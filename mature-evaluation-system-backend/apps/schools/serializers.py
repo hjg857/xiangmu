@@ -92,6 +92,6 @@ class AccountApplicationCreateSerializer(serializers.ModelSerializer):
         
         from apps.accounts.models import User
         if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError('该邮箱已被注册')
+            raise serializers.ValidationError('用户已注册账号，请勿重复申请')
         
         return value

@@ -233,7 +233,7 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER', '')
 
 # 系统配置
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://8.155.152.174')
 SYSTEM_EMAIL_SIGNATURE = '此邮件由系统自动发送，请勿回复'
 
 # 大模型API配置（可选，也可在数据库中配置）

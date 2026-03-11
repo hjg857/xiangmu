@@ -45,11 +45,11 @@
               <h3 class="assessment-title">
                 {{ activeYear }}年{{ activeAssessment.school_name }}数据文化成熟度评估
               </h3>
-              <span class="percentage-label">{{ activeAssessment?.progress_rate || 0 }}% 完成</span>
+              <span class="percentage-label">{{ currentProgress }}% 完成</span>
             </div>
             
             <el-progress 
-              :percentage="activeAssessment?.progress_rate || 0"
+              :percentage="currentProgress"
               :stroke-width="15" 
               color="#ff9800" 
               :show-text="false"
@@ -212,6 +212,8 @@ const paginatedHistory = computed(() => {
   return historyAssessments.value.slice(start, end)
 })
 
+
+
 const activeAssessment = computed(() => {
   // 只有草稿状态才显示在顶部的“进度”卡片里，方便用户点击“继续”
   return assessments.value.find(a => a.status === 'draft')
@@ -272,6 +274,32 @@ const formatYearMonth = (dateStr) => {
   const month = date.getMonth() + 1 // getMonth() 返回 0-11，所以要加 1
   return `${year}年${month}月`
 }
+
+const currentProgress = computed(() => {
+  const a = activeAssessment.value;
+  // 如果没有数据，或者后端还没返回状态对象，返回 0
+  if (!a || !a.module_status) return 0;
+
+  // 直接提取后端返回的模块状态（这些状态直接决定了评估页是否有绿勾）
+  const ms = a.module_status;
+
+  // 1. 数据素养：保留你要求的“每份问卷至少各收集1份”逻辑
+  // 注意：如果后端 ms.literacy 已经是按“各收1份”算的，直接用 ms.literacy 即可
+  const literacyDone = ms.literacy || false;
+
+  // 2. 其他四个模块：直接读取后端状态，确保与“绿色对号”完全同步
+  const institutionDone = ms.institution || false;
+  const behaviorDone = ms.behavior || false;
+  const assetDone = ms.asset || false;
+  const technologyDone = ms.technology || false;
+
+  // 3. 统计完成数
+  const modules = [literacyDone, institutionDone, behaviorDone, assetDone, technologyDone];
+  const doneCount = modules.filter(Boolean).length;
+
+  // 计算百分比：(完成数 / 5) * 100
+  return Math.round((doneCount / 5) * 100);
+});
 </script>
 
 <style scoped>

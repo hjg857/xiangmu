@@ -42,11 +42,23 @@
       >
         <!-- 1. 数据基础设施 -->
         <div class="section-title">1. 数据基础设施</div>
-        
-                <el-form-item prop="data_center_standard">
+
+        <el-form-item prop="has_independent_data_center">
           <template #label>
             <div class="label-with-hint">
-              <span>学校设有独立数据中心（如独立机房等）目标标准符合GB50174-2017数据中心设计规范的相应标准要求？</span>
+              <span>学校是否设有独立数据中心（如独立机房等）？</span>
+            </div>
+          </template>
+          <el-radio-group v-model="formData.has_independent_data_center" class="horizontal-radio">
+            <el-radio :value="true">是</el-radio>
+            <el-radio :value="false">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        
+                <el-form-item v-if="formData.has_independent_data_center === true" prop="data_center_standard">
+          <template #label>
+            <div class="label-with-hint">
+              <span>学校设有独立数据中心（如独立机房等）且中心各项指标符合GB50174-2017《数据中心设计规范》的相应标准？</span>
               <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
                   <span class="hint-tag">填写提示</span>
@@ -54,6 +66,16 @@
                 <div class="hint-body">
                   <p class="hint-text">学校是否拥有独立数据中心（独立机房），且该数据中心的建设标准是否符合 GB50174-2017《数据中心设计规范》的对应要求，按实际情况选择对应选项。</p>
                   <p class="hint-example"><em>示例：学校建有独立机房且各项指标完全满足 GB50174-2017 B 级要求，则选择「完全符合」；学校有独立机房但仅部分指标符合 B 级要求，则选择「部分符合」；学校有独立机房但未达到 B 级要求，则选择「不符合」。</em></p>
+                  <a
+                    class="pdf-link"
+                    type="primary"
+                    :href="pdfUrl"
+                    target="_blank"
+                    :underline="false"
+                    rel="noopener noreferrer"
+                    >
+                    查看附件：GB50174-2017《数据中心设计规范》
+                   </a>
                 </div>
               </el-popover>
             </div>
@@ -80,7 +102,7 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item prop="cloud_dedicated_service">
+        <el-form-item v-if="formData.has_independent_data_center === false" prop="cloud_dedicated_service">
         <template #label>
           <div class="label-with-hint">
             <span>学校未设有独立数据中心，但使用专享云服务，且完全满足学校的数据应用需求？</span>
@@ -309,7 +331,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft } from '@element-plus/icons-vue'
@@ -317,6 +339,7 @@ import { ArrowLeft } from '@element-plus/icons-vue'
 const route = useRoute()
 const router = useRouter()
 const assessmentId = computed(() => route.params.id)
+const pdfUrl = new URL('@/assets/files/GB50174-2017.pdf', import.meta.url).href
 
 const loading = ref(true)
 const saving = ref(false)
@@ -325,6 +348,7 @@ const isReadonly = ref(false)  // 只读模式
 
 // 表单数据
 const formData = ref({
+  has_independent_data_center: null,
   data_center_standard: null,
   cloud_dedicated_service: null,
   student_device_ratio: null,
@@ -416,6 +440,14 @@ onBeforeUnmount(() => {
     clearInterval(autoSaveTimer)
   }
 })
+
+watch(() => formData.value.has_independent_data_center, (newVal) => {
+  if (newVal === true) {
+    formData.value.cloud_dedicated_service = null;
+  } else if (newVal === false) {
+    formData.value.data_center_standard = null;
+  }
+})
 </script>
 
 <style scoped>
@@ -423,6 +455,18 @@ onBeforeUnmount(() => {
   padding: 20px;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+.pdf-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: #409eff;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.pdf-link:hover {
+  text-decoration: underline;
 }
 
 .card-header {

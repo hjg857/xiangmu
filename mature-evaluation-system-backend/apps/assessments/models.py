@@ -16,7 +16,7 @@ class Assessment(models.Model):
     ]
     
     MATURITY_LEVEL_CHOICES = [
-        ('leading', '引领级'),
+        ('leading', '创新级'),
         ('mature', '成熟级'),
         ('growing', '成长级'),
         ('initial', '初始级'),
@@ -199,6 +199,7 @@ class AssetAssessment(models.Model):
         return f"{self.assessment.school.name} - 数据资产"
 
 
+
 class TechnologyAssessment(models.Model):
     """数据技术评估模型"""
     
@@ -234,6 +235,7 @@ class TechnologyAssessment(models.Model):
     )
     
     # 1. 数据基础设施
+    has_independent_data_center = models.BooleanField(null=True, blank=True, verbose_name="是否有独立数据中心")
     data_center_standard = models.CharField('数据中心标准符合度', max_length=30, choices=DATA_CENTER_STANDARD_CHOICES, blank=True, null=True)
     cloud_dedicated_service = models.CharField('专享云服务完全满足需求情况', max_length=30, choices=CLOUD_DEDICATED_FULFILL_CHOICES, blank=True, null=True)
     student_device_ratio = models.CharField('生机比', max_length=20, choices=DEVICE_RATIO_CHOICES, blank=True, null=True)

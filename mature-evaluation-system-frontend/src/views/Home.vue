@@ -30,9 +30,12 @@
     <!-- 主体内容区 -->
     <main class="main-content">
       <div class="hero-section">
-        <h2 class="hero-title">数据驱动决策 文化赋能教育</h2>
-        <p class="hero-description">
-          本系统为中小学校提供全方位数据文化成熟度评估与诊断服务，通过科学量化的评估模型，帮助学校深度数据应用现状，定位差距瓶颈，提炼数据驱动文化建设，评估结果将生成可视化诊断的改进路线图，推动学校建立数据驱动的教育决策机制。
+        <h2 class="hero-title">数据赋能教育，文化引领未来</h2>
+        <p class="hero-description1">
+          研究团队立足国家教育数字化战略部署，构建了具有中国特色的中小学校数据文化成熟度模型，并依托该模型开发了中小学校数据文化成熟度评估监测系统。系统将从数据素养、数据制度、数据行为、数据资产、数据技术五个维度系统评估中小学校数据文化建设水平。
+        </p>
+        <p class="hero-description2">
+          在此基础上，平台创新引入大模型技术对评估数据开展智能化分析，综合研判学校数据文化的发展短板与关键问题，并自动生成可视化的中小学校数据文化成熟度评估报告，为提升学校数据治理能力、推进数据规范管理与高效应用提供有力支撑。
         </p>
         
         <div class="action-buttons">
@@ -290,12 +293,24 @@ const handleLogout = () => {
   letter-spacing: 2px;
 }
 
-.hero-description {
+.hero-description1 {
+  font-size: 16px;
+  line-height: 1.8;
+  max-width: 900px;
+  margin: 0 auto 6px;
+  opacity: 0.95;
+  text-align: left;
+  text-indent: 2em;
+}
+
+.hero-description2 {
   font-size: 16px;
   line-height: 1.8;
   max-width: 900px;
   margin: 0 auto 48px;
   opacity: 0.95;
+  text-align: left;
+  text-indent: 2em;
 }
 
 .action-buttons {

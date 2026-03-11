@@ -146,240 +146,13 @@
             为全面评估您所在学校“数据素养”发展水平，请您将以下问卷链接分享给学校更多教师、学生、管理者填写，问卷有限填写期限为48小时
           </p>
 
-          <!-- 教师问卷 -->
-          <div class="section-header">
-            <el-icon><Link /></el-icon>
-            <span>数据素养评测问卷</span>
-          </div>
+                    <!-- 管理者问卷 -->
+
 
           <div class="survey-card">
             <div class="survey-header">
             <div class="title-line">
-              <h3 class="survey-title">教师数据素养调查问卷</h3>
-                  <!-- 填写提示组件 -->
-                      <el-popover
-                        placement="top-start"
-                        title="温馨提示"
-                        :width="350"
-                        trigger="hover"
-                        popper-class="custom-hint-popper"
-                      >
-                        <template #reference>
-                          <span class="hint-tag">填写提示</span>
-                        </template>
-      
-                        <!-- 弹出框的具体内容 -->
-                        <div class="hint-body">
-                          <p class="hint-text">
-我们将依据每位教师的作答结果生成个人得分，通过整合个人得分，计算出学校教师数据素养的平均水平。
-请您将此问卷链接或二维码转发给学校更多教师填写，尽可能覆盖不同学科、不同教龄的教师。参与测评的人数越多，越能客观反映学校真实水平。
-
-                          </p>
-                          <p class="hint-example">
-                            <em></em>
-                          </p>
-                        </div>
-                      </el-popover>
-              </div>
-              <p class="survey-desc">34题，评估教师数据素养及数据应用效果</p>
-            </div>
-            
-            <div v-if="teacherInstance" class="survey-content">
-              <div class="survey-stats">
-                <div class="stat-item">
-                  <span class="stat-label">已收集：</span>
-                  <el-tag type="success">{{ teacherInstance.collected_count }}</el-tag>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">截止日期：</span>
-                  <el-tag type="warning">{{ formatExpiredTime(teacherInstance.expired_at) }}</el-tag>
-                </div>
-                <div v-if="isReadonly" class="stat-item">
-                  <el-tag type="info">已停止收集</el-tag>
-                </div>
-              </div>
-              
-              <div class="share-link-section" v-if="!isReadonly">
-                <div class="share-area">
-                  <div class="share-left">
-                    <div class="input-group-custom">
-                      <el-input
-                        type="textarea"
-                        :rows="2"
-                        readonly
-                        resize="none"
-                        :model-value="`${schoolName}《教师数据素养调查问卷》\n问卷链接：${teacherShareUrl}`"
-                        class="share-textarea-custom"
-                      />
-                      <el-button 
-                        type="primary" 
-                        class="share-append-btn"
-                        @click="copyLink(`${schoolName}《教师数据素养调查问卷》\n问卷链接：${teacherShareUrl}`)"
-                      >
-                        <el-icon style="margin-right: 4px;"><DocumentCopy /></el-icon>
-                        复制
-                      </el-button>
-                    </div>
-                  </div>
-
-                  <div class="share-right">
-                    <div class="qr-wrapper">
-                      <!-- 二维码区域 -->
-                      <div class="qr-box">
-                        <img
-                          v-if="teacherQrUrl"
-                          :src="teacherQrUrl"
-                          class="qr-img"
-                          alt="教师问卷二维码"
-                        />
-                        <div v-else class="qr-placeholder">二维码生成中...</div>
-
-                      
-                      </div>
-
-                      <!-- 二维码下方提示文字 -->
-                      <div class="qr-tip">
-                        《教师数据素养及数据应用效果调查问卷》<br />
-                        请在48小时内完成问卷填写！
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-            
-            <div v-else class="survey-empty">
-              <p>{{ isReadonly ? '未生成问卷链接' : '尚未生成问卷链接' }}</p>
-              <el-button v-if="!isReadonly" type="primary" @click="createInstanceDirect('teacher')" :loading="creating">
-                生成问卷链接
-              </el-button>
-            </div>
-          </div>
-
-          <!-- 学生问卷 -->
-          <div class="section-header">
-            <el-icon><Link /></el-icon>
-            <span>数据素养评测问卷</span>
-          </div>
-
-          <div class="survey-card">
-            <div class="survey-header">
-            <div class="title-line">
-              <h3 class="survey-title">学生数据素养调查问卷</h3>
-              <!-- 填写提示组件 -->
-                      <el-popover
-                        placement="top-start"
-                        title="温馨提示"
-                        :width="350"
-                        trigger="hover"
-                        popper-class="custom-hint-popper"
-                      >
-                        <template #reference>
-                          <span class="hint-tag">填写提示</span>
-                        </template>
-      
-                        <!-- 弹出框的具体内容 -->
-                        <div class="hint-body">
-                          <p class="hint-text">
-我们将依据每位学生的作答结果生成个人得分，通过整合个人得分，计算出本校学生数据素养的平均水平。
-请您将此问卷链接或二维码转发给学校更多学生填写，尽可能覆盖不同年级、不同班级的学生。参与测评的人数越多，越能客观反映学校真实水平。
-
-                          </p>
-                          <p class="hint-example">
-                            <em></em>
-                          </p>
-                        </div>
-                      </el-popover>
-              </div>
-              <p class="survey-desc">28题，评估学生数据素养及数据应用效果</p>
-            </div>
-            
-            <div v-if="studentInstance" class="survey-content">
-              <div class="survey-stats">
-                <div class="stat-item">
-                  <span class="stat-label">已收集：</span>
-                  <el-tag type="success">{{ studentInstance.collected_count }}</el-tag>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">截止日期：</span>
-                  <el-tag type="warning">{{ formatExpiredTime(studentInstance.expired_at) }}</el-tag>
-                </div>
-                <div v-if="isReadonly" class="stat-item">
-                  <el-tag type="info">已停止收集</el-tag>
-                </div>
-              </div>
-              
-              <div class="share-link-section" v-if="!isReadonly">
-                <div class="share-area">
-                  <div class="share-left">
-                  <div class="input-group-custom">
-                      <el-input
-                        type="textarea"
-                        :rows="2"
-                        readonly
-                        resize="none"
-                        :model-value="`${schoolName}《学生数据素养调查问卷》\n问卷链接：${studentShareUrl}`"
-                        class="share-textarea-custom"
-                      />
-                      <el-button 
-                        type="primary" 
-                        class="share-append-btn"
-                        @click="copyLink(`${schoolName}《教师数据素养调查问卷》\n问卷链接：${studentShareUrl}`)"
-                      >
-                        <el-icon style="margin-right: 4px;"><DocumentCopy /></el-icon>
-                        复制
-                      </el-button>
-                    </div>
-                  </div>
-
-                  <div class="share-right">
-                    <div class="qr-wrapper">
-                      <!-- 二维码区域 -->
-                      <div class="qr-box">
-                        <img
-                          v-if="studentQrUrl"
-                          :src="studentQrUrl"
-                          class="qr-img"
-                          alt="学生问卷二维码"
-                        />
-                        <div v-else class="qr-placeholder">二维码生成中...</div>
-
-                        <!-- 中间学校名覆盖 -->
-                        <div class="qr-center">
-                          <span class="school-name">{{ schoolName }}</span>
-                        </div>
-                      </div>
-
-                      <!-- 二维码下方提示文字 -->
-                      <div class="qr-tip">
-                        《学生数据素养及数据应用效果调查问卷》<br />
-                        请在48小时内完成问卷填写！
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div v-else class="survey-empty">
-              <p>{{ isReadonly ? '未生成问卷链接' : '尚未生成问卷链接' }}</p>
-              <el-button v-if="!isReadonly" type="primary" @click="createInstanceDirect('student')" :loading="creating">
-                生成问卷链接
-              </el-button>
-            </div>
-          </div>
-
-          <!-- 管理者问卷 -->
-          <div class="section-header">
-            <el-icon><Link /></el-icon>
-            <span>数据素养评测问卷</span>
-          </div>
-
-          <div class="survey-card">
-            <div class="survey-header">
-            <div class="title-line">
-              <h3 class="survey-title">管理者数据素养调查问卷</h3>
+              <h3 class="survey-title">管理者调查问卷</h3>
               <el-popover
                         placement="top-start"
                         title="温馨提示"
@@ -394,7 +167,7 @@
                         <!-- 弹出框的具体内容 -->
                         <div class="hint-body">
                           <p class="hint-text">
-我们将依据每位管理者的作答结果生成个人得分，通过整合个人得分，计算出本校管理者数据素养的平均水平。
+我们将依据每位管理者的作答结果生成个人得分，通过整合个人得分，计算出学校管理者数据素养的平均水平。
 请您将此问卷链接或二维码转发给学校更多管理者填写，尽可能覆盖不同管理岗位、不同管理年限的管理者。参与测评的人数越多，越能客观反映学校真实水平。
                           </p>
                           <p class="hint-example">
@@ -403,7 +176,7 @@
                         </div>
                       </el-popover>
               </div>
-              <p class="survey-desc">37题，评估管理者数据素养及数据资产意识</p>
+              <p class="survey-desc">调查管理者的数据素养水平、数据资产意识及其对学校数据应用效果的主观评价。</p>
             </div>
             
             <div v-if="managerInstance" class="survey-content">
@@ -481,6 +254,224 @@
               </el-button>
             </div>
           </div>
+
+          <!-- 教师问卷 -->
+
+          <div class="survey-card">
+            <div class="survey-header">
+            <div class="title-line">
+              <h3 class="survey-title">教师调查问卷</h3>
+                  <!-- 填写提示组件 -->
+                      <el-popover
+                        placement="top-start"
+                        title="温馨提示"
+                        :width="350"
+                        trigger="hover"
+                        popper-class="custom-hint-popper"
+                      >
+                        <template #reference>
+                          <span class="hint-tag">填写提示</span>
+                        </template>
+      
+                        <!-- 弹出框的具体内容 -->
+                        <div class="hint-body">
+                          <p class="hint-text">
+我们将依据每位教师的作答结果生成个人得分，通过整合个人得分，计算出学校教师数据素养的平均水平。
+请您将此问卷链接或二维码转发给学校更多教师填写，尽可能覆盖不同学科、不同教龄的教师。参与测评的人数越多，越能客观反映学校真实水平。
+
+                          </p>
+                          <p class="hint-example">
+                            <em></em>
+                          </p>
+                        </div>
+                      </el-popover>
+              </div>
+              <p class="survey-desc">调查教师的数据素养水平及其对学校数据应用效果的主观评价。</p>
+            </div>
+            
+            <div v-if="teacherInstance" class="survey-content">
+              <div class="survey-stats">
+                <div class="stat-item">
+                  <span class="stat-label">已收集：</span>
+                  <el-tag type="success">{{ teacherInstance.collected_count }}</el-tag>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">截止日期：</span>
+                  <el-tag type="warning">{{ formatExpiredTime(teacherInstance.expired_at) }}</el-tag>
+                </div>
+                <div v-if="isReadonly" class="stat-item">
+                  <el-tag type="info">已停止收集</el-tag>
+                </div>
+              </div>
+              
+              <div class="share-link-section" v-if="!isReadonly">
+                <div class="share-area">
+                  <div class="share-left">
+                    <div class="input-group-custom">
+                      <el-input
+                        type="textarea"
+                        :rows="2"
+                        readonly
+                        resize="none"
+                        :model-value="`${schoolName}《教师数据素养调查问卷》\n问卷链接：${teacherShareUrl}`"
+                        class="share-textarea-custom"
+                      />
+                      <el-button 
+                        type="primary" 
+                        class="share-append-btn"
+                        @click="copyLink(`${schoolName}《教师数据素养调查问卷》\n问卷链接：${teacherShareUrl}`)"
+                      >
+                        <el-icon style="margin-right: 4px;"><DocumentCopy /></el-icon>
+                        复制
+                      </el-button>
+                    </div>
+                  </div>
+
+                  <div class="share-right">
+                    <div class="qr-wrapper">
+                      <!-- 二维码区域 -->
+                      <div class="qr-box">
+                        <img
+                          v-if="teacherQrUrl"
+                          :src="teacherQrUrl"
+                          class="qr-img"
+                          alt="教师问卷二维码"
+                        />
+                        <div v-else class="qr-placeholder">二维码生成中...</div>
+
+                      
+                      </div>
+
+                      <!-- 二维码下方提示文字 -->
+                      <div class="qr-tip">
+                        《教师数据素养及数据应用效果调查问卷》<br />
+                        请在48小时内完成问卷填写！
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            
+            <div v-else class="survey-empty">
+              <p>{{ isReadonly ? '未生成问卷链接' : '尚未生成问卷链接' }}</p>
+              <el-button v-if="!isReadonly" type="primary" @click="createInstanceDirect('teacher')" :loading="creating">
+                生成问卷链接
+              </el-button>
+            </div>
+          </div>
+
+          <!-- 学生问卷 -->
+
+          <div class="survey-card">
+            <div class="survey-header">
+            <div class="title-line">
+              <h3 class="survey-title">学生调查问卷</h3>
+              <!-- 填写提示组件 -->
+                      <el-popover
+                        placement="top-start"
+                        title="温馨提示"
+                        :width="350"
+                        trigger="hover"
+                        popper-class="custom-hint-popper"
+                      >
+                        <template #reference>
+                          <span class="hint-tag">填写提示</span>
+                        </template>
+      
+                        <!-- 弹出框的具体内容 -->
+                        <div class="hint-body">
+                          <p class="hint-text">
+我们将依据每位学生的作答结果生成个人得分，通过整合个人得分，计算出学校学生数据素养的平均水平。
+请您将此问卷链接或二维码转发给学校更多学生填写，尽可能覆盖不同年级、不同班级的学生。参与测评的人数越多，越能客观反映学校真实水平。
+
+                          </p>
+                          <p class="hint-example">
+                            <em></em>
+                          </p>
+                        </div>
+                      </el-popover>
+              </div>
+              <p class="survey-desc">调查学生的数据素养水平及其对学校数据应用效果的主观评价。</p>
+            </div>
+            
+            <div v-if="studentInstance" class="survey-content">
+              <div class="survey-stats">
+                <div class="stat-item">
+                  <span class="stat-label">已收集：</span>
+                  <el-tag type="success">{{ studentInstance.collected_count }}</el-tag>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">截止日期：</span>
+                  <el-tag type="warning">{{ formatExpiredTime(studentInstance.expired_at) }}</el-tag>
+                </div>
+                <div v-if="isReadonly" class="stat-item">
+                  <el-tag type="info">已停止收集</el-tag>
+                </div>
+              </div>
+              
+              <div class="share-link-section" v-if="!isReadonly">
+                <div class="share-area">
+                  <div class="share-left">
+                  <div class="input-group-custom">
+                      <el-input
+                        type="textarea"
+                        :rows="2"
+                        readonly
+                        resize="none"
+                        :model-value="`${schoolName}《学生数据素养调查问卷》\n问卷链接：${studentShareUrl}`"
+                        class="share-textarea-custom"
+                      />
+                      <el-button 
+                        type="primary" 
+                        class="share-append-btn"
+                        @click="copyLink(`${schoolName}《教师数据素养调查问卷》\n问卷链接：${studentShareUrl}`)"
+                      >
+                        <el-icon style="margin-right: 4px;"><DocumentCopy /></el-icon>
+                        复制
+                      </el-button>
+                    </div>
+                  </div>
+
+                  <div class="share-right">
+                    <div class="qr-wrapper">
+                      <!-- 二维码区域 -->
+                      <div class="qr-box">
+                        <img
+                          v-if="studentQrUrl"
+                          :src="studentQrUrl"
+                          class="qr-img"
+                          alt="学生问卷二维码"
+                        />
+                        <div v-else class="qr-placeholder">二维码生成中...</div>
+
+                        <!-- 中间学校名覆盖 -->
+                        <div class="qr-center">
+                          <span class="school-name">{{ schoolName }}</span>
+                        </div>
+                      </div>
+
+                      <!-- 二维码下方提示文字 -->
+                      <div class="qr-tip">
+                        《学生数据素养及数据应用效果调查问卷》<br />
+                        请在48小时内完成问卷填写！
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div v-else class="survey-empty">
+              <p>{{ isReadonly ? '未生成问卷链接' : '尚未生成问卷链接' }}</p>
+              <el-button v-if="!isReadonly" type="primary" @click="createInstanceDirect('student')" :loading="creating">
+                生成问卷链接
+              </el-button>
+            </div>
+          </div>
+
+
         </div>
 
         <!-- 其他模块占位 -->
@@ -620,6 +611,28 @@ const isFilled = (v) => {
   return true
 }
 
+// 判断是否所有模块都已完成
+const isAllModulesDone = computed(() => {
+  return moduleDone.literacy && 
+         moduleDone.institution && 
+         moduleDone.behavior && 
+         moduleDone.asset && 
+         moduleDone.technology;
+});
+
+const getIncompleteModules = () => {
+  const names = {
+    literacy: '数据素养',
+    institution: '数据制度',
+    behavior: '数据行为',
+    asset: '数据资产',
+    technology: '数据技术'
+  };
+  return Object.keys(moduleDone)
+    .filter(key => !moduleDone[key])
+    .map(key => names[key]);
+};
+
 // ====== 各模块“必填字段”清单（你按实际表单字段微调）======
 // ====== 各模块“必填字段”清单：严格对齐你前端 formData ======
 const REQUIRED_FIELDS = {
@@ -657,8 +670,7 @@ const REQUIRED_FIELDS = {
   ],
 
   technology: [
-    'data_center_standard',
-    'cloud_dedicated_service',
+    'has_independent_data_center',
     'student_device_ratio',
     'teacher_device_ratio',
     'has_data_platform',
@@ -668,6 +680,25 @@ const REQUIRED_FIELDS = {
   ]
 }
 
+const calcTechnologyDone = (data) => {
+  if (!data) return false;
+
+  // 1. 检查基础必填项（即上面列表里的那些）
+  const baseFields = REQUIRED_FIELDS.technology;
+  const baseOk = baseFields.every(f => isFilled(data[f]));
+  if (!baseOk) return false;
+
+  // 2. 检查二选一逻辑
+  if (data.has_independent_data_center === true) {
+    // 如果有机房，必须填标准符合度
+    return isFilled(data.data_center_standard);
+  } else if (data.has_independent_data_center === false) {
+    // 如果没机房，必须填云服务满足情况
+    return isFilled(data.cloud_dedicated_service);
+  }
+
+  return false;
+}
 
 // ====== 拉取各模块数据（假设后端已有这些 GET 接口）======
 // 你项目里如果封装了 axios api，就替换成你现有的 api 调用即可
@@ -787,7 +818,7 @@ const refreshModuleDone = async () => {
   moduleDone.institution = calcInstitutionDone(institution)
   moduleDone.behavior = calcModuleDoneByFields(behavior, REQUIRED_FIELDS.behavior)
   moduleDone.asset = calcModuleDoneByFields(asset, REQUIRED_FIELDS.asset)
-  moduleDone.technology = calcModuleDoneByFields(technology, REQUIRED_FIELDS.technology)
+  moduleDone.technology = calcTechnologyDone(technology)
 }
 
 // 只读模式（非草稿状态都是只读）
@@ -1153,6 +1184,41 @@ const handleSubmitAssessment = async () => {
   if (assessmentStatus.value !== 'draft') {
     ElMessage.warning('评估已在处理中，请勿重复操作')
     return
+  }
+
+  if (!isAllModulesDone.value) {
+    const incomplete = getIncompleteModules();
+    ElMessageBox.alert(
+      `您还有模块未完成填写：<br/><b style="color: #f56c6c">${incomplete.join('、')}</b><br/>请确保所有模块均出现<b style="color: #67c23a">绿色对号</b>后再提交。`,
+      '提示：模块未完成',
+      { 
+        confirmButtonText: '去填写',
+        dangerouslyUseHTMLString: true 
+      }
+    );
+    return;
+  }
+  // --- 第二关：针对第一个模块，校验是否有实际回收数据（硬性限制） ---
+  const teacherCount = teacherInstance.value?.collected_count || 0;
+  const studentCount = studentInstance.value?.collected_count || 0;
+  const managerCount = managerInstance.value?.collected_count || 0;
+
+  if (teacherCount === 0 || studentCount === 0 || managerCount === 0) {
+    let missing = [];
+    if (teacherCount === 0) missing.push('教师问卷');
+    if (studentCount === 0) missing.push('学生问卷');
+    if (managerCount === 0) missing.push('管理者问卷');
+
+    ElMessageBox.alert(
+      `虽然您已生成链接，但以下问卷<b>暂无回收数据</b>：<br/><b style="color: #f56c6c">${missing.join('、')}</b>。<br/><br/>系统需要每类问卷至少有 <b>1 份</b>填答记录才能生成分析报告。请分发链接并让相关人员填写后，点击页面上方的“<b>刷新</b>”按钮再尝试提交。`,
+      '问卷数据不足',
+      { 
+        dangerouslyUseHTMLString: true, 
+        confirmButtonText: '我知道了',
+        type: 'warning'
+      }
+    );
+    return;
   }
 
   try {

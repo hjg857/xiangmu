@@ -58,7 +58,6 @@ def compute_module_status(assessment) -> Dict[str, bool]:
         "has_leadership_group",
         "meeting_activity_count",
         "has_data_staff",
-        "has_clear_responsibilities",
         "has_training",
         "has_management_doc",
         "has_practice_doc",
@@ -134,19 +133,50 @@ def compute_module_status(assessment) -> Dict[str, bool]:
     # -------------------------
     # E) 数据技术：全部填写（含你新增 cloud_dedicated_service）
     # -------------------------
-    tech = getattr(assessment, "technology", None)
-    technology_ok, _ = _require(tech, [
-        # 1. 基础设施
-        "data_center_standard",
-        "cloud_dedicated_service",
-        "student_device_ratio",
-        "teacher_device_ratio",
-        "has_data_platform",
-        # 2. 安全
-        "security_certified_count",
-        "security_certified_ratio",
-        "has_security_incident",
-    ])
+    from apps.assessments.models import TechnologyAssessment
+
+    # 强制重新获取最新的字典数据，打印 ID 确保对齐
+    tech_data = TechnologyAssessment.objects.filter(assessment_id=assessment.id).values().first()
+
+    technology_ok = False
+    if tech_data:
+        # 关键：从字典直接取值
+        has_center = tech_data.get('has_independent_data_center')
+
+        # 1. 基础项：排除 has_independent_data_center 后单独判断
+        # 这里必须使用 _is_blank 的严格判断，确保 0 或 False 算已填
+        base_fields = [
+            "student_device_ratio",
+            "teacher_device_ratio",
+            "has_data_platform",
+            "security_certified_count",
+            "security_certified_ratio",
+            "has_security_incident",
+        ]
+
+        # 只要 has_center 不是 None（可以是 False 或 True），就算第一步过了
+        base_ok = (has_center is not None)
+        for f in base_fields:
+            if _is_blank(tech_data.get(f)):
+                base_ok = False
+                break
+
+        # 2. 条件项：二选一
+        cond_ok = False
+        if has_center is True:
+            cond_ok = not _is_blank(tech_data.get('data_center_standard'))
+        elif has_center is False:
+            cond_ok = not _is_blank(tech_data.get('cloud_dedicated_service'))
+
+        technology_ok = bool(base_ok and cond_ok)
+
+        # 打印这一行，在终端看 ID 是否和你浏览器里的 ID (19) 一致
+        if not technology_ok:
+            print(f"--- 正在诊断评估ID: {assessment.id} ---")
+            print(f"has_center值: {has_center}, 基础项通过: {base_ok}, 条件项通过: {cond_ok}")
+    else:
+        # 如果进到这里，说明数据库里根本没这条技术评估记录
+        technology_ok = False
 
     return {
         "literacy": literacy_ok,

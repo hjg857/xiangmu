@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 blank=True,
                 choices=[
-                    ("leading", "引领级"),
+                    ("leading", "创新级"),
                     ("mature", "成熟级"),
                     ("growing", "成长级"),
                     ("initial", "初始级"),

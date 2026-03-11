@@ -113,7 +113,7 @@ class ReportDataService:
             'initial': '初始级',
             'growing': '成长级',
             'mature': '成熟级',
-            'leading': '引领级',
+            'leading': '创新级',
         }
         return level_map.get(self.assessment.maturity_level, '未知')
     
