@@ -350,7 +350,7 @@ def approve_application(request, application_id):
 
 您的账号申请已通过审核，以下是您的登录信息：
 
-登录地址：{settings.FRONTEND_URL}/login
+登录地址：{settings.FRONTEND_URL}
 用户名：{username}
 密码：{password}
 
@@ -659,7 +659,7 @@ def import_schools(request):
 
                 您的账号申请已通过审核，以下是您的登录信息：
 
-                登录地址：{settings.FRONTEND_URL}/login
+                登录地址：{settings.FRONTEND_URL}
                 用户名：{username}
                 密码：{password}
 

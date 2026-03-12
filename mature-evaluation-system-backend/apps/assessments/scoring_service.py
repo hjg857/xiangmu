@@ -516,7 +516,7 @@ class ScoringService:
             elif cond == 'between':
                 min_val = rule.get('min', float('-inf'))
                 max_val = rule.get('max', float('inf'))
-                if min_val <= value <= max_val:
+                if min_val < value <= max_val:
                     return rule['score']
         return 0.0
 

@@ -121,8 +121,8 @@ const form = reactive({
   school_type: '',
   area_display: '',
   founding_year: '',
-  student_count: null,
-  teacher_count: null
+  student_count: '',
+  teacher_count: ''
 })
 
 const rules = {
@@ -152,9 +152,9 @@ onMounted(async () => {
       form.school_name = data.school_name || form.school_name
       form.school_type = data.school_type_display || typeMap[data.school_type] || data.school_type
       form.area_display = `${data.province}/${data.city}/${data.district}`
-      form.founding_year = data.founding_year || ''
-      form.student_count = data.student_count || null
-      form.teacher_count = data.teacher_count || null
+      form.founding_year = ''
+      form.student_count = ''
+      form.teacher_count = ''
     }
   } catch (error) {
     ElMessage.error('无法加载学校信息')

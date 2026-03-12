@@ -13,7 +13,7 @@ def send_school_account_email(*, school_name: str, to_email: str, username: str,
 
 您的学校账号已创建成功，以下是您的登录信息：
 
-登录地址：{settings.FRONTEND_URL}/login
+登录地址：{settings.FRONTEND_URL}
 用户名：{username}
 密码：{password}
 祝 工作顺利，万事如意！ 

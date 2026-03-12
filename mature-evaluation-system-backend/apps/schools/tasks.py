@@ -19,7 +19,7 @@ def send_account_approval_email(username, password, email, school_name):
 
 您的账号申请已通过审核，以下是您的登录信息：
 
-登录地址：{settings.FRONTEND_URL}/login
+登录地址：{settings.FRONTEND_URL}
 用户名：{username}
 密码：{password}
 
