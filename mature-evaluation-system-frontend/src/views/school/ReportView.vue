@@ -47,16 +47,16 @@
         </h2>
         
         <p class="section-summary">
-          学校数据文化整体处于{{ reportData.maturity_level }}（{{ reportData.total_score_percent?.toFixed(5) }}分）。
-          其中数据素养（{{ dimensionScores.literacy?.toFixed(5) }}分）
+          学校数据文化整体处于{{ reportData.maturity_level }}（{{ reportData.total_score_percent?.toFixed(2) }}分）。
+          其中数据素养（{{ dimensionScores.literacy?.toFixed(2) }}分）
           {{ getPerformanceText(dimensionScores.literacy) }}，
-          数据制度（{{ dimensionScores.institution?.toFixed(5) }}分）
+          数据制度（{{ dimensionScores.institution?.toFixed(2) }}分）
           {{ getPerformanceText(dimensionScores.institution) }}，
-          数据行为（{{ dimensionScores.behavior?.toFixed(5) }}分）
+          数据行为（{{ dimensionScores.behavior?.toFixed(2) }}分）
           {{ getPerformanceText(dimensionScores.behavior) }}，
-          数据资产（{{ dimensionScores.asset?.toFixed(5) }}分）
+          数据资产（{{ dimensionScores.asset?.toFixed(2) }}分）
           {{ getPerformanceText(dimensionScores.asset) }}，
-          数据技术（{{ dimensionScores.technology?.toFixed(5) }}分）
+          数据技术（{{ dimensionScores.technology?.toFixed(2) }}分）
           {{ getPerformanceText(dimensionScores.technology) }}。
         </p>
 
@@ -64,7 +64,7 @@
         <div class="overview-scores">
           <div class="score-card total">
             <span class="label">学校数据文化得分</span>
-            <span class="value">{{ reportData.total_score?.toFixed(5) }}分</span>
+            <span class="value">{{ reportData.total_score?.toFixed(2) }}分</span>
           </div>
           <div class="score-card level">
             <span class="label">学校数据文化等级</span>
@@ -83,7 +83,7 @@
               </div>
               <div class="dimension-item" v-for="(item, key) in dimensionList" :key="key">
                 <span class="dim-name">{{ item.name }}</span>
-                <span class="dim-score">{{ item.score?.toFixed(5) }}分</span>
+                <span class="dim-score">{{ item.score?.toFixed(2) }}分</span>
               </div>
             </div>
           </div>
@@ -124,25 +124,25 @@
         </div>
 
         <p class="section-summary">
-          学校数据素养得分为{{ dimensionScores.literacy?.toFixed(5) }}分。
-          其中，教师数据素养得分为{{ secondaryScores.A1?.toFixed(5) }}分，
-          管理者数据素养得分为{{ secondaryScores.A2?.toFixed(5) }}分，
-          学生数据素养得分为{{ secondaryScores.A3?.toFixed(5) }}分。
+          学校数据素养得分为{{ dimensionScores.literacy?.toFixed(2) }}分。
+          其中，教师数据素养得分为{{ secondaryScores.A1?.toFixed(2) }}分，
+          管理者数据素养得分为{{ secondaryScores.A2?.toFixed(2) }}分，
+          学生数据素养得分为{{ secondaryScores.A3?.toFixed(2) }}分。
           具体情况如下：
         </p>
 
         <!-- 三个群体得分展示 -->
         <div class="literacy-scores">
           <div class="literacy-score-card teacher">
-            <span class="score">{{ secondaryScores.A1?.toFixed(5) }}分</span>
+            <span class="score">{{ secondaryScores.A1?.toFixed(2) }}分</span>
             <span class="label">教师平均分</span>
           </div>
           <div class="literacy-score-card manager">
-            <span class="score">{{ secondaryScores.A2?.toFixed(5) }}分</span>
+            <span class="score">{{ secondaryScores.A2?.toFixed(2) }}分</span>
             <span class="label">管理者平均分</span>
           </div>
           <div class="literacy-score-card student">
-            <span class="score">{{ secondaryScores.A3?.toFixed(5) }}分</span>
+            <span class="score">{{ secondaryScores.A3?.toFixed(2) }}分</span>
             <span class="label">学生平均分</span>
           </div>
         </div>
@@ -198,7 +198,7 @@
             <li><strong>B1 数据组织机构</strong>（权重 0.3599）：
               <ul>
                 <li>B11 数据领导/工作小组（满分10分）：设立计10分，未设立计0分。</li>
-                <li>B12 数据组织运行情况（满分10分）：按近5年相关会议/活动次数计分（≤5次计3分，5-15次计6分，>15次计10分）。</li>
+                <li>B12 数据组织运行情况（满分10分）：按近5年相关会议/活动次数计分（≤5次计3分，6-15次计6分，>15次计10分）。</li>
               </ul>
             </li>
             <li><strong>B2 数据人员配备</strong>（权重 0.4131）：
@@ -217,17 +217,17 @@
         </div>
 
         <p class="section-summary">
-          学校数据制度得分为{{ dimensionScores.institution?.toFixed(5) }}分。
-          其中，数据组织机构得分{{ secondaryScores.B1?.toFixed(5) }}分，
-          数据人员配备得分{{ secondaryScores.B2?.toFixed(5) }}分，
-          数据管理文件得分{{ secondaryScores.B3?.toFixed(5) }}分。
+          学校数据制度得分为{{ dimensionScores.institution?.toFixed(2) }}分。
+          其中，数据组织机构得分{{ secondaryScores.B1?.toFixed(2) }}分，
+          数据人员配备得分{{ secondaryScores.B2?.toFixed(2) }}分，
+          数据管理文件得分{{ secondaryScores.B3?.toFixed(2) }}分。
           具体情况如下：
         </p>
 
         <!-- 数据组织机构 -->
         <div class="institution-card">
           <div class="card-header">
-            <span class="card-title">数据组织机构：{{ secondaryScores.B1?.toFixed(5) }}分</span>
+            <span class="card-title">数据组织机构：{{ secondaryScores.B1?.toFixed(2) }}分</span>
           </div>
           <div class="card-content">
             <div class="info-item">
@@ -244,7 +244,7 @@
         <!-- 数据人员配备 -->
         <div class="institution-card">
           <div class="card-header">
-            <span class="card-title">数据人员配备：{{ secondaryScores.B2?.toFixed(5) }}分</span>
+            <span class="card-title">数据人员配备：{{ secondaryScores.B2?.toFixed(2) }}分</span>
           </div>
           <div class="card-content">
             <div class="info-item">
@@ -267,7 +267,7 @@
         <!-- 数据管理文件 -->
         <div class="institution-card">
           <div class="card-header">
-            <span class="card-title">数据管理文件：{{ secondaryScores.B3?.toFixed(5) }}分</span>
+            <span class="card-title">数据管理文件：{{ secondaryScores.B3?.toFixed(2) }}分</span>
           </div>
           <div class="card-content">
             <div class="info-item">
@@ -314,9 +314,9 @@
           <ul>
             <li><strong>C1 数据行为监测</strong>（权重 0.4679）：
               <ul>
-                <li>C11 教师数据行为（满分10分）：按人均登录频次计分（≤200次计3分，200-300次计6分，>300次计10分）。</li>
-                <li>C12 学生数据行为（满分10分）：按人均登录频次计分（≤100次计3分，100-200次计6分，>200次计10分）。</li>
-                <li>C13 管理者数据行为（满分10分）：按人均登录频次计分（≤200次计3分，200-300次计6分，>300次计10分）。</li>
+                <li>C11 教师数据行为（满分10分）：按人均登录频次计分（≤200次计3分，201-300次计6分，>300次计10分）。</li>
+                <li>C12 学生数据行为（满分10分）：按人均登录频次计分（≤100次计3分，101-200次计6分，>200次计10分）。</li>
+                <li>C13 管理者数据行为（满分10分）：按人均登录频次计分（≤200次计3分，201-300次计6分，>300次计10分）。</li>
               </ul>
             </li>
             <li><strong>C2 数据应用成效</strong>（权重 0.5321）：
@@ -330,16 +330,16 @@
         </div>
 
         <p class="section-summary">
-          学校数据行为得分为{{ dimensionScores.behavior?.toFixed(5) }}分。
-          其中，数据行为监测得分{{ secondaryScores.C1?.toFixed(5) }}分，
-          数据应用成效{{ secondaryScores.C2?.toFixed(5) }}分。
+          学校数据行为得分为{{ dimensionScores.behavior?.toFixed(2) }}分。
+          其中，数据行为监测得分{{ secondaryScores.C1?.toFixed(2) }}分，
+          数据应用成效{{ secondaryScores.C2?.toFixed(2) }}分。
           具体情况如下：
         </p>
 
         <!-- 数据行为监测 -->
         <div class="behavior-card">
           <div class="card-header">
-            <span class="card-title">数据行为监测：{{ secondaryScores.C1?.toFixed(5) }}分</span>
+            <span class="card-title">数据行为监测：{{ secondaryScores.C1?.toFixed(2) }}分</span>
           </div>
           <div class="card-content">
             <div class="login-stats">
@@ -354,7 +354,7 @@
         <!-- 数据应用成效 -->
         <div class="behavior-card">
           <div class="card-header">
-            <span class="card-title">数据应用成效：{{ secondaryScores.C2?.toFixed(5) }}分</span>
+            <span class="card-title">数据应用成效：{{ secondaryScores.C2?.toFixed(2) }}分</span>
           </div>
           <div class="card-content">
             <div class="achievement-section">
@@ -410,16 +410,16 @@
         </div>
 
         <p class="section-summary">
-          学校数据资产得分为{{ dimensionScores.asset?.toFixed(5) }}分。
-          其中，数据资产意识得分{{ secondaryScores.D1?.toFixed(5) }}分，
-          数据资产积累{{ secondaryScores.D2?.toFixed(5) }}分。
+          学校数据资产得分为{{ dimensionScores.asset?.toFixed(2) }}分。
+          其中，数据资产意识得分{{ secondaryScores.D1?.toFixed(2) }}分，
+          数据资产积累{{ secondaryScores.D2?.toFixed(2) }}分。
           具体情况如下：
         </p>
 
         <!-- 数据资产意识 -->
         <div class="asset-card">
           <div class="card-header">
-            <span class="card-title">数据资产意识：{{ secondaryScores.D1?.toFixed(5) }}分</span>
+            <span class="card-title">数据资产意识：{{ secondaryScores.D1?.toFixed(2) }}分</span>
             <span class="card-subtitle">其中{{ reportData.participant_counts?.manager || 0 }}名管理者参评</span>
           </div>
           <div class="card-content">
@@ -430,7 +430,7 @@
         <!-- 数据资产积累 -->
         <div class="asset-card">
           <div class="card-header">
-            <span class="card-title">数据资产积累：{{ secondaryScores.D2?.toFixed(5) }}分</span>
+            <span class="card-title">数据资产积累：{{ secondaryScores.D2?.toFixed(2) }}分</span>
           </div>
           <div class="card-content">
             <div class="staff-info">
@@ -511,16 +511,16 @@
         </div>
 
         <p class="section-summary">
-          学校数据技术得分为{{ dimensionScores.technology?.toFixed(5) }}分。
-          其中，数据基础设施得分{{ secondaryScores.E1?.toFixed(5) }}分，
-          数据安保水平{{ secondaryScores.E2?.toFixed(5) }}分。
+          学校数据技术得分为{{ dimensionScores.technology?.toFixed(2) }}分。
+          其中，数据基础设施得分{{ secondaryScores.E1?.toFixed(2) }}分，
+          数据安保水平{{ secondaryScores.E2?.toFixed(2) }}分。
           具体情况如下：
         </p>
 
         <!-- 数据基础设施 -->
         <div class="tech-card">
           <div class="card-header">
-            <span class="card-title">数据基础设施：{{ secondaryScores.E1?.toFixed(5) }}分</span>
+            <span class="card-title">数据基础设施：{{ secondaryScores.E1?.toFixed(2) }}分</span>
           </div>
           <div class="card-content">
             <div class="info-item">
@@ -542,7 +542,7 @@
         <!-- 数据安保水平 -->
         <div class="tech-card">
           <div class="card-header">
-            <span class="card-title">数据安保水平：{{ secondaryScores.E2?.toFixed(5) }}分</span>
+            <span class="card-title">数据安保水平：{{ secondaryScores.E2?.toFixed(2) }}分</span>
           </div>
           <div class="card-content">
             <div class="info-item">
@@ -766,20 +766,20 @@ const initOverviewChart = () => {
 
     const dimensions = ['数据素养', '数据制度', '数据行为', '数据资产', '数据技术']
   const scores = [
-      (dimensionScores.value.literacy || 0).toFixed(5),
-      (dimensionScores.value.institution || 0).toFixed(5),
-      (dimensionScores.value.behavior || 0).toFixed(5),
-      (dimensionScores.value.asset || 0).toFixed(5),
-      (dimensionScores.value.technology || 0).toFixed(5)
+      (dimensionScores.value.literacy || 0).toFixed(2),
+      (dimensionScores.value.institution || 0).toFixed(2),
+      (dimensionScores.value.behavior || 0).toFixed(2),
+      (dimensionScores.value.asset || 0).toFixed(2),
+      (dimensionScores.value.technology || 0).toFixed(2)
     ]
     // 从后端获取平均分，如果没有则使用默认值60
     const avgScoresData = reportData.value.average_scores || {}
     const avgScores = [
-      (avgScoresData.literacy ?? 3.0).toFixed(5),
-      (avgScoresData.institution ?? 3.0).toFixed(5),
-      (avgScoresData.behavior ?? 3.0).toFixed(5),
-      (avgScoresData.asset ?? 3.0).toFixed(5),
-      (avgScoresData.technology ?? 3.0).toFixed(5),
+      (avgScoresData.literacy ?? 3.0).toFixed(2),
+      (avgScoresData.institution ?? 3.0).toFixed(2),
+      (avgScoresData.behavior ?? 3.0).toFixed(2),
+      (avgScoresData.asset ?? 3.0).toFixed(2),
+      (avgScoresData.technology ?? 3.0).toFixed(2),
     ]
 
     chart.setOption({
@@ -945,7 +945,7 @@ const initLiteracyComparisonChart = () => {
       title: { text: '教师、管理者、学生数据素养对比', left: 'center', top: 10 },
       tooltip: { 
         trigger: 'axis',
-        valueFormatter: (value) => value ? value.toFixed(5) : '0.00'
+        valueFormatter: (value) => value ? value.toFixed(2) : '0.00'
       },
       legend: { data: ['教师', '管理者', '学生'], top: 40 },
       grid: { left: '3%', right: '4%', bottom: '3%', top: 80, containLabel: true },
@@ -1191,14 +1191,14 @@ const getTotalConference = () => {
 
 const formatDataVolume = (volume) => {
   if (!volume) return '0 GB'
-  return `${volume.toFixed(5)} GB`
+  return `${volume.toFixed(2)} GB`
 }
 
 const getPerCapitaVolume = () => {
   const total = assetDetails.value.total_data_volume || 0
   const people = (assetDetails.value.student_count || 0) + (assetDetails.value.staff_count || 0)
   if (people === 0) return '0'
-  return (total / people).toFixed(5)
+  return (total / people).toFixed(2)
 }
 
 const getVolumePercentage = (value, max) => {
@@ -1207,10 +1207,36 @@ const getVolumePercentage = (value, max) => {
 }
 
 const getDataCenterText = () => {
-  const standard = technologyDetails.value.data_center_standard
-  if (standard === 'fully_compliant') return '建有独立数据中心且指标完全达到B级要求'
-  if (standard === 'partially_compliant') return '建有独立数据中心且指标部分达到B级要求'
-  return '数据中心指标未达到B级要求'
+  const details = technologyDetails.value
+  
+  // 1. 如果有独立数据中心 (True)
+  if (details.has_independent_data_center === true) {
+    const standard = details.data_center_standard
+    
+    // 对应 DATA_CENTER_STANDARD_CHOICES 的值
+    if (standard === 'fully_compliant') {
+      return '学校建有独立数据中心，且相关指标完全达到B级要求'
+    } else if (standard === 'partially_compliant') {
+      return '学校建有独立数据中心，相关指标部分达到B级要求'
+    } else {
+      return '学校建有独立数据中心，但相关指标未达到B级要求'
+    }
+  } 
+  
+  // 2. 如果没有独立数据中心 (False) -> 讲云服务内容
+  else {
+    const cloud = details.cloud_dedicated_service
+    
+    // 这里的文案合并了“没有建立”和“云服务情况”
+    // 对应 CLOUD_DEDICATED_FULFILL_CHOICES 的值
+    if (cloud === 'fully_satisfies') {
+      return '学校未建有独立数据中心，但专享云服务能够完全满足学校数据应用需求'
+    } else if (cloud === 'partially_satisfies') {
+      return '学校未建有独立数据中心，专享云服务仅能部分满足学校数据应用需求'
+    } else {
+      return '学校未建有独立数据中心，且当前的云服务保障能力尚无法满足学校数据应用需求'
+    }
+  }
 }
 
 const getSecurityRatioText = () => {
