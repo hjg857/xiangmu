@@ -355,6 +355,15 @@ TECHNOLOGY_SCORING_RULES = {
                 }
             },
             {
+                'name': '云服务情况',  # 新增
+                'field': 'cloud_dedicated_service',
+                'rules': {
+                    'fully_satisfies': 10,
+                    'partially_satisfies': 6,
+                    'not_satisfies': 3
+                }
+            },
+            {
                 'name': '生机比',
                 'field': 'student_device_ratio',
                 'max_score': 10,

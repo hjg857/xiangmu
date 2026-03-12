@@ -1176,6 +1176,7 @@ const getActionButtonText = () => {
 
 // --- 3. 修改提交评估函数 ---
 const handleSubmitAssessment = async () => {
+  // --- 第一步：基础校验 ---
   if (!currentAssessmentId.value) {
     ElMessage.error('评估记录未加载，请刷新页面')
     return
@@ -1186,6 +1187,7 @@ const handleSubmitAssessment = async () => {
     return
   }
 
+  // --- 第二步：模块填写完整度校验（侧边栏绿勾） ---
   if (!isAllModulesDone.value) {
     const incomplete = getIncompleteModules();
     ElMessageBox.alert(
@@ -1198,20 +1200,43 @@ const handleSubmitAssessment = async () => {
     );
     return;
   }
-  // --- 第二关：针对第一个模块，校验是否有实际回收数据（硬性限制） ---
-  const teacherCount = teacherInstance.value?.collected_count || 0;
-  const studentCount = studentInstance.value?.collected_count || 0;
-  const managerCount = managerInstance.value?.collected_count || 0;
 
-  if (teacherCount === 0 || studentCount === 0 || managerCount === 0) {
-    let missing = [];
-    if (teacherCount === 0) missing.push('教师问卷');
-    if (studentCount === 0) missing.push('学生问卷');
-    if (managerCount === 0) missing.push('管理者问卷');
+  // --- 第三步：核心逻辑校验 - 问卷回收情况与截止日期判定 ---
+  const now = new Date();
+  
+  /**
+   * 内部判定函数：
+   * 满足以下任一条件即返回 true:
+   * 1. 已经有至少 1 份数据 (collected_count > 0)
+   * 2. 当前时间已经超过了截止日期 (expired_at)
+   */
+  const isSurveyReady = (instance) => {
+    if (!instance) return false;
+    const hasData = (instance.collected_count || 0) > 0;
+    const isExpired = instance.expired_at ? (new Date(instance.expired_at) <= now) : false;
+    return hasData || isExpired;
+  };
+
+  const teacherReady = isSurveyReady(teacherInstance.value);
+  const studentReady = isSurveyReady(studentInstance.value);
+  const managerReady = isSurveyReady(managerInstance.value);
+
+  // 如果有任何一个问卷既没数据也没到期，则拦截
+  if (!teacherReady || !studentReady || !managerReady) {
+    let unreadyList = [];
+    if (!teacherReady) unreadyList.push('教师问卷');
+    if (!studentReady) unreadyList.push('学生问卷');
+    if (!managerReady) unreadyList.push('管理者问卷');
 
     ElMessageBox.alert(
-      `虽然您已生成链接，但以下问卷<b>暂无回收数据</b>：<br/><b style="color: #f56c6c">${missing.join('、')}</b>。<br/><br/>系统需要每类问卷至少有 <b>1 份</b>填答记录才能生成分析报告。请分发链接并让相关人员填写后，点击页面上方的“<b>刷新</b>”按钮再尝试提交。`,
-      '问卷数据不足',
+      `<div style="line-height: 1.6;">
+        以下问卷<b>既无回收数据也未到截止时间</b>：<br/>
+        <b style="color: #f56c6c">${unreadyList.join('、')}</b>。<br/><br/>
+        系统要求每类问卷至少有 <b>1 份</b>填答记录才能进行有效评估。<br/>
+        如果您无法获取填答数据，请等待<b>问卷过期（生成链接48小时后）</b>再尝试提交。<br/><br/>
+        <small style="color: #909399;">若已填写，请点击页面上方“刷新”按钮更新数据状态。</small>
+      </div>`,
+      '无法提交：数据不足且未过期',
       { 
         dangerouslyUseHTMLString: true, 
         confirmButtonText: '我知道了',
@@ -1221,6 +1246,7 @@ const handleSubmitAssessment = async () => {
     return;
   }
 
+  // --- 第四步：提交确认 ---
   try {
     await ElMessageBox.confirm(
       '确认提交评估？提交后将无法修改已填写的内容，系统将启动大模型进行智能分析。',
@@ -1229,29 +1255,30 @@ const handleSubmitAssessment = async () => {
     )
   } catch { return }
 
+  // --- 第五步：正式执行提交 ---
   generatingReport.value = true
   try {
-    // 调用后端 generate 接口
+    // 调用后端生成报告接口
     const res = await generateReport(currentAssessmentId.value)
     
+    // 更新状态
     if (res && res.status) {
       assessmentStatus.value = res.status
     } else if (res && res.data && res.data.status) {
       assessmentStatus.value = res.data.status
     } else {
-      // 兜底方案：如果后端没回状态，既然成功了，手动设为收集中
       assessmentStatus.value = 'collecting'
     }
     
     ElMessage.success('评估已提交，系统正在处理中...')
     
-    // ✅ 开启轮询：实时捕捉状态从 collecting -> analyzing -> completed 的变化
+    // 启动轮询检查后台分析进度
     startPolling()
     
   } catch (error) {
-    console.error('提交失败:', error)
+    console.error('提交评估失败:', error)
     generatingReport.value = false
-    ElMessage.error(error.response?.data?.error || '提交失败')
+    ElMessage.error(error.response?.data?.error || '提交失败，请稍后重试')
   }
 }
 
