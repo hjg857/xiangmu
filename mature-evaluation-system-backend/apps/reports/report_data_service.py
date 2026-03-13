@@ -146,7 +146,7 @@ class ReportDataService:
         """
         if not self.scoring_service.observation_scores:
             self.scoring_service.calculate_all_scores()
-        # 转换为百分制
+
         return {k: v for k, v in self.scoring_service.observation_scores.items()}
     
     def get_participant_counts(self) -> Dict[str, int]:
