@@ -47,6 +47,7 @@ class School(models.Model):
 
     student_count = models.IntegerField("在校学生总数", default=0, null=True)
     teacher_count = models.IntegerField("教职工总数", default=0, null=True)
+    founding_year = models.IntegerField('建校年份', null=True, blank=True)
 
 
     class Meta:

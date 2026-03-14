@@ -50,12 +50,22 @@ class AssessmentViewSet(viewsets.ModelViewSet):
         asset, _ = AssetAssessment.objects.get_or_create(assessment=assessment)
         technology, _ = TechnologyAssessment.objects.get_or_create(assessment=assessment)
 
+        school = assessment.school
+
         return Response({
             'assessment': AssessmentSerializer(assessment).data,
             'institution': InstitutionAssessmentSerializer(institution).data,
             'behavior': BehaviorAssessmentSerializer(behavior).data,
             'asset': AssetAssessmentSerializer(asset).data,
             'technology': TechnologyAssessmentSerializer(technology).data,
+            'school_name': school.name,
+            'school_type': school.school_type,
+            'province': school.province,
+            'city': school.city,
+            'district': school.district,
+            'founding_year': school.founding_year,
+            'teacher_count': school.teacher_count,
+            'student_count': school.student_count,
             'scores': {
                 'total_score': str(assessment.total_score),
                 'maturity_level': assessment.maturity_level,

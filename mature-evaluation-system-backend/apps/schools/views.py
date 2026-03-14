@@ -259,6 +259,7 @@ def update_school_info_count(request):
         # 从请求中获取数据
         school.student_count = request.data.get('student_count', school.student_count)
         school.teacher_count = request.data.get('teacher_count', school.teacher_count)
+        school.founding_year = request.data.get('founding_year', school.founding_year)
 
         school.save()
         return Response({"success": True, "message": "学校信息更新成功"})

@@ -27,26 +27,53 @@
         <p class="report-date">报告生成时间：{{ formatDate(reportData.report_date) }}</p>
       </div>
 
+      <!-- 新增：学校基础信息展示区 -->
+      <div class="school-basic-card">
+        <div class="basic-info-grid">
+          <div class="grid-item">
+            <span class="grid-label">办学类型</span>
+            <span class="grid-value">{{ reportData.school_type || '未填写' }}</span>
+          </div>
+          <div class="grid-item">
+            <span class="grid-label">所属地区</span>
+            <span class="grid-value">{{ reportData.area_display || '未填写' }}</span>
+          </div>
+          <div class="grid-item">
+            <span class="grid-label">建校年份</span>
+            <span class="grid-value">{{ reportData.founding_year ? reportData.founding_year + '年' : '未填写' }}</span>
+          </div>
+          <div class="grid-item">
+            <span class="grid-label">教职工人数</span>
+            <span class="grid-value">{{ reportData.teacher_count ? reportData.teacher_count + '人' : '未填写' }}</span>
+          </div>
+          <div class="grid-item">
+            <span class="grid-label">学生人数</span>
+            <span class="grid-value">{{ reportData.student_count ? reportData.student_count + '人' : '未填写' }}</span>
+          </div>
+        </div>
+      </div>
       <!-- 报告说明 -->
       <div class="report-intro">
         <p style="text-indent: 2em;">本报告旨在帮助您全面了解学校数据文化建设情况。数据文化是指学校在数据使用和管理方面的制度、规范、实践和价值观的集合；而数据文化成熟度则是学校在数据使用、管理和价值实现方面的成熟程度。平台基于学校填报的多维度数据，通过科学的评估规则，并辅助于DeepSeek大模型进行智能评估，准确识别学校数据文化的建设水平与现实问题，以促进学校数据使用、管理和价值实现，推动学校数据治理能力的提升。本报告包括以下五个核心分析维度：</p>
-        <ol style="padding-left: 0;">
-          <li style="text-indent: 2em; list-style-position: inside; margin-bottom: 10px; line-height: 1.6; text-align: justify;">
-            <strong style="text-indent: 0;">数据素养</strong>：评估学校管理者、教师和学生在数据应用方面的综合能力，包括数据意识与思维、数据知识与技能、数据伦理与隐私等，为数据文化的落地提供核心人才支撑。
-          </li>
-          <li style="text-indent: 2em; list-style-position: inside; margin-bottom: 10px; line-height: 1.6; text-align: justify;">
-            <strong style="text-indent: 0;">数据制度</strong>：评估学校在组织架构、人员配备与管理规范方面的制度化水平，包括数据组织机构、数据人员配备、数据管理文件等，为学校数据文化的有序发展提供制度依据。
-          </li>
-          <li style="text-indent: 2em; list-style-position: inside; margin-bottom: 10px; line-height: 1.6; text-align: justify;">
-            <strong style="text-indent: 0;">数据行为</strong>：评估数据在工作、学习与决策中的实际应用情况，包括学生数据行为、教师数据行为、数据应用成效等。
-          </li>
-          <li style="text-indent: 2em; list-style-position: inside; margin-bottom: 10px; line-height: 1.6; text-align: justify;">
-            <strong style="text-indent: 0;">数据资产</strong>：评估学校对数据资源的认知水平、积累规模等内容，包括数据资产意识、数据资产总量等。
-          </li>
-          <li style="text-indent: 2em; list-style-position: inside; margin-bottom: 10px; line-height: 1.6; text-align: justify;">
-            <strong style="text-indent: 0;">数据技术</strong>：评估学校在数据采集、存储、处理与安全保障方面的技术支撑能力，包括数据硬件设施、数据系统平台、数据安全合规与认证等，为数据文化提供可靠的底层支撑。
-          </li>
-        </ol>
+        <!-- padding-left: 0 确保列表整体不左偏 -->
+        <!-- padding-left: 0 确保列表整体不左偏 -->
+          <ol style="padding-left: 0; list-style: none;">
+            <li style="text-indent: 2em; margin-bottom: 10px; line-height: 1.6; text-align: justify;">
+              1. <strong>数据素养</strong>：评估学校管理者、教师和学生在数据应用方面的综合能力，包括数据意识与思维、数据知识与技能、数据伦理与隐私等，为数据文化的落地提供核心人才支撑。
+            </li>
+            <li style="text-indent: 2em; margin-bottom: 10px; line-height: 1.6; text-align: justify;">
+              2. <strong>数据制度</strong>：评估学校在组织架构、人员配备与管理规范方面的制度化水平，包括数据组织机构、数据人员配备、数据管理文件等，为学校数据文化的有序发展提供制度依据。
+            </li>
+            <li style="text-indent: 2em; margin-bottom: 10px; line-height: 1.6; text-align: justify;">
+              3. <strong>数据行为</strong>：评估数据在工作、学习与决策中的实际应用情况，包括学生数据行为、教师数据行为、数据应用成效等。
+            </li>
+            <li style="text-indent: 2em; margin-bottom: 10px; line-height: 1.6; text-align: justify;">
+              4. <strong>数据资产</strong>：评估学校对数据资源的认知水平、积累规模等内容，包括数据资产意识、数据资产总量等。
+            </li>
+            <li style="text-indent: 2em; margin-bottom: 10px; line-height: 1.6; text-align: justify;">
+              5. <strong>数据技术</strong>：评估学校在数据采集、存储、处理与安全保障方面的技术支撑能力，包括数据硬件设施、数据系统平台、数据安全合规与认证等，为数据文化提供可靠的底层支撑。
+            </li>
+          </ol>
       </div>
 
       <!-- 第一部分：学校数据文化评估概况 -->
@@ -344,15 +371,15 @@
           </div>
           <div class="card-content">
             <div class="achievement-section">
-              <h2>数据应用特色成果</h2>
+              <h4>数据应用特色成果</h4>
               <p>出版论文{{ behaviorDetails.published_paper_count || 0 }}篇、著作{{ behaviorDetails.published_book_count || 0 }}部、典型案例{{ getTotalCases() }}个、获得奖励荣誉{{ getTotalAwards() }}个</p>
             </div>
             <div class="achievement-section">
-              <h2>数据应用社会影响</h2>
+              <h4>数据应用社会影响</h4>
               <p>学校被报道{{ getTotalMedia() }}次、参与经验交流{{ getTotalConference() }}次、参观学习{{ behaviorDetails.visit_count || 0 }}次</p>
             </div>
             <div class="achievement-section">
-              <h2>应用效果主观评价</h2>
+              <h4>应用效果主观评价</h4>
               <p>学校教师学生对数据应用成效的主观评价：</p>
               <!-- 新型卡片布局容器 -->
               <div class="subjective-eval-cards">
@@ -376,10 +403,6 @@
                   <div ref="teacherEffectCircle" class="circle-chart"></div>
                   <div class="eval-bottom-info">教师参评人数：{{ reportData.participant_counts?.teacher || 0 }} 人</div>
                 </div>
-              </div>
-              <div class="behavior-radar-row">
-                <div ref="teacherEffectRadar" class="chart-box" style="height: 300px; flex: 1;"></div>
-                <div ref="studentEffectRadar" class="chart-box" style="height: 300px; flex: 1;"></div>
               </div>
             </div>
           </div>
@@ -454,7 +477,7 @@
             <div class="asset-progress-section">
               <div class="progress-card">
                 <div class="progress-header">
-                  <span class="progress-title">D21 数据资产总量</span>
+                  <span class="progress-title">数据资产总量</span>
                 </div>
                 <div class="progress-value">{{ formatDataVolume(assetDetails.total_data_volume) }}</div>
                 <div class="progress-label">累计数据存储总量</div>
@@ -471,7 +494,7 @@
               </div>
               <div class="progress-card">
                 <div class="progress-header">
-                  <span class="progress-title">D22 人均数据资产量</span>
+                  <span class="progress-title">人均数据资产量</span>
                 </div>
                 <div class="progress-value red">{{ getPerCapitaVolume() }} GB</div>
                 <div class="progress-label">按师生人数平均</div>
@@ -616,6 +639,7 @@
 import { ref, onMounted, computed, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getReportDataDetail  } from '@/api/assessment'
+import { getSchoolInfo } from '@/api/school'
 import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
 import html2canvas from 'html2canvas'
@@ -695,6 +719,16 @@ const loadReportData = async (assessmentId) => {
     const res = await getReportDataDetail(assessmentId)
     const raw = res || {} // res 本身就是你发的那个完整对象
 
+    const schoolRes = await getSchoolInfo()
+    const sInfo = schoolRes.data || {}
+    const typeMap = {
+      'primary': '小学',
+      'junior': '初中',
+      'senior': '高中',
+      'nine_year': '九年一贯制',
+      'twelve_year': '十二年一贯制'
+    }
+
     // 辅助工具：确保转为数字，防止后端传字符串导致图表崩溃
     const toF = (v) => parseFloat(v || 0)
 
@@ -704,6 +738,12 @@ const loadReportData = async (assessmentId) => {
       school_name: raw.school_name || "学校名称",
       report_date: raw.report_date,
       maturity_level: raw.maturity_level || "未知",
+
+      school_type: typeMap[sInfo.school_type] || sInfo.school_type_display || sInfo.school_type || '未填写',
+      area_display: sInfo.province ? `${sInfo.province}${sInfo.city}${sInfo.district}` : '未填写',
+      founding_year: sInfo.founding_year || '未填写',
+      teacher_count: sInfo.teacher_count || 0,
+      student_count: sInfo.student_count || 0,
       
       // 2. 总分（保持5分制）
       total_score:视觉处理(toF(raw.total_score || raw.scores?.total_score)),
@@ -749,6 +789,7 @@ const loadReportData = async (assessmentId) => {
       average_scores: raw.average_scores || {
         literacy: 3.0, institution: 3.0, behavior: 3.0, asset: 3.0, technology: 3.0
       }
+
     }
 
     // ✅ 最终赋值给响应式变量
@@ -829,19 +870,19 @@ const initSubjectiveCharts = () => {
     const chart = echarts.init(managerEffectCircle.value, null, { renderer: 'svg' });
     chartInstances.push(chart);
     // 这里假设 C231 是管理者主观分，你可以根据实际数据调整 Key
-    chart.setOption(getCircleOption(observationScores.value['C23'] || 0, '#722ed1', '管理者'));
+    chart.setOption(getCircleOption(observationScores.value['C23'] || 0, '#409eff', '管理者'));
   }
 
   if (studentEffectCircle.value) {
     const chart = echarts.init(studentEffectCircle.value, null, { renderer: 'svg' });
     chartInstances.push(chart);
-    chart.setOption(getCircleOption(observationScores.value['C23'] || 0, '#13c2c2', '学生'));
+    chart.setOption(getCircleOption(observationScores.value['C23'] || 0, '#67c23a', '学生'));
   }
 
   if (teacherEffectCircle.value) {
     const chart = echarts.init(teacherEffectCircle.value, null, { renderer: 'svg' });
     chartInstances.push(chart);
-    chart.setOption(getCircleOption(observationScores.value['C23'] || 0, '#1890ff', '教师'));
+    chart.setOption(getCircleOption(observationScores.value['C23'] || 0, '#909399', '教师'));
   }
 };
 
@@ -852,7 +893,7 @@ const initOverviewChart = () => {
     return
   }
   try {
-    const chart = echarts.init(overviewChart.value)
+    const chart = echarts.init(overviewChart.value, null,{ renderer: 'svg' })
     chartInstances.push(chart)
 
     const dimensions = ['数据素养', '数据制度', '数据行为', '数据资产', '数据技术']
@@ -940,11 +981,8 @@ const initLiteracyRadarCharts = () => {
         lineStyle: { width: 3 },
         label: {
           show: true, // 显示数值
-          position: 'top',
+          position: 'inside',
           formatter: (params) => params.value.toFixed(2),
-          fontSize: 12,
-          fontWeight: 'bold',
-          color: '#000'
         },
         data: [{
           value: scores,
@@ -1096,9 +1134,6 @@ const initLiteracyComparisonChart = () => {
       position: 'top', // 数值显示在柱子正上方
       distance: 5,     // 距离柱顶的距离
       formatter: (params) => params.value ? parseFloat(params.value).toFixed(2) : '0.00',
-      fontSize: 11,
-      fontWeight: 'bold',
-      color: '#333'    // 字体颜色设为深灰色，清晰易读
     }
 
 
@@ -1168,7 +1203,7 @@ const initBehaviorBarChart = () => {
     chart.setOption({
       title: { text: '年度数据行为频次统计', left: 'center', top: 5 },
       tooltip: { trigger: 'axis' },
-      grid: { left: '22%', right: '10%', bottom: '10%', top: 50 },
+      grid: { left: '22%', right: '15%', bottom: '10%', top: 50 },
       xAxis: { type: 'value', name: '年均频次(次)', nameTextStyle: {
       fontSize: 14,
       fontWeight: 'bold',
@@ -1176,26 +1211,25 @@ const initBehaviorBarChart = () => {
     },
     // 2. 放大刻度数字
     axisLabel: {
-      fontSize: 16,
+      fontSize: 14,
       color: '#333'
     }},
       yAxis: {
         type: 'category',
         data: ['管理者数据行为', '学生数据行为', '教师数据行为'],
          axisLabel: {
-      fontSize: 18,
-      fontWeight: 'bold',
+      fontSize: 14,
       color: '#333'
     }
       },
       series: [{
         type: 'bar',
         data: [
-          { value: behaviorDetails.value.manager_login_freq || 0, itemStyle: { color: '#67c23a' } },
-          { value: behaviorDetails.value.student_login_freq || 0, itemStyle: { color: '#e6a23c' } },
+          { value: behaviorDetails.value.manager_login_freq || 0, itemStyle: { color: '#909399' } },
+          { value: behaviorDetails.value.student_login_freq || 0, itemStyle: { color: '#67c23a' } },
           { value: behaviorDetails.value.teacher_login_freq || 0, itemStyle: { color: '#409eff' } }
         ],
-        label: { show: true, position: 'right' }
+        label: { show: true, position: 'right' ,fontSize: 14}
       }]
     })
   } catch (e) {
@@ -1343,12 +1377,6 @@ const initAssetAwarenessRadar = () => {
     chartInstances.push(chart)
 
     chart.setOption({
-      title: { 
-        text: '数据资产意识评价', 
-        left: 'center', 
-        top: 0,
-        textStyle: { fontSize: 18, fontWeight: 'bold' } 
-      },
       radar: {
         indicator: [
           { name: '数据资产价值意识', max: 5 },
@@ -1378,11 +1406,9 @@ const initAssetAwarenessRadar = () => {
           // 核心配置：这里负责显示顶点的数值
           label: {
             show: true,        // 开启数值显示
-            position: 'top',   // 显示在点上方
+            position: 'inside',   // 显示在点上方
             distance: 12,      // 距离点的距离，防止重合
             formatter: (params) => params.value ? params.value.toFixed(2) : '0.00',
-            fontSize: 16,      // 放大：顶点数值字号（16号非常醒目）
-            fontWeight: 'bold',
             color: '#000'      // 黑色字体
           },
           areaStyle: { color: '#409eff', opacity: 0.3 }
@@ -1720,6 +1746,7 @@ const downloadPDF = async () => {
   color: #606266;
   line-height: 1.8;
   margin-bottom: 24px;
+  font-size:18px;
 }
 
 /* 概况得分卡片 */
@@ -1981,7 +2008,7 @@ const downloadPDF = async () => {
 
 .card-title {
   font-weight: 500;
-  fontSize: 24px;
+  font-size: 20px !important;
   font-weight: bold;
 }
 
@@ -2114,6 +2141,50 @@ const downloadPDF = async () => {
   display: flex;
   gap: 16px;
   margin-top: 16px;
+}
+
+/* 学校基础信息卡片样式 */
+.school-basic-card {
+  margin: 20px auto 40px;
+  background-color: #f8fbff; /* 浅蓝色背景 */
+  padding: 30px 20px;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+.basic-info-grid {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+/* 上方的文字：灰色、小一点 */
+.grid-label {
+  font-size: 14px;
+  color: #909399;
+  font-weight: 500;
+}
+
+/* 下方的数值：黑色、大一点、加粗 */
+.grid-value {
+  font-size: 18px;
+  color: #303133;
+  font-weight: bold;
+  /* 沿用中英文双字体要求 */
+  font-family: "Times New Roman", "Microsoft YaHei", sans-serif;
+}
+
+/* 给项之间加个细微的分隔线（可选，增加精致感） */
+.grid-item:not(:last-child) {
+  border-right: 1px solid #e4eaf2;
 }
 
 /* 资产进度条 */

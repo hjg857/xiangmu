@@ -174,7 +174,8 @@ const handleStart = async () => {
           method: 'post',
           data: {
             student_count: form.student_count,
-            teacher_count: form.teacher_count
+            teacher_count: form.teacher_count,
+            founding_year: form.founding_year
           }
         })
         ElMessage.success('基础信息确认成功，进入评估')
