@@ -2146,7 +2146,8 @@ const downloadPDF = async () => {
 /* 学校基础信息卡片样式 */
 .school-basic-card {
   margin: 20px auto 40px;
-  background-color: #f8fbff; /* 浅蓝色背景 */
+  background-color: #f5f7fa; /* 浅蓝色背景 */
+  border: 1px solid #e4e7ed; 
   padding: 30px 20px;
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.03);
@@ -2166,18 +2167,16 @@ const downloadPDF = async () => {
   flex: 1;
 }
 
-/* 上方的文字：灰色、小一点 */
 .grid-label {
-  font-size: 14px;
-  color: #909399;
+  font-size: 15px;
+  font-weight: bold;
+  color: #303133;
   font-weight: 500;
 }
 
-/* 下方的数值：黑色、大一点、加粗 */
 .grid-value {
-  font-size: 18px;
-  color: #303133;
-  font-weight: bold;
+  font-size: 14px;
+  color: #909399;
   /* 沿用中英文双字体要求 */
   font-family: "Times New Roman", "Microsoft YaHei", sans-serif;
 }
