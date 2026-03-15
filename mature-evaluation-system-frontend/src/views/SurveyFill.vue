@@ -6,6 +6,22 @@
       <p>加载问卷中...</p>
     </div>
 
+    <!-- 2. 提交成功状态 (新增：提交后直接展示这个，替换掉表单) -->
+    <div v-else-if="submitted" class="success-container">
+      <el-result
+        icon="success"
+        title="问卷提交成功"
+        sub-title="感谢您的参与！您的回答已安全提交，您可以放心关闭此页面。"
+      >
+        <template #extra>
+          <div class="success-footer">
+            <el-icon :size="50" color="#67c23a"><CircleCheck /></el-icon>
+            <p>感谢您的支持！</p>
+          </div>
+        </template>
+      </el-result>
+    </div>
+
     <!-- 问卷内容 -->
     <div v-else-if="survey" class="survey-content">
       <div class="survey-header">
@@ -92,6 +108,7 @@
             type="primary"
             size="large"
             :loading="submitting"
+            :disabled="submitting"
             @click="handleSubmit"
           >
             {{ submitting ? '提交中...' : '提交问卷' }}
@@ -154,6 +171,7 @@ const formRef = ref(null)
 const formData = reactive({})
 const formRules = reactive({})
 const submitting = ref(false)
+const submitted = ref(false)
 const successDialogVisible = ref(false)
 
 // 加载问卷
@@ -213,6 +231,7 @@ const handleSubmit = async () => {
     // 提交答案
     await submitSurvey(uuid.value, formData)
     
+    submitted.value = true 
     // 显示成功对话框
     successDialogVisible.value = true
   } catch (err) {
@@ -422,6 +441,33 @@ onMounted(() => {
   font-size: 14px;
   color: #909399;
   margin: 0;
+}
+
+/* 新增：提交成功结果页的样式 */
+.success-container {
+  max-width: 800px;
+  margin: 40px auto;
+  background: white;
+  border-radius: 12px;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.success-footer {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: #67c23a;
+  font-weight: bold;
+}
+
+/* 优化提交按钮动画 */
+.submit-section .el-button.is-loading {
+  opacity: 0.8;
+  cursor: not-allowed;
 }
 
 /* 响应式设计 */
