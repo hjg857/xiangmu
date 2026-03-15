@@ -176,30 +176,121 @@ const studentQrUrl = ref('')
 const managerQrUrl = ref('')
 
 // 统一二维码生成函数
-const generateQr = async (text) => {
-  if (!text) return ''
+const generateQr = async (url, title) => {
+  if (!url) return ''
   try {
-    return await QRCode.toDataURL(text, {
-      width: 128,
-      margin: 1
+    // 1. 获取高质量原始二维码 (800px)
+    const rawQrDataUrl = await QRCode.toDataURL(url, {
+      width: 800,
+      margin: 2,
+      color: { dark: '#000000', light: '#ffffff' }
     })
-  } catch (err) {
-    console.error('生成二维码失败:', err)
+
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      
+      // 设置画布大小 (宽 800, 高 1050，预留底部空间)
+      const w = 800
+      const h = 1050
+      canvas.width = w
+      canvas.height = h
+
+      const img = new Image()
+      img.src = rawQrDataUrl
+      img.onload = () => {
+        // --- 1. 绘制背景 ---
+        ctx.fillStyle = '#FFFFFF'
+        ctx.fillRect(0, 0, w, h)
+
+        // --- 2. 绘制二维码 ---
+        ctx.drawImage(img, 0, 0, w, w)
+
+        // --- 3. 绘制中心学校名白块 (增强视觉) ---
+        const boxSize = w * 0.25
+        const bx = (w - boxSize) / 2
+        const by = (w - boxSize) / 2
+        
+        ctx.fillStyle = '#FFFFFF'
+        ctx.shadowColor = 'rgba(0,0,0,0.1)'
+        ctx.shadowBlur = 10
+        ctx.fillRect(bx, by, boxSize, boxSize)
+        ctx.shadowBlur = 0 // 重置阴影
+
+        // 绘制学校文字
+        ctx.fillStyle = '#333333'
+        const fontSize = Math.floor(boxSize * 0.2)
+        ctx.font = `bold ${fontSize}px "Microsoft YaHei", sans-serif`
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        const nameLines = splitTextIntoLines(ctx, schoolName.value || '评估系统', boxSize * 0.85)
+        const lineHeight = fontSize * 1.3
+        const startY = (w / 2) - ((nameLines.length - 1) * lineHeight) / 2
+        nameLines.forEach((line, i) => {
+          ctx.fillText(line, w / 2, startY + i * lineHeight)
+        })
+
+        // --- 4. 绘制底部文字区域 (关键修改) ---
+        // 绘制一条浅色分割线
+        ctx.strokeStyle = '#f0f0f0'
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.moveTo(50, w)
+        ctx.lineTo(w - 50, w)
+        ctx.stroke()
+
+        // 绘制问卷标题
+        ctx.fillStyle = '#303133'
+        ctx.font = `bold 32px "Microsoft YaHei", sans-serif`
+        ctx.textAlign = 'center'
+        // 自动换行处理标题
+        const titleLines = splitTextIntoLines(ctx, `《${title}》`, w - 100)
+        titleLines.forEach((line, i) => {
+          ctx.fillText(line, w / 2, w + 60 + i * 45)
+        })
+
+        // 绘制红色提醒字
+        ctx.fillStyle = '#f56c6c' // Element UI 的红色
+        ctx.font = `bold 28px "Microsoft YaHei", sans-serif`
+        ctx.fillText('请在48小时内完成问卷填写！', w / 2, h - 60)
+
+        resolve(canvas.toDataURL('image/png', 1.0))
+      }
+    })
+  } catch (e) {
     return ''
   }
 }
 
+// 辅助函数：文字换行
+const splitTextIntoLines = (ctx, text, maxWidth) => {
+  const words = text.split('')
+  let line = ''
+  const lines = []
+  for (let n = 0; n < words.length; n++) {
+    let testLine = line + words[n]
+    if (ctx.measureText(testLine).width > maxWidth && n > 0) {
+      lines.push(line)
+      line = words[n]
+    } else {
+      line = testLine
+    }
+  }
+  lines.push(line)
+  return lines
+}
+
 // 监听分享链接变化，自动生成二维码
 watch(teacherShareUrl, async (url) => {
-  teacherQrUrl.value = await generateQr(url)
+  teacherQrUrl.value = await generateQr(url,"教师数据素养及数据应用效果调查问卷")
 })
 
 watch(studentShareUrl, async (url) => {
-  studentQrUrl.value = await generateQr(url)
+  studentQrUrl.value = await generateQr(url,"学生数据素养及数据应用效果调查问卷")
 })
 
 watch(managerShareUrl, async (url) => {
-  managerQrUrl.value = await generateQr(url)
+  managerQrUrl.value = await generateQr(url,"管理者数据素养及数据应用效果调查问卷")
 })
 
 // 分享链接
@@ -430,8 +521,8 @@ onMounted(async () => {
 }
 
 .qr-box {
-  width: 128px;
-  height: 128px;
+  width: 140px;
+  height: auto;
   border: 1px dashed #dcdfe6;
   border-radius: 6px;
   display: flex;
@@ -441,8 +532,9 @@ onMounted(async () => {
 }
 
 .qr-img {
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: auto;
+  display: block;
 }
 
 .qr-placeholder {

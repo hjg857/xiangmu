@@ -39,7 +39,7 @@ def send_account_approval_email(username, password, email, school_name):
 
 联系人：曾老师
 电  话：18252169610
-邮  件：a18390917485@163.com
+邮  件：2020250606@jsnu.edu.cn
 邮  编：221116
 地  址：江苏省徐州市铜山新区上海路101号
 

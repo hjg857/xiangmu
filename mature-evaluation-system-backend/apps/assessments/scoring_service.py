@@ -360,12 +360,20 @@ class ScoringService:
         return dimension_score
 
     def _calc_application_effect_score(self) -> float:
-        """计算C23应用效果主观评价得分"""
+        """计算C23应用效果主观评价得分并记录分类分值"""
         from apps.surveys.models import SurveyInstance, SurveyResponse
-        
+
         c23_config = config.BEHAVIOR_SCORING_RULES['C23']
         survey_ranges = c23_config['survey_ranges']
         total = 0.0
+
+        # 定义每个群体的子项满分（基于5点量表，每题5分）
+        # 教师：6题=30分，学生：6题=30分，管理者：5题=25分
+        sub_max_mapping = {
+            'teacher': 30.0,
+            'student': 30.0,
+            'manager': 25.0
+        }
 
         for survey_type, (start, end) in survey_ranges.items():
             instances = SurveyInstance.objects.filter(
@@ -373,7 +381,18 @@ class ScoringService:
             responses = []
             for inst in instances:
                 responses.extend(SurveyResponse.objects.filter(instance=inst))
-            total += self._calc_survey_raw_score(responses, list(range(start, end + 1)))
+
+            # 1. 计算该群体的原始平均分 (例如教师组可能得 24.5 / 30)
+            group_raw_score = self._calc_survey_raw_score(responses, list(range(start, end + 1)))
+
+            # 2. 【核心新增】：将该群体的分数转为 5 分制并记录，供前端环形图使用
+            # 存入的键名为 C23_teacher, C23_student, C23_manager
+            sub_max = sub_max_mapping.get(survey_type, 30.0)
+            normalized_score = (group_raw_score / sub_max) * 5.0 if sub_max > 0 else 0
+            self.observation_scores[f'C23_{survey_type}'] = normalized_score
+
+            # 3. 累加到总原始分（最高 85 分）
+            total += group_raw_score
 
         return total
 

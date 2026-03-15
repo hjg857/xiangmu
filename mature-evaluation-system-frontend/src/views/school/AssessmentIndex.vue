@@ -426,7 +426,7 @@
                       <el-button 
                         type="primary" 
                         class="share-append-btn"
-                        @click="copyLink(`${schoolName}《教师数据素养调查问卷》\n问卷链接：${studentShareUrl}`)"
+                        @click="copyLink(`${schoolName}《学生数据素养调查问卷》\n问卷链接：${studentShareUrl}`)"
                       >
                         <el-icon style="margin-right: 4px;"><DocumentCopy /></el-icon>
                         复制
@@ -861,99 +861,116 @@ const teacherQrUrl = ref('')
 const studentQrUrl = ref('')
 const managerQrUrl = ref('')
 
-const generateQr = async (text) => {
-  if (!text) return ''
+const generateQr = async (url, title) => {
+  if (!url) return ''
   try {
-    // 1. 先生成原始二维码的 Base64
-    const rawQrDataUrl = await QRCode.toDataURL(text, {
-      width: 600, // 增加原始分辨率，保证合成后清晰
-      margin: 1,
-      color: {
-        dark: '#000000',
-        light: '#ffffff'
-      }
+    const rawQrDataUrl = await QRCode.toDataURL(url, {
+      width: 1000,
+      margin: 2,
+      color: { dark: '#000000', light: '#ffffff' }
     })
 
-    // 2. 使用 Canvas 进行合成
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d')
-      const size = 600
-      canvas.width = size
-      canvas.height = size
+      
+      const w = 800      
+      const h = 1100     // 维持高度，留出空间放特大号文字
+      canvas.width = w
+      canvas.height = h
 
       const img = new Image()
       img.src = rawQrDataUrl
       img.onload = () => {
-        // A. 画背景二维码
-        ctx.drawImage(img, 0, 0, size, size)
-
-        // B. 画中心白底方块
-        const boxSize = size * 0.22 // 中心区域大小
-        const x = (size - boxSize) / 2
-        const y = (size - boxSize) / 2
-        
+        // --- 1. 背景 ---
         ctx.fillStyle = '#FFFFFF'
-        ctx.fillRect(x, y, boxSize, boxSize)
-        // 给白框加个细灰色边框（可选，增加精致感）
+        ctx.fillRect(0, 0, w, h)
+
+        // --- 2. 二维码 (稍微上移，给底部留空间) ---
+        const qrSize = 740
+        const qrX = (w - qrSize) / 2
+        ctx.drawImage(img, qrX, 20, qrSize, qrSize)
+
+        // --- 3. 中心遮罩与文字 (增大尺寸增强识别度) ---
+        const boxSize = 220 
+        const bx = (w - boxSize) / 2
+        const by = 20 + (qrSize - boxSize) / 2
+        ctx.fillStyle = '#FFFFFF'
+        ctx.fillRect(bx, by, boxSize, boxSize)
         ctx.strokeStyle = '#eeeeee'
         ctx.lineWidth = 2
-        ctx.strokeRect(x, y, boxSize, boxSize)
+        ctx.strokeRect(bx, by, boxSize, boxSize)
 
-        // C. 画学校名称（核心：将文字画入像素）
-        ctx.fillStyle = '#333333'
-        const fontSize = Math.floor(boxSize * 0.22) // 动态算字号
-        ctx.font = `bold ${fontSize}px "Microsoft YaHei", sans-serif`
+        ctx.fillStyle = '#303133'
+        const centerFontSize = 38 // 中心字号也加大
+        ctx.font = `bold ${centerFontSize}px "Microsoft YaHei", sans-serif`
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
-
         const name = schoolName.value || '评估系统'
-        
-        // 自动换行算法
-        const maxWidth = boxSize * 0.9
-        const chars = name.split('')
-        let line = ''
-        const lines = []
-        for (let n = 0; n < chars.length; n++) {
-          let testLine = line + chars[n]
-          if (ctx.measureText(testLine).width > maxWidth && n > 0) {
-            lines.push(line)
-            line = chars[n]
-          } else {
-            line = testLine
-          }
-        }
-        lines.push(line)
-
-        // 渲染文字
-        const displayLines = lines.slice(0, 3) // 最多3行
-        const lineHeight = fontSize * 1.2
-        const startY = size / 2 - ((displayLines.length - 1) * lineHeight) / 2
-        displayLines.forEach((content, i) => {
-          ctx.fillText(content, size / 2, startY + i * lineHeight)
+        const nameLines = splitTextIntoLines(ctx, name, boxSize * 0.9)
+        const nameLineHeight = centerFontSize * 1.3
+        const startNameY = by + (boxSize / 2) - ((nameLines.length - 1) * nameLineHeight) / 2
+        nameLines.forEach((line, i) => {
+          ctx.fillText(line, w / 2, startNameY + i * nameLineHeight)
         })
 
-        // D. 输出最终合成的图片 Base64
-        resolve(canvas.toDataURL('image/png'))
+        // --- 4. 底部文字区域 (特大号字优化) ---
+        const textStartY = 820 // 紧跟二维码下方
+
+        // A. 问卷标题 (调大到 42px)
+        ctx.fillStyle = '#303133'
+        ctx.font = `bold 48px "Microsoft YaHei", sans-serif` 
+        ctx.textAlign = 'center'
+        // 增加行间距
+        const titleLines = splitTextIntoLines(ctx, `《${title}》`, w - 100)
+        titleLines.forEach((line, i) => {
+          ctx.fillText(line, w / 2, textStartY + i * 60)
+        })
+
+        // B. 红色提醒 (调大到 38px，加粗)
+        ctx.fillStyle = '#F56C6C'
+        ctx.font = `bold 44px "Microsoft YaHei", sans-serif`
+        // 动态计算 Y 坐标，确保在标题下方合适位置
+        const reminderY = textStartY + (titleLines.length * 60) + 30
+        ctx.fillText('请在48小时内完成问卷填写！', w / 2, reminderY)
+
+        resolve(canvas.toDataURL('image/png', 1.0))
       }
     })
   } catch (e) {
-    console.error('合成二维码失败:', e)
     return ''
   }
 }
 
+// 辅助函数：限制最多两行
+const splitTextIntoLines = (ctx, text, maxWidth) => {
+  const chars = text.split('')
+  let line = ''
+  const lines = []
+  for (let n = 0; n < chars.length; n++) {
+    let testLine = line + chars[n]
+    if (ctx.measureText(testLine).width > maxWidth && n > 0) {
+      lines.push(line)
+      line = chars[n]
+    } else {
+      line = testLine
+    }
+  }
+  lines.push(line)
+  return lines.slice(0, 2)
+}
+
 watch(teacherShareUrl, async (url) => {
-  teacherQrUrl.value = await generateQr(url)
-})
+  if (url) teacherQrUrl.value = await generateQr(url, '教师数据素养及数据应用效果调查问卷')
+}, { immediate: true })
 
 watch(studentShareUrl, async (url) => {
-  studentQrUrl.value = await generateQr(url)
-})
+  if (url) studentQrUrl.value = await generateQr(url, '学生数据素养及数据应用效果调查问卷')
+}, { immediate: true })
 
 watch(managerShareUrl, async (url) => {
-  managerQrUrl.value = await generateQr(url)
-})
+  if (url) managerQrUrl.value = await generateQr(url, '管理者数据素养及数据资产意识调查问卷')
+}, { immediate: true })
 
 onMounted(async () => {
   const storedUser = localStorage.getItem('user')
@@ -1832,19 +1849,40 @@ const handleViewProgress = () => {
   margin-top: 8px; /* 控制整体往上 */
 }
 
-/* 二维码盒子 */
 .qr-box {
   position: relative;
-  width: 140px;
-  height: 140px;
+  width: 160px; /* 固定显示宽度 */
+  height: auto !important;
+  background: #ffffff;
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
+  padding: 5px; /* 减小内边距，让图片更紧凑 */
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: center;
 }
 
-/* 二维码图片 */
 .qr-img {
-  width: 140px;
-  height: 140px;
+  width: 100%;
+  height: auto !important;
   display: block;
 }
+
+/* 此时二维码中间的覆盖层已经画在图片里了，HTML里的 .qr-center 必须删掉 */
+.qr-center {
+  display: none !important;
+}
+
+/* 彻底隐藏网页上的原有提示文字 */
+.qr-tip {
+  display: none !important;
+}
+
+.share-right {
+  width: 170px; /* 宽度给够 */
+  margin-top: -200px; /* 根据实际位置上下微调 */
+}
+
 
 /* 占位 */
 .qr-placeholder {

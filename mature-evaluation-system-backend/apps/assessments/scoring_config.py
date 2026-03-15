@@ -58,7 +58,7 @@ INSTITUTION_SCORING_RULES = {
         'field': 'meeting_activity_count',
         'max_score': 10,
         'rules': [
-            {'condition': 'lt', 'value': 5, 'score': 3},
+            {'condition': 'lte', 'value': 5, 'score': 3},
             {'condition': 'between', 'min': 5, 'max': 15, 'score': 6},
             {'condition': 'gt', 'value': 15, 'score': 10}
         ]

@@ -234,7 +234,7 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'ckhendemphogigah')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # 系统配置
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://8.155.152.174')
+FRONTEND_URL = 'http://8.155.152.174'
 SYSTEM_EMAIL_SIGNATURE = '此邮件由系统自动发送，请勿回复'
 
 # 大模型API配置（可选，也可在数据库中配置）
@@ -245,7 +245,7 @@ LLM_MODEL_NAME = os.getenv('LLM_MODEL_NAME', 'gpt-3.5-turbo')
 
 # DeepSeek API配置（使用OpenAI SDK）
 DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', 'sk-028ca182138140cb92efc9317c504615')
-DEEPSEEK_API_ENDPOINT = os.getenv('DEEPSEEK_API_ENDPOINT', 'https://api.deepseek.com')  # base_url不需要完整路径
+DEEPSEEK_API_ENDPOINT = 'https://api.deepseek.com'  # base_url不需要完整路径
 DEEPSEEK_MODEL_NAME = os.getenv('DEEPSEEK_MODEL_NAME', 'deepseek-chat')
 
 # 阿里云OSS配置

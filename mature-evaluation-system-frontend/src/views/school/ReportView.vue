@@ -84,17 +84,7 @@
         </h2>
         
         <p class="section-summary">
-          学校数据文化整体处于{{ reportData.maturity_level }}（{{ reportData.total_score_percent?.toFixed(2) }}分）。
-          其中数据素养（{{ dimensionScores.literacy?.toFixed(2) }}分）
-          {{ getPerformanceText(dimensionScores.literacy) }}，
-          数据制度（{{ dimensionScores.institution?.toFixed(2) }}分）
-          {{ getPerformanceText(dimensionScores.institution) }}，
-          数据行为（{{ dimensionScores.behavior?.toFixed(2) }}分）
-          {{ getPerformanceText(dimensionScores.behavior) }}，
-          数据资产（{{ dimensionScores.asset?.toFixed(2) }}分）
-          {{ getPerformanceText(dimensionScores.asset) }}，
-          数据技术（{{ dimensionScores.technology?.toFixed(2) }}分）
-          {{ getPerformanceText(dimensionScores.technology) }}。
+          经综合评估，学校数据文化成熟度总得分为{{ reportData.total_score_percent?.toFixed(2) }}分，整体发展水平为{{ reportData.maturity_level }}。从五大维度来看，数据素养维度得分{{ dimensionScores.literacy?.toFixed(2) }}分，数据制度维度得分{{ dimensionScores.institution?.toFixed(2) }}分，数据行为维度得分{{ dimensionScores.behavior?.toFixed(2) }}分，数据资产维度得分{{ dimensionScores.asset?.toFixed(2) }}分，数据技术维度得分{{ dimensionScores.technology?.toFixed(2) }}分。
         </p>
 
         <!-- 总分和等级展示 -->
@@ -561,7 +551,9 @@
               <span class="info-label">数据硬件设施</span>
               <div class="info-value">
                 <p>1. 学校{{ getDataCenterText() }}。</p>
-                <p>2. 数字终端配备生机比为：{{ technologyDetails.student_device_ratio_display || '未填写' }}，师机比为{{ technologyDetails.teacher_device_ratio_display || '未填写' }}。</p>
+                <p>
+                  2. 数字终端配备生机比为：<span>{{ getStudentRatioText() }}</span>，师机比为：<span>{{ getTeacherRatioText() }}</span>。
+                </p>
               </div>
             </div>
             <div class="info-item">
@@ -870,19 +862,19 @@ const initSubjectiveCharts = () => {
     const chart = echarts.init(managerEffectCircle.value, null, { renderer: 'svg' });
     chartInstances.push(chart);
     // 这里假设 C231 是管理者主观分，你可以根据实际数据调整 Key
-    chart.setOption(getCircleOption(observationScores.value['C23'] || 0, '#409eff', '管理者'));
+    chart.setOption(getCircleOption(observationScores.value['C23_manager'] || 0, '#409eff', '管理者'));
   }
 
   if (studentEffectCircle.value) {
     const chart = echarts.init(studentEffectCircle.value, null, { renderer: 'svg' });
     chartInstances.push(chart);
-    chart.setOption(getCircleOption(observationScores.value['C23'] || 0, '#67c23a', '学生'));
+    chart.setOption(getCircleOption(observationScores.value['C23_student'] || 0, '#67c23a', '学生'));
   }
 
   if (teacherEffectCircle.value) {
     const chart = echarts.init(teacherEffectCircle.value, null, { renderer: 'svg' });
     chartInstances.push(chart);
-    chart.setOption(getCircleOption(observationScores.value['C23'] || 0, '#909399', '教师'));
+    chart.setOption(getCircleOption(observationScores.value['C23_teacher'] || 0, '#909399', '教师'));
   }
 };
 
@@ -1573,6 +1565,33 @@ const downloadPDF = async () => {
   } finally {
     downloading.value = false
   }
+}
+
+// 获取生机比描述文字
+const getStudentRatioText = () => {
+  const val = technologyDetails.value.student_device_ratio
+  if (!val) return '未填写'
+  
+  // 这里的 Key (low/medium/high) 需要与你后端 ChoiceField 定义的完全一致
+  const map = {
+    'low': '小于 6:1',
+    'medium': '介于 6:1 与 15:1 之间',
+    'high': '大于等于 15:1'
+  }
+  return map[val] || val
+}
+
+// 获取师机比描述文字
+const getTeacherRatioText = () => {
+  const val = technologyDetails.value.teacher_device_ratio
+  if (!val) return '未填写'
+  
+  const map = {
+    'low': '小于 1:1',
+    'medium': '介于 1:1 与 4:1 之间',
+    'high': '大于等于 4:1'
+  }
+  return map[val] || val
 }
 </script>
 

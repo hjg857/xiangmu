@@ -255,13 +255,13 @@ class ReportDataService:
             technology = TechnologyAssessment.objects.get(assessment=self.assessment)
             return {
                 # 数据基础设施
+                'has_independent_data_center':technology.has_data_platform,
                 'data_center_standard': technology.data_center_standard,
                 'data_center_standard_display': technology.get_data_center_standard_display() if technology.data_center_standard else '',
                 'student_device_ratio': technology.student_device_ratio,
                 'student_device_ratio_display': technology.get_student_device_ratio_display() if technology.student_device_ratio else '',
                 'teacher_device_ratio': technology.teacher_device_ratio,
                 'teacher_device_ratio_display': technology.get_teacher_device_ratio_display() if technology.teacher_device_ratio else '',
-                'has_data_platform': technology.has_data_platform,
                 # 数据安全水平
                 'security_certified_count': technology.security_certified_count,
                 'security_certified_ratio': technology.security_certified_ratio,

@@ -154,7 +154,7 @@
         </template>
         <el-radio-group v-model="formData.student_device_ratio" class="horizontal-radio">
           <el-radio value="low">生机比 < 6:1</el-radio>
-          <el-radio value="medium"> 6:1 < 生机比 ≤ 15:1</el-radio>
+          <el-radio value="medium"> 6:1 ≤ 生机比 < 15:1</el-radio>
           <el-radio value="high">生机比 ≥ 15:1</el-radio>
         </el-radio-group>
       </el-form-item>
@@ -170,14 +170,14 @@
               </template>
               <div class="hint-body">
                 <p class="hint-text">师机比指 “教师人数：数字终端数量”，按实际计算结果选择对应区间选项（数字终端含电脑、平板等教学用智能终端）。</p>
-                <p class="hint-example"><em>示例：全校教师 100 人、数字终端 80 台，师机比 = 1.25:1（1:1 < 师机比 ≤ 4:1），则选择「1:1 < 师机比 ≤ 4:1」。</em></p>
+                <p class="hint-example"><em>示例：全校教师 100 人、数字终端 80 台，师机比 = 1.25:1（1:1 ≤ 师机比 < 4:1），则选择「1:1 ≤ 师机比 < 4:1」。</em></p>
               </div>
             </el-popover>
           </div>
         </template>
         <el-radio-group v-model="formData.teacher_device_ratio" class="horizontal-radio">
           <el-radio value="low">师机比 < 1:1</el-radio>
-          <el-radio value="medium">1:1 < 师机比 ≤ 4:1</el-radio>
+          <el-radio value="medium">1:1 ≤ 师机比 < 4:1</el-radio>
           <el-radio value="high">师机比 ≥ 4:1</el-radio>
         </el-radio-group>
       </el-form-item>
