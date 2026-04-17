@@ -4,7 +4,7 @@
     <div class="left-panel">
       <div class="left-content">
         <div class="accent-bar"></div>
-        <h1 class="left-title">中小学数据文化</h1>
+        <h1 class="left-title">中小学校数据文化</h1>
         <h1 class="left-title">成熟度评估监测系统</h1>
       </div>
     </div>
