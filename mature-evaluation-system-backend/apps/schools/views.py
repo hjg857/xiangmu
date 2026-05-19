@@ -1,8 +1,10 @@
 """
 学校模块视图
 """
+from django.utils import timezone
+
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 
@@ -271,69 +273,72 @@ def update_school_info_count(request):
 def approve_application(request, application_id):
     """审批账号申请（管理员）"""
     if not request.user.is_admin_user():
-        return APIResponse.error(
-            message='只有管理员可以审批',
-            status_code=status.HTTP_403_FORBIDDEN
-        )
-    
+        return APIResponse.error(message='只有管理员可以审批', status_code=status.HTTP_403_FORBIDDEN)
+
     application = get_object_or_404(AccountApplication, id=application_id)
-    
     if application.status != 'pending':
         return APIResponse.error('该申请已处理')
-    
-    # 检查邮箱是否已被使用
+
     if User.objects.filter(email=application.contact_email).exists():
         return APIResponse.error('该邮箱已被注册，请联系管理员')
-    
+
     try:
         with transaction.atomic():
-            # 生成用户名和密码（使用电话号码）
+            # 1. 生成凭证
             username = gen_unique_school_username(application.school_name, User)
             password = gen_strong_password(8)
+            # 修正：去掉逗号，防止变成元组
+            access_code = password
 
-            # --- 修改：更精准地查找或创建 Region ---
-            region = None
-            # 优先使用前端传来的 6 位代码查找
-            if hasattr(application, 'district_code') and application.district_code:
-                region = Region.objects.filter(code=application.district_code).first()
+            # 2. 确定角色
+            # 这里的角色直接决定了登录后的权限：'school' 或 'region_admin'
+            target_role = getattr(application, 'apply_role', 'school')
 
-            # 如果没找到（或者是旧数据没有 code），再退回到原来的文本匹配
-            if not region:
-                region = get_or_create_region_by_text(
-                    application.province,
-                    application.city,
-                    application.district,
-                    application.district_code
-                )
-            # 确保用户名唯一
-            while User.objects.filter(username=username).exists():
-                username = generate_username(application.school_name, application.contact_phone)
-            
-            # 创建用户
+            # 3. 创建用户
             user = User.objects.create_user(
                 username=username,
                 email=application.contact_email,
                 password=password,
-                role='school'
+                role=target_role # 核心：赋予对应的系统角色
             )
 
-            # 创建学校记录
-            school = School.objects.create(
-                user=user,
-                name=application.school_name,
-                school_type=application.school_type,
-                province=application.province,
-                city=application.city,
-                district=application.district,
-                region=region,
-                contact_name=application.contact_name,
-                contact_position=application.contact_position,
-                contact_phone=application.contact_phone,
-                contact_email=application.contact_email
-            )
-            
-            # 更新申请状态
-            from django.utils import timezone
+            # 4. 根据角色处理关联数据
+            region = None
+            if hasattr(application, 'district_code') and application.district_code:
+                region = Region.objects.filter(code=application.district_code).first()
+
+            if not region:
+                region = get_or_create_region_by_text(
+                    application.province, application.city, application.district, application.district_code
+                )
+
+            if target_role == 'school':
+                # 如果是学校申请，创建学校档案
+                School.objects.create(
+                    user=user,
+                    name=application.school_name,
+                    school_type=application.school_type,
+                    province=application.province,
+                    city=application.city,
+                    district=application.district,
+                    region=region,
+                    contact_name=application.contact_name,
+                    contact_position=application.contact_position,
+                    contact_phone=application.contact_phone,
+                    contact_email=application.contact_email,
+                    access_code=access_code
+                )
+            elif target_role == 'region_admin':
+                # 如果是区域管理员申请，通常将其与 Region 记录绑定
+                # 假设你的 Region 模型有一个 region_admin 字段指向 User
+                if region:
+                    region.region_admin = user
+                    region.save(update_fields=['region_admin'])
+
+                # 可选：如果区域管理员也需要一个“虚拟学校”外壳，可以在此处也创建 School
+                # 但通常 region_admin 角色登录后直接看全区数据，不需要 School 记录
+
+            # 5. 更新申请状态
             application.status = 'approved'
             application.reviewed_by = request.user
             application.reviewed_at = timezone.now()
@@ -344,7 +349,7 @@ def approve_application(request, application_id):
                 from django.core.mail import send_mail
                 from django.conf import settings
                 
-                subject = '【数据文化成熟度评估系统】账号审批通过通知'
+                subject = '【中小学数据文化成熟度评估监测系统】账号审批通过通知'
                 message = f"""尊敬的 {application.school_name} 用户：
 
 您好！
@@ -396,13 +401,10 @@ def approve_application(request, application_id):
                 ip_address=request.META.get('REMOTE_ADDR'),
                 user_agent=request.META.get('HTTP_USER_AGENT', '')
             )
-            
+
             return APIResponse.success(
-                data={
-                    'username': username,
-                    'school_name': school.name
-                },
-                message='审批成功，账号信息已发送至邮箱'
+                data={'username': username, 'role': target_role},
+                message='审批成功，账号信息已发送'
             )
             
     except Exception as e:
@@ -445,7 +447,7 @@ def reject_application(request, application_id):
         from django.core.mail import send_mail
         from django.conf import settings
         
-        subject = '【数据文化成熟度评估系统】账号申请审核结果通知'
+        subject = '【中小学数据文化成熟度评估监测系统】账号申请审核结果通知'
         message = f"""
 尊敬的 {application.school_name} 用户：
 
@@ -459,7 +461,9 @@ def reject_application(request, application_id):
 如有疑问，请联系管理员。
 
 ---
-数据文化研究中心
+智能学习与评价江苏省产业技术工程化中心
+邮箱:2020250606@jsnu.edu.cn
+地址:江苏省徐州市铜山新区上海路101号
 {settings.SYSTEM_EMAIL_SIGNATURE}
 """
         
@@ -622,6 +626,8 @@ def import_schools(request):
                 username = row.get('username') or gen_unique_school_username(name, User)
                 password = row.get('password') or gen_strong_password(8)
 
+                access_code = password
+
                 # 3. 创建 User 对象
                 user = User.objects.create_user(
                     username=username,
@@ -649,11 +655,12 @@ def import_schools(request):
                     contact_name=row.get('contact_name'),
                     contact_position=row.get('contact_position'),
                     contact_phone=row.get('contact_phone'),
-                    contact_email=email
+                    contact_email=email,
+                    access_code=access_code
                 )
 
                 # 6. 发送邮件
-                subject = '【数据文化成熟度评估系统】账号审批通过通知'
+                subject = '【中小学数据文化成熟度评估监测系统】账号审批通过通知'
                 message = f"""尊敬的 {name} 用户：
 
                 您好！
@@ -741,3 +748,34 @@ def submit_collaboration(request):
         return Response({"success": True, "message": "提交成功，我们会尽快联系您"})
     except Exception as e:
         return Response({"success": False, "message": str(e)}, status=500)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def export_accounts(request):
+    """
+    超级管理员专用：全量导出学校账号数据
+    接口路径：GET /api/schools/export-accounts/
+    """
+    # 1. 权限拦截
+    if not request.user.is_admin_user():
+        return Response({'success': False, 'message': '权限不足'}, status=403)
+
+    # 2. 获取数据 (select_related 减少 SQL 查询)
+    schools = School.objects.all().select_related('user').order_by('-created_at')
+
+    # 3. 组织数据格式
+    data_list = []
+    for s in schools:
+        data_list.append({
+            "school_name": s.name,
+            "username": s.user.username if s.user else "未配置",
+            "access_code": s.access_code or "未记录",
+            "contact_name": s.contact_name,
+            "contact_phone": s.contact_phone
+        })
+
+    return Response({
+        "success": True,
+        "data": data_list
+    })

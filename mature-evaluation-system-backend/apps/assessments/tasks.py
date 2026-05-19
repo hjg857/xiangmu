@@ -94,7 +94,7 @@ def calculate_assessment_scores(self, assessment_id):
             school_name = assessment.school.name
             email = assessment.school.contact_email
             
-            subject = f'【数据文化成熟度评估系统】评估报告生成通知'
+            subject = f'【中小学数据文化成熟度评估监测系统】评估报告生成通知'
             message = f"""
 尊敬的 {school_name} 用户：
 
@@ -107,7 +107,9 @@ def calculate_assessment_scores(self, assessment_id):
 感谢您的使用！
 
 ---
-数据文化研究中心
+智能学习与评价江苏省产业技术工程化中心
+邮箱:2020250606@jsnu.edu.cn
+地址:江苏省徐州市铜山新区上海路101号
 {settings.SYSTEM_EMAIL_SIGNATURE}
 """
             

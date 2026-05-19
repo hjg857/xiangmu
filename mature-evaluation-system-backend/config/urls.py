@@ -38,6 +38,7 @@ urlpatterns = [
     path('api/surveys/', include('apps.surveys.urls')),
     path('api/', include('apps.reports.urls')),
     path('api/admin/', include('apps.admin_panel.urls')),
+    path('api/schools/', include('apps.schools.urls')),
     
     # 公开内容接口
     path('api/', include('apps.admin_panel.public_urls')),

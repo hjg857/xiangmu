@@ -19,27 +19,27 @@
       >
         <el-menu-item index="/admin/dashboard">
           <el-icon><DataAnalysis /></el-icon>
-          <span>数据概览</span>
+          <span>区校评估概览</span>
+        </el-menu-item>
+
+        <el-menu-item index="/admin/applications">
+          <el-icon><Document /></el-icon>
+          <span>区校账户申请</span>
         </el-menu-item>
         
         <el-menu-item index="/admin/schools">
           <el-icon><School /></el-icon>
-          <span>学校管理</span>
-        </el-menu-item>
-        
-        <el-menu-item index="/admin/applications">
-          <el-icon><Document /></el-icon>
-          <span>账号申请</span>
+          <span>区校账户管理</span>
         </el-menu-item>
         
         <el-menu-item index="/admin/news">
           <el-icon><Promotion /></el-icon>
-          <span>实践动态</span>
+          <span>区校评估动态</span>
         </el-menu-item>
         
         <el-menu-item index="/admin/reports">
           <el-icon><DataLine /></el-icon>
-          <span>评估报告</span>
+          <span>区校评估报告</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
@@ -49,7 +49,7 @@
       <!-- 顶部导航 -->
       <el-header class="header">
         <div class="header-left">
-          <span class="current-page-title">管理后台</span>
+          <span class="current-page-title">中小学校数据文化成熟度监测系统管理后台</span>
         </div>
         
         <div class="header-right">
@@ -71,11 +71,6 @@
       <el-main class="content">
         <router-view />
       </el-main>
-
-      <!-- 页脚 -->
-      <el-footer class="footer">
-        <span>© 2025 苏师YangTeam 版权所有</span>
-      </el-footer>
     </el-container>
   </div>
 </template>

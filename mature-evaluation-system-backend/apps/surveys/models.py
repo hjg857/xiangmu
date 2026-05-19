@@ -11,7 +11,6 @@ class SurveyTemplate(models.Model):
     SURVEY_TYPE_CHOICES = [
         ('teacher', '教师问卷'),
         ('student', '学生问卷'),
-        ('manager', '管理者问卷'),
     ]
     
     survey_type = models.CharField('问卷类型', max_length=20, choices=SURVEY_TYPE_CHOICES, unique=True)

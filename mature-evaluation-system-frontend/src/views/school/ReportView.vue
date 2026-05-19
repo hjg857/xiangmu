@@ -32,7 +32,7 @@
         <div class="basic-info-grid">
           <div class="grid-item">
             <span class="grid-label">办学类型</span>
-            <span class="grid-value">{{ reportData.school_type || '未填写' }}</span>
+            <span class="grid-value">{{ schoolTypeLabel(reportData.school_type) }}</span>
           </div>
           <div class="grid-item">
             <span class="grid-label">所属地区</span>
@@ -59,7 +59,7 @@
         <!-- padding-left: 0 确保列表整体不左偏 -->
           <ol style="padding-left: 0; list-style: none;">
             <li style="text-indent: 2em; margin-bottom: 10px; line-height: 1.6; text-align: justify;">
-              1. <strong>数据素养</strong>：评估学校管理者、教师和学生在数据应用方面的综合能力，包括数据意识与思维、数据知识与技能、数据伦理与隐私等，为数据文化的落地提供核心人才支撑。
+              1. <strong>数据素养</strong>：评估学校教师和学生在数据应用方面的综合能力，包括数据意识与思维、数据知识与技能、数据伦理与隐私等，为数据文化的落地提供核心人才支撑。
             </li>
             <li style="text-indent: 2em; margin-bottom: 10px; line-height: 1.6; text-align: justify;">
               2. <strong>数据制度</strong>：评估学校在组织架构、人员配备与管理规范方面的制度化水平，包括数据组织机构、数据人员配备、数据管理文件等，为学校数据文化的有序发展提供制度依据。
@@ -137,23 +137,19 @@
         <p class="section-summary">
           学校数据素养得分为{{ dimensionScores.literacy?.toFixed(2) }}分。
           其中，教师数据素养得分为{{ secondaryScores.A1?.toFixed(2) }}分，
-          管理者数据素养得分为{{ secondaryScores.A2?.toFixed(2) }}分，
-          学生数据素养得分为{{ secondaryScores.A3?.toFixed(2) }}分。
+          学生数据素养得分为{{ secondaryScores.A2?.toFixed(2) }}分。
           具体情况如下：
         </p>
 
         <!-- 三个群体得分展示 -->
-        <div class="literacy-scores">
+        <!-- 两个群体得分展示 -->
+        <div class="literacy-scores two-columns">
           <div class="literacy-score-card teacher">
             <span class="score">{{ secondaryScores.A1?.toFixed(2) }}分</span>
             <span class="label">教师平均分</span>
           </div>
-          <div class="literacy-score-card manager">
-            <span class="score">{{ secondaryScores.A2?.toFixed(2) }}分</span>
-            <span class="label">管理者平均分</span>
-          </div>
           <div class="literacy-score-card student">
-            <span class="score">{{ secondaryScores.A3?.toFixed(2) }}分</span>
+            <span class="score">{{ secondaryScores.A2?.toFixed(2) }}分</span>
             <span class="label">学生平均分</span>
           </div>
         </div>
@@ -161,19 +157,16 @@
         <!-- 参评人数 -->
         <div class="participant-info">
           <span>教师参评人数：{{ reportData.participant_counts?.teacher || 0 }}人</span>
-          <span>管理者参评人数：{{ reportData.participant_counts?.manager || 0 }}人</span>
           <span>学生参评人数：{{ reportData.participant_counts?.student || 0 }}人</span>
         </div>
 
         <!-- 三个雷达图 -->
+        <!-- 两个雷达图 -->
         <div class="literacy-radar-section">
-          <h4>各群体数据素养雷达图</h4>
-          <div class="radar-charts-row">
+          <h4>教师与学生数据素养雷达图</h4>
+          <div class="radar-charts-row two-columns">
             <div class="radar-chart-item">
               <div ref="teacherRadarChart" class="chart-box" style="height: 280px;"></div>
-            </div>
-            <div class="radar-chart-item">
-              <div ref="managerRadarChart" class="chart-box" style="height: 280px;"></div>
             </div>
             <div class="radar-chart-item">
               <div ref="studentRadarChart" class="chart-box" style="height: 280px;"></div>
@@ -194,13 +187,20 @@
 
         <div class="scoring-rules">
           <h4><el-icon><InfoFilled /></el-icon> 计分规则说明</h4>
-          <p>数据素养维度总权重为 <strong>0.3543</strong>，下设三个二级指标：</p>
+          <p>数据素养维度下设两个二级指标：</p>
           <ul>
-            <li><strong>A1 教师数据素养</strong>（权重 0.3748）：包含数据意识与思维、知识与技能、评价与交流、应用与创新、伦理与隐私5个观测点。</li>
-            <li><strong>A2 管理者数据素养</strong>（权重 0.3443）：包含数据意识与思维、知识与技能、评价与交流、应用与创新、伦理与隐私5个观测点。</li>
-            <li><strong>A3 学生数据素养</strong>（权重 0.2809）：包含数据意识与思维、知识与技能、评价与交流、应用与创新、伦理与隐私5个观测点。</li>
+            <li>
+              <strong>A1 教师数据素养</strong>（权重 0.5716）：
+              包含教师数据意识与思维、教师数据知识与技能、教师数据评价与交流、教师数据应用与创新、教师数据伦理与隐私5个观测点。
+            </li>
+            <li>
+              <strong>A2 学生数据素养</strong>（权重 0.4284）：
+              包含学生数据意识与思维、学生数据知识与技能、学生数据评价与交流、学生数据应用与创新、学生数据伦理与隐私5个观测点。
+            </li>
           </ul>
-          <p class="rule-note">注：观测点采用5点量表计分，计分完成后，对每个观测点的分值进行归一化处理，转化为相同分值区间进评分计算。</p>
+          <p class="rule-note">
+            注：教师问卷和学生问卷均采用5点量表计分。计分完成后，对每个观测点分值进行归一化处理，转化为相同分值区间后参与加权计算。
+          </p>
         </div>
       </section>
 
@@ -214,77 +214,110 @@
         <!-- 计分规则说明 -->
 
         <p class="section-summary">
-          学校数据制度得分为{{ dimensionScores.institution?.toFixed(2) }}分。
-          其中，数据组织机构得分{{ secondaryScores.B1?.toFixed(2) }}分，
-          数据人员配备得分{{ secondaryScores.B2?.toFixed(2) }}分，
-          数据管理文件得分{{ secondaryScores.B3?.toFixed(2) }}分。
+          学校数据制度得分为{{ formatScore(dimensionScores.institution) }}。
+          其中，数据组织机构得分{{ formatScore(secondaryScores.B1) }}，
+          数据人员配备得分{{ formatScore(secondaryScores.B2) }}，
+          数据管理文件得分{{ formatScore(secondaryScores.B3) }}。
           具体情况如下：
         </p>
 
         <!-- 数据组织机构 -->
-        <div class="institution-card" >
+        <!-- 数据组织机构 -->
+        <div class="institution-card">
           <div class="card-header" style="display: flex; justify-content: center; align-items: center;">
             <span class="card-title">数据组织机构：{{ secondaryScores.B1?.toFixed(2) }}分</span>
           </div>
-          <div class="card-content" style="display: flex; gap: 40px; align-items: flex-start;">
-            <div class="info-item" style="flex: 1; margin-bottom: 0;">
+
+          <div class="card-content institution-grid">
+            <div class="info-item">
               <span class="info-label">数据领导/工作小组</span>
-              <span class="info-value">学校{{ institutionDetails.has_leadership_group ? '已设立' : '未设立' }}数据领导/工作小组。</span>
+              <div class="info-value">
+                <p>学校数据领导/工作小组设置情况为：{{ getLeadershipGroupText() }}。</p>
+              </div>
             </div>
-            <div class="info-item" style="flex: 1; margin-bottom: 0;">
+
+            <div class="info-item">
               <span class="info-label">数据组织运行情况</span>
-              <span class="info-value">近5年，学校组织开展数据相关会议、活动{{ institutionDetails.meeting_activity_count || 0 }}次。</span>
+              <div class="info-value">
+                <p>近5年，学校组织开展数据相关会议、活动{{ institutionDetails.meeting_activity_count || 0 }}次。</p>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- 数据人员配备 -->
+        <!-- 数据人员配备 -->
         <div class="institution-card">
           <div class="card-header" style="display: flex; justify-content: center; align-items: center;">
             <span class="card-title">数据人员配备：{{ secondaryScores.B2?.toFixed(2) }}分</span>
           </div>
-          <div class="card-content" style="display: flex; gap: 40px; align-items: flex-start;">
-            <div class="info-item" style="flex: 1; margin-bottom: 0;">
+
+          <div class="card-content institution-grid">
+            <div class="info-item">
               <span class="info-label">数据专职/兼职管理人员</span>
               <div class="info-value">
-                <p>1. 配备专职人员{{ institutionDetails.fulltime_staff_count || 0 }}位，兼职人员{{ institutionDetails.parttime_staff_count || 0 }}位。</p>
-                <p>2. 学校专职人员{{ institutionDetails.has_clear_responsibilities ? '已有' : '暂无' }}明确职务。</p>
+                <template v-if="institutionDetails.has_data_staff">
+                  <p>1. 学校配备专职数据管理人员{{ institutionDetails.fulltime_staff_count || 0 }}位，兼职数据管理人员{{ institutionDetails.parttime_staff_count || 0 }}位。</p>
+                  <p>2. 相关人员{{ institutionDetails.has_clear_responsibilities ? '已有明确职责分工' : '暂未形成明确职责分工' }}。</p>
+                </template>
+                <template v-else>
+                  <p>学校暂未配备专职或兼职数据管理人员。</p>
+                </template>
               </div>
             </div>
-            <div class="info-item" style="flex: 1; margin-bottom: 0;">
+
+            <div class="info-item">
               <span class="info-label">数据人员进修与培训情况</span>
               <div class="info-value">
-                <p>1. 学校近5年参与数据相关培训{{ institutionDetails.training_count || 0 }}次。</p>
-                <p>2. 相关人员获得证书{{ (institutionDetails.national_cert_count || 0) + (institutionDetails.provincial_cert_count || 0) + (institutionDetails.city_cert_count || 0) }}份。</p>
+                <template v-if="institutionDetails.has_training">
+                  <p>1. 学校近5年组织或参与数据相关进修、培训{{ institutionDetails.training_count || 0 }}次。</p>
+                  <p>2. 相关人员获得数据相关认证或考核证书{{ getTotalCertificates() }}份。</p>
+                </template>
+                <template v-else>
+                  <p>学校近5年暂无数据相关进修或培训记录。</p>
+                </template>
               </div>
             </div>
           </div>
         </div>
 
         <!-- 数据管理文件 -->
+        <!-- 数据管理文件 -->
         <div class="institution-card">
           <div class="card-header" style="display: flex; justify-content: center; align-items: center;">
             <span class="card-title">数据管理文件：{{ secondaryScores.B3?.toFixed(2) }}分</span>
           </div>
-          <div class="card-content" style="display: flex; gap: 40px; align-items: flex-start;">
-            <div class="info-item" style="flex: 1; margin-bottom: 0;">
+
+          <div class="card-content institution-grid">
+            <div class="info-item">
               <span class="info-label">数据管理制度类文件</span>
               <div class="info-value">
-                <p>1. 学校发布{{ getTotalManagementDocs() }}份制度文件。</p>
-                <div v-if="institutionDetails.management_doc_analysis" class="llm-analysis">
-                  <p>2. 大模型文件质量分析：</p>
-                  <div class="analysis-content">{{ institutionDetails.management_doc_analysis }}</div>
-                </div>
+                <p>1. {{ getManagementDocStatusText() }}</p>
+
+                <template v-if="institutionDetails.management_doc_status === 'clear_required'">
+                  <p>2. 学校出台的与数据管理相关文件共{{ getTotalManagementDocs() }}份。</p>
+
+                  <div v-if="institutionDetails.management_doc_analysis" class="llm-analysis">
+                    <p>3. 大模型文件质量分析：</p>
+                    <div class="analysis-content">{{ institutionDetails.management_doc_analysis }}</div>
+                  </div>
+                </template>
               </div>
             </div>
-            <div class="info-item" style="flex: 1; margin-bottom: 0;">
+
+            <div class="info-item">
               <span class="info-label">数据实践指导类文件</span>
               <div class="info-value">
-                <p>1. 学校发布{{ getTotalPracticeDocs() }}份数据指导相关文件。</p>
-                <div v-if="institutionDetails.practice_doc_analysis" class="llm-analysis">
-                  <p>2. 大模型文件质量分析：</p>
-                  <div class="analysis-content">{{ institutionDetails.practice_doc_analysis }}</div>
-                </div>
+                <p>1. {{ getPracticeDocStatusText() }}</p>
+
+                <template v-if="institutionDetails.practice_doc_status === 'published'">
+                  <p>2. 学校出台的与数据实践指导相关文件共{{ getTotalPracticeDocs() }}份。</p>
+
+                  <div v-if="institutionDetails.practice_doc_analysis" class="llm-analysis">
+                    <p>3. 大模型文件质量分析：</p>
+                    <div class="analysis-content">{{ institutionDetails.practice_doc_analysis }}</div>
+                  </div>
+                </template>
               </div>
             </div>
           </div>
@@ -297,28 +330,40 @@
 
         <div class="scoring-rules">
           <h4><el-icon><InfoFilled /></el-icon> 计分规则说明</h4>
-          <p>数据制度维度总权重为 <strong>0.1578</strong>，下设三个二级指标：</p>
+          <p>数据制度维度下设三个二级指标：</p>
           <ul>
-            <li><strong>B1 数据组织机构</strong>（权重 0.3599）：
+            <li>
+              <strong>B1 数据组织机构</strong>：
               <ul>
-                <li>B11 数据领导/工作小组（满分10分）：设立计10分，未设立计0分。</li>
-                <li>B12 数据组织运行情况（满分10分）：按近5年相关会议/活动次数计分（≤5次计3分，6-15次计6分，>15次计10分）。</li>
+                <li>B11 数据领导/工作小组（满分10分）：规范管理小组计10分，基础管理小组计5分，无相关小组计0分。</li>
+                <li>B12 数据组织运行情况（满分10分）：按近5年相关会议或活动次数计分，0次计0分，较少开展计较低分，开展较充分计较高分。</li>
               </ul>
             </li>
-            <li><strong>B2 数据人员配备</strong>（权重 0.4131）：
+
+            <li>
+              <strong>B2 数据人员配备</strong>：
               <ul>
-                <li>B21 数据专职/兼职管理人员（满分20分）：根据是否配备、人数及职责明确情况计分。</li>
-                <li>B22 数据人员进修与培训情况（满分30分）：根据是否参与、频次及证书获得情况计分。</li>
+                <li>B21 数据专职/兼职管理人员（满分20分）：根据是否配备数据管理人员、专兼职人员数量及职责明确情况计分。</li>
+                <li>B22 数据人员进修与培训情况（满分30分）：根据是否参与数据相关培训、培训次数及获得相关认证或考核证书数量计分。</li>
               </ul>
             </li>
-            <li><strong>B3 数据管理文件</strong>（权重 0.2270）：
+
+            <li>
+              <strong>B3 数据管理文件</strong>：
               <ul>
-                <li>B31 数据管理制度类文件（满分40分）：根据文件出台情况及质量（DeepSeek评估）计分。</li>
-                <li>B32 数据实践指导类文件（满分40分）：根据文件出台情况及质量（DeepSeek评估）计分。</li>
+                <li>
+                  B31 数据管理制度类文件（满分40分）：若已在相关制度或规范文件中作出明确要求，则根据文件份数和大模型文件质量分析结果计分；若未作明确要求但遵循国家或区域相关文件执行，则按规则赋分；若主要依靠师生自主意识，则按规则赋分。
+                </li>
+                <li>
+                  B32 数据实践指导类文件（满分40分）：若已发布指南、操作说明或工作手册，则根据文件份数和大模型文件质量分析结果计分；若未发布但有内部培训进行指导，则按规则赋分；若主要依靠师生自主实践，则按规则赋分。
+                </li>
               </ul>
             </li>
           </ul>
-           <p class="rule-note">注：观测点计分完成后，对每个观测点的分值进行归一化处理，转化为相同分值区间进评分计算。</p>
+
+          <p class="rule-note">
+            注：观测点计分完成后，对每个观测点分值进行归一化处理，转化为相同分值区间后参与加权计算。
+          </p>
         </div>
       </section>
 
@@ -333,65 +378,83 @@
 
 
         <p class="section-summary">
-          学校数据行为得分为{{ dimensionScores.behavior?.toFixed(2) }}分。
-          其中，数据行为监测得分{{ secondaryScores.C1?.toFixed(2) }}分，
-          数据应用成效{{ secondaryScores.C2?.toFixed(2) }}分。
+          学校数据行为得分为{{ formatScore(dimensionScores.behavior) }}。
+          其中，数据行为监测得分{{ formatScore(secondaryScores.C1) }}，
+          数据应用成效得分{{ formatScore(secondaryScores.C2) }}。
           具体情况如下：
         </p>
 
         <!-- 数据行为监测 -->
+        <!-- 数据行为监测 -->
         <div class="behavior-card">
           <div class="card-header" style="display: flex; justify-content: center; align-items: center;">
-            <span class="card-title">数据行为监测：{{ secondaryScores.C1?.toFixed(2) }}分</span>
+            <span class="card-title">数据行为监测：{{ formatScore(secondaryScores.C1) }}</span>
           </div>
+
           <div class="card-content">
-            <div class="login-stats">
-              <p>上1学年，全校教师登录数据相关平台的人均频次：{{ behaviorDetails.teacher_login_freq || 0 }}次</p>
-              <p>上1学年，全校学生登录数据相关平台的人均频次：{{ behaviorDetails.student_login_freq || 0 }}次</p>
-              <p>上1学年，全校管理者登录数据相关平台的人均频次：{{ behaviorDetails.manager_login_freq || 0 }}次</p>
+            <div class="behavior-monitor-grid">
+              <div class="info-item">
+                <span class="info-label">教师数据行为</span>
+                <div class="info-value">
+                  <p>1. 教师每周使用数字化设备开展教学的人均频次为{{ behaviorDetails.teacher_device_use_freq ?? 0 }}次。</p>
+                  <p>2. 教师每周使用数据相关平台的人均频次为{{ behaviorDetails.teacher_platform_use_freq ?? 0 }}次。</p>
+                  <p>3. 教师常态化开展的数据行为共{{ getTeacherBehaviorCount() }}项。</p>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <span class="info-label">学生数据行为</span>
+                <div class="info-value">
+                  <p>1. 学生数字化学习设备配备情况为：{{ getStudentDeviceProvisionText() }}。</p>
+                  <p>2. 学生平台账号开通情况为：{{ getStudentAccountStatusText() }}。</p>
+                  <p>3. 学生日常学习生活中常态化实现的数据行为共{{ getStudentBehaviorCount() }}项。</p>
+                </div>
+              </div>
             </div>
-            <div ref="behaviorBarChart" class="chart-box" style="height: 250px;"></div>
+
+            <div ref="behaviorBarChart" class="chart-box behavior-chart" style="height: 280px;"></div>
           </div>
         </div>
 
         <!-- 数据应用成效 -->
+        <!-- 数据应用成效 -->
         <div class="behavior-card">
           <div class="card-header" style="display: flex; justify-content: center; align-items: center;">
-            <span class="card-title">数据应用成效：{{ secondaryScores.C2?.toFixed(2) }}分</span>
+            <span class="card-title">数据应用成效：{{ formatScore(secondaryScores.C2) }}</span>
           </div>
+
           <div class="card-content">
             <div class="achievement-section">
               <h4>数据应用特色成果</h4>
-              <p>出版论文{{ behaviorDetails.published_paper_count || 0 }}篇、著作{{ behaviorDetails.published_book_count || 0 }}部、典型案例{{ getTotalCases() }}个、获得奖励荣誉{{ getTotalAwards() }}个</p>
+              <p>
+                学校公开发表数据相关论文{{ behaviorDetails.published_paper_count || 0 }}篇，
+                出版相关著作{{ behaviorDetails.published_book_count || 0 }}部，
+                入选典型案例{{ getTotalCases() }}个，
+                获得数据应用相关奖励或荣誉{{ getTotalAwards() }}个。
+              </p>
             </div>
+
             <div class="achievement-section">
               <h4>数据应用社会影响</h4>
-              <p>学校被报道{{ getTotalMedia() }}次、参与经验交流{{ getTotalConference() }}次、参观学习{{ behaviorDetails.visit_count || 0 }}次</p>
+              <p>
+                学校获得媒体宣传报道{{ getTotalMedia() }}次，
+                参与数据应用相关经验交流{{ getTotalConference() }}次，
+                通过公众号发布相关经验分享或创新实践{{ behaviorDetails.public_account_post_count || 0 }}次，
+                接待其他学校参观学习{{ behaviorDetails.visit_count || 0 }}次。
+              </p>
             </div>
+
             <div class="achievement-section">
-              <h4>应用效果主观评价</h4>
-              <p>学校教师学生对数据应用成效的主观评价：</p>
-              <!-- 新型卡片布局容器 -->
-              <div class="subjective-eval-cards">
-                <!-- 管理者卡片 -->
-                <div class="eval-card">
-                  <div class="eval-top-title">管理者评价得分</div>
-                  <div ref="managerEffectCircle" class="circle-chart"></div>
-                  <div class="eval-bottom-info">管理者参评人数：{{ reportData.participant_counts?.manager || 0 }} 人</div>
-                </div>
+              <h4>教师对数据应用效果的主观评价</h4>
+              <p>该指标来自教师问卷中的数据应用效果评价题项。</p>
 
-                <!-- 学生卡片 -->
-                <div class="eval-card">
-                  <div class="eval-top-title">学生评价得分</div>
-                  <div ref="studentEffectCircle" class="circle-chart"></div>
-                  <div class="eval-bottom-info">学生参评人数：{{ reportData.participant_counts?.student || 0 }} 人</div>
-                </div>
-
-                <!-- 教师卡片 -->
+              <div class="subjective-eval-cards single">
                 <div class="eval-card">
                   <div class="eval-top-title">教师评价得分</div>
                   <div ref="teacherEffectCircle" class="circle-chart"></div>
-                  <div class="eval-bottom-info">教师参评人数：{{ reportData.participant_counts?.teacher || 0 }} 人</div>
+                  <div class="eval-bottom-info">
+                    教师参评人数：{{ reportData.participant_counts?.teacher || 0 }} 人
+                  </div>
                 </div>
               </div>
             </div>
@@ -404,26 +467,34 @@
         </div>
 
         <div class="scoring-rules">
-          <h4><el-icon><InfoFilled /></el-icon> 计分规则说明</h4>
-          <p>数据行为维度总权重为 <strong>0.1930</strong>，下设两个二级指标：</p>
-          <ul>
-            <li><strong>C1 数据行为监测</strong>（权重 0.4679）：
-              <ul>
-                <li>C11 教师数据行为（满分10分）：按人均登录频次计分（≤200次计3分，201-300次计6分，>300次计10分）。</li>
-                <li>C12 学生数据行为（满分10分）：按人均登录频次计分（≤100次计3分，101-200次计6分，>200次计10分）。</li>
-                <li>C13 管理者数据行为（满分10分）：按人均登录频次计分（≤200次计3分，201-300次计6分，>300次计10分）。</li>
-              </ul>
-            </li>
-            <li><strong>C2 数据应用成效</strong>（权重 0.5321）：
-              <ul>
-                <li>C21 数据应用特色成果（满分60分）：包含论文、著作、典型案例、荣誉奖励等，按数量及级别计分。</li>
-                <li>C22 数据应用社会影响（满分50分）：包含媒体报道、经验交流、参观学习等，按次数及级别计分。</li>
-                <li>C23 应用效果主观评价（满分85分）：基于问卷调查，评估师生对数据应用成效的满意度。</li>
-              </ul>
-            </li>
-          </ul>
-          <p class="rule-note">注：观测点计分完成后，对每个观测点的分值进行归一化处理，转化为相同分值区间进评分计算。</p>
-        </div>
+        <h4><el-icon><InfoFilled /></el-icon> 计分规则说明</h4>
+        <p>数据行为维度下设两个二级指标：</p>
+        <ul>
+          <li>
+            <strong>C1 数据行为监测</strong>：
+            <ul>
+              <li>
+                C11 教师数据行为：由教师数字化设备使用频次、教师数据相关平台使用频次、教师常态化数据行为数量综合计分。
+              </li>
+              <li>
+                C12 学生数据行为：由学生数字化学习设备配备情况、学生平台账号开通情况、学生常态化数据行为数量综合计分。
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            <strong>C2 数据应用成效</strong>：
+            <ul>
+              <li>C21 数据应用特色成果：包含论文、著作、典型案例、荣誉奖励等，按数量及级别计分。</li>
+              <li>C22 数据应用社会影响：包含媒体报道、会议交流、公众号发布、参观学习等，按次数及级别计分。</li>
+              <li>C23 应用效果主观评价：基于教师问卷，评估教师对学校数据应用效果的主观评价。</li>
+            </ul>
+          </li>
+        </ul>
+        <p class="rule-note">
+          注：观测点计分完成后，对每个观测点分值进行归一化处理，转化为相同分值区间后参与加权计算。
+        </p>
+      </div>
       </section>
 
       <!-- 第五部分：学校数据资产分析 -->
@@ -432,76 +503,142 @@
           <el-icon><Files /></el-icon>
           学校数据资产分析
         </h2>
-
-        
-
         <p class="section-summary">
-          学校数据资产得分为{{ dimensionScores.asset?.toFixed(2) }}分。
-          其中，数据资产意识得分{{ secondaryScores.D1?.toFixed(2) }}分，
-          数据资产积累{{ secondaryScores.D2?.toFixed(2) }}分。
+          学校数据资产得分为{{ formatScore(dimensionScores.asset) }}。
+          其中，数据资产意识得分{{ formatScore(secondaryScores.D1) }}，
+          数据资产积累得分{{ formatScore(secondaryScores.D2) }}。
           具体情况如下：
         </p>
 
         <!-- 数据资产意识 -->
         <div class="asset-card">
-          <div class="card-header" style="display: flex; justify-content: center; align-items: center; position: relative; padding: 12px 20px;">
-              <!-- 标题：因为父级用了 justify-content: center，它会水平居中 -->
-              <span class="card-title">数据资产意识：{{ secondaryScores.D1?.toFixed(2) }}分</span>
-              
-              <!-- 副标题：使用绝对定位强行推到右边 -->
-              <span class="card-subtitle" style="position: absolute; right: 20px; font-size: 13px; opacity: 0.9;">
-                管理员参评人数：{{ reportData.participant_counts?.manager || 0 }}人
-              </span>
-            </div>
+          <div class="card-header asset-card-header">
+            <span class="card-title">数据资产意识：{{ formatScore(secondaryScores.D1) }}</span>
+
+            <span class="card-subtitle">
+              教师参评人数：{{ reportData.participant_counts?.teacher || 0 }}人
+            </span>
+          </div>
+
           <div class="card-content">
-            <div ref="assetAwarenessRadar" class="chart-box" style="height: 300px;"></div>
+            <p class="asset-desc">
+              数据资产意识指标来自教师问卷中的数据资产意识评价题项，主要反映教师对数据资产价值、应用和治理的认知水平。
+            </p>
+
+            <div ref="assetAwarenessRadar" class="chart-box asset-awareness-chart" style="height: 320px;"></div>
           </div>
         </div>
 
         <!-- 数据资产积累 -->
+        <!-- 数据资产积累 -->
         <div class="asset-card">
-          <div class="card-header" style="display: flex; justify-content: center; align-items: center;">
-            <span class="card-title">数据资产积累：{{ secondaryScores.D2?.toFixed(2) }}分</span>
-          </div>
-          <div class="card-content">
-            <div class="asset-progress-section">
-              <div class="progress-card">
-                <div class="progress-header">
-                  <span class="progress-title">数据资产总量</span>
-                </div>
-                <div class="progress-value">{{ formatDataVolume(assetDetails.total_data_volume) }}</div>
-                <div class="progress-label">累计数据存储总量</div>
-                <el-progress 
-                  :percentage="getVolumePercentage(assetDetails.total_data_volume, 5000)" 
-                  :stroke-width="12"
-                  :show-text="false"
-                  color="#67c23a"
-                />
-                <div class="progress-range">
-                  <span>0 GB</span>
-                  <span>5000 GB</span>
-                </div>
+        <div class="card-header" style="display: flex; justify-content: center; align-items: center;">
+          <span class="card-title">数据资产积累：{{ formatScore(secondaryScores.D2) }}</span>
+        </div>
+
+        <div class="card-content">
+          <div class="asset-status-grid">
+            <div class="info-item">
+              <span class="info-label">数据资产统筹管理情况</span>
+              <div class="info-value">
+                <p>学校{{ assetDetails.has_unified_data_management ? '已对校内数据资产进行统一管理或统筹管理' : '暂未对校内数据资产进行统一管理或统筹管理' }}。</p>
               </div>
-              <div class="progress-card">
-                <div class="progress-header">
-                  <span class="progress-title">人均数据资产量</span>
-                </div>
-                <div class="progress-value red">{{ getPerCapitaVolume() }} GB</div>
-                <div class="progress-label">按师生人数平均</div>
-                <el-progress 
-                  :percentage="getVolumePercentage(parseFloat(getPerCapitaVolume()), 10)" 
-                  :stroke-width="12"
-                  :show-text="false"
-                  color="#f56c6c"
-                />
-                <div class="progress-range">
-                  <span>0 GB</span>
-                  <span>10 GB</span>
-                </div>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">数据资源统计查询情况</span>
+              <div class="info-value">
+                <p>
+                  <template v-if="assetDetails.has_unified_data_management === false">
+                    由于学校暂未对校内数据资产进行统一管理，本报告不再展开统计各类数据资源总量。
+                  </template>
+                  <template v-else>
+                    学校{{ assetDetails.can_query_data_assets ? '能够通过相关平台或系统对校内主要数据资源进行统计查询' : '暂不能通过相关平台或系统对校内主要数据资源进行统计查询' }}。
+                  </template>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <template v-if="assetDetails.has_unified_data_management && assetDetails.can_query_data_assets">
+            <div class="asset-volume-table">
+              <div class="asset-volume-row header">
+                <span>数据类型</span>
+                <span>统计方式</span>
+                <span>数据量</span>
+              </div>
+
+              <div class="asset-volume-row">
+                <span>教育教学数据</span>
+                <span>{{ getDataStatMethodText(assetDetails.teaching_data_stat_method) }}</span>
+                <span>{{ formatDataVolume(assetDetails.teaching_data_volume) }}</span>
+              </div>
+
+              <div class="asset-volume-row">
+                <span>师生管理数据</span>
+                <span>{{ getDataStatMethodText(assetDetails.teacher_student_data_stat_method) }}</span>
+                <span>{{ formatDataVolume(assetDetails.teacher_student_data_volume) }}</span>
+              </div>
+
+              <div class="asset-volume-row">
+                <span>数字资源数据</span>
+                <span>{{ getDataStatMethodText(assetDetails.digital_resource_data_stat_method) }}</span>
+                <span>{{ formatDataVolume(assetDetails.digital_resource_data_volume) }}</span>
+              </div>
+
+              <div class="asset-volume-row">
+                <span>校园管理与行政数据</span>
+                <span>{{ getDataStatMethodText(assetDetails.campus_admin_data_stat_method) }}</span>
+                <span>{{ formatDataVolume(assetDetails.campus_admin_data_volume) }}</span>
+              </div>
+
+              <div class="asset-volume-row">
+                <span>其他类型数据</span>
+                <span>补充统计</span>
+                <span>{{ formatDataVolume(assetDetails.other_type_data_volume) }}</span>
+              </div>
+            </div>
+          </template>
+
+          <div class="asset-progress-section">
+            <div class="progress-card">
+              <div class="progress-header">
+                <span class="progress-title">数据资产总量</span>
+              </div>
+              <div class="progress-value">{{ formatDataVolume(getTotalDataVolume()) }}</div>
+              <div class="progress-label">教育教学、师生管理、数字资源、校园管理与行政及其他数据总量</div>
+              <el-progress
+                :percentage="getVolumePercentage(getTotalDataVolume(), 9000)"
+                :stroke-width="12"
+                :show-text="false"
+                color="#67c23a"
+              />
+              <div class="progress-range">
+                <span>0 GB</span>
+                <span>9000 GB</span>
+              </div>
+            </div>
+
+            <div class="progress-card">
+              <div class="progress-header">
+                <span class="progress-title">人均数据资产量</span>
+              </div>
+              <div class="progress-value red">{{ getPerCapitaVolume() }} GB</div>
+              <div class="progress-label">按学校教师人数和学生人数平均计算</div>
+              <el-progress
+                :percentage="getVolumePercentage(Number(getPerCapitaVolume()), 40)"
+                :stroke-width="12"
+                :show-text="false"
+                color="#f56c6c"
+              />
+              <div class="progress-range">
+                <span>0 GB</span>
+                <span>40 GB</span>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
         <!-- AI评估建议 -->
         <div class="ai-suggestion">
@@ -510,19 +647,32 @@
 
         <!-- 计分规则说明 -->
         <div class="scoring-rules">
-          <h4><el-icon><InfoFilled /></el-icon> 计分规则说明</h4>
-          <p>数据资产维度总权重为 <strong>0.1549</strong>，下设两个二级指标：</p>
-          <ul>
-            <li><strong>D1 数据资产意识</strong>（权重 0.4795）：包含价值意识（20分）、应用意识（20分）、治理意识（30分），通过管理者问卷评估。</li>
-            <li><strong>D2 数据资产积累</strong>（权重 0.5205）：
-              <ul>
-                <li>D21 数据资产总量（满分10分）：按累计存储总量计分（≤1TB计2分，1-5.5TB计4分，5.5-9TB计6分，>9TB计10分）。</li>
-                <li>D22 人均数据资产量（满分10分）：按师生人均存储量计分（≤10GB计3分，10-20GB计6分，20-40GB计10分，>40GB计10分）。</li>
-              </ul>
-            </li>
-          </ul>
-          <p class="rule-note">注：观测点计分完成后，对每个观测点的分值进行归一化处理，转化为相同分值区间进评分计算。</p>
-        </div>
+        <h4><el-icon><InfoFilled /></el-icon> 计分规则说明</h4>
+        <p>数据资产维度下设两个二级指标：</p>
+
+        <ul>
+          <li>
+            <strong>D1 数据资产意识</strong>：
+            包含数据资产价值意识、数据资产应用意识、数据资产治理意识3个观测点，通过教师问卷中的数据资产意识题项进行评估。
+          </li>
+
+          <li>
+            <strong>D2 数据资产积累</strong>：
+            <ul>
+              <li>
+                D21 数据资产总量：首先判断学校是否对校内数据资产进行统一或统筹管理，以及是否能够通过平台或系统统计查询主要数据资源；若能够统计查询，则根据教育教学数据、师生管理数据、数字资源数据、校园管理与行政数据及其他类型数据的总量进行计分。
+              </li>
+              <li>
+                D22 人均数据资产量：根据学校数据资产总量与学校教师、学生人数计算人均数据资产量，并按规则赋分。
+              </li>
+            </ul>
+          </li>
+        </ul>
+
+        <p class="rule-note">
+          注：观测点计分完成后，对每个观测点分值进行归一化处理，转化为相同分值区间后参与加权计算。
+        </p>
+      </div>
       </section>
 
       <!-- 第六部分：学校数据技术分析 -->
@@ -535,53 +685,77 @@
         
 
         <p class="section-summary">
-          学校数据技术得分为{{ dimensionScores.technology?.toFixed(2) }}分。
-          其中，数据基础设施得分{{ secondaryScores.E1?.toFixed(2) }}分，
-          数据安保水平{{ secondaryScores.E2?.toFixed(2) }}分。
+          学校数据技术得分为{{ formatScore(dimensionScores.technology) }}。
+          其中，数据基础设施得分{{ formatScore(secondaryScores.E1) }}，
+          数据安全水平得分{{ formatScore(secondaryScores.E2) }}。
           具体情况如下：
         </p>
 
         <!-- 数据基础设施 -->
+        <!-- 数据基础设施 -->
         <div class="tech-card">
           <div class="card-header" style="display: flex; justify-content: center; align-items: center;">
-            <span class="card-title">数据基础设施：{{ secondaryScores.E1?.toFixed(2) }}分</span>
+            <span class="card-title">数据基础设施：{{ formatScore(secondaryScores.E1) }}</span>
           </div>
-          <div class="card-content">
+
+          <div class="card-content technology-grid">
             <div class="info-item">
               <span class="info-label">数据硬件设施</span>
               <div class="info-value">
-                <p>1. 学校{{ getDataCenterText() }}。</p>
+                <p>1. {{ getDataCenterText() }}。</p>
                 <p>
-                  2. 数字终端配备生机比为：<span>{{ getStudentRatioText() }}</span>，师机比为：<span>{{ getTeacherRatioText() }}</span>。
+                  2. 数字终端配备生机比为：{{ getStudentRatioText() }}；
+                  师机比为：{{ getTeacherRatioText() }}。
                 </p>
               </div>
             </div>
+
             <div class="info-item">
               <span class="info-label">数据系统平台</span>
               <div class="info-value">
-                <p>学校{{ technologyDetails.has_data_platform ? '建设有' : '暂未建设' }}数据治理平台，如数据中台、数据交换中心等。</p>
+                <p>
+                  学校{{ technologyDetails.has_data_platform ? '已建设' : '暂未建设' }}数据治理平台，
+                  用于数据集中归集、统一管理或共享调用。
+                </p>
               </div>
             </div>
           </div>
         </div>
 
         <!-- 数据安保水平 -->
+        <!-- 数据安全水平 -->
         <div class="tech-card">
           <div class="card-header" style="display: flex; justify-content: center; align-items: center;">
-            <span class="card-title">数据安保水平：{{ secondaryScores.E2?.toFixed(2) }}分</span>
+            <span class="card-title">数据安全水平：{{ formatScore(secondaryScores.E2) }}</span>
           </div>
-          <div class="card-content">
+
+          <div class="card-content technology-grid">
             <div class="info-item">
               <span class="info-label">数据安全合规与认证</span>
               <div class="info-value">
-                <p>1. 学校{{ technologyDetails.security_certified_count || 0 }}类平台通过国家安保等级认定。</p>
-                <p>2. 学校部署的各类平台通过国家安保等级认定的比例为{{ getSecurityRatioText() }}。</p>
+                <p>1. 学校平台建设管理模式为：{{ getPlatformBuildModeText() }}。</p>
+
+                <template v-if="technologyDetails.platform_build_mode === 'self_built' || technologyDetails.platform_build_mode === 'mixed'">
+                  <p>2. 学校{{ technologyDetails.security_certified_count || 0 }}类平台通过国家安保等级认定。</p>
+                  <p>3. 学校部署的各类平台通过国家安保等级认定的比例为：{{ getSecurityRatioText() }}。</p>
+                </template>
+
+                <template v-else-if="technologyDetails.platform_build_mode === 'external'">
+                  <p>2. 学校完全接入外部平台，系统根据计分规则对数据安全合规与认证情况进行赋分。</p>
+                </template>
+
+                <template v-else>
+                  <p>2. 学校平台建设管理模式暂未填写。</p>
+                </template>
               </div>
             </div>
+
             <div class="info-item">
               <span class="info-label">数据风险事件记录</span>
               <div class="info-value">
-                <p>近5年，学校{{ technologyDetails.has_security_incident ? '发生过' : '未发生' }}数据风险事件。</p>
+                <p>
+                  2023年至2025年，学校{{ technologyDetails.has_security_incident ? '发生过' : '未发生' }}数据风险事件。
+                </p>
               </div>
             </div>
           </div>
@@ -595,22 +769,37 @@
         <!-- 计分规则说明 -->
         <div class="scoring-rules">
           <h4><el-icon><InfoFilled /></el-icon> 计分规则说明</h4>
-          <p>数据技术维度总权重为 <strong>0.1400</strong>，下设两个二级指标：</p>
+          <p>数据技术维度下设两个二级指标：</p>
+
           <ul>
-            <li><strong>E1 数据基础设施</strong>（权重 0.5449）：
+            <li>
+              <strong>E1 数据基础设施</strong>：
               <ul>
-                <li>E11 数据硬件设施（满分30分）：根据独立数据中心建设标准及数字终端师生机比计分。</li>
-                <li>E12 数据系统平台（满分10分）：建设数据治理平台计10分，否则计0分。</li>
+                <li>
+                  E11 数据硬件设施：根据学校是否设立独立数据中心、数据中心是否达到B级要求，以及数字终端生机比、师机比等情况综合计分。
+                </li>
+                <li>
+                  E12 数据系统平台：根据学校是否建设数据治理平台，如云平台、专享云服务、数据中台或数据交换中心等，进行计分。
+                </li>
               </ul>
             </li>
-            <li><strong>E2 数据安保水平</strong>（权重 0.4551）：
+
+            <li>
+              <strong>E2 数据安全水平</strong>：
               <ul>
-                <li>E21 数据安全合规与认证（满分20分）：根据通过等保认定的平台数量及比例计分。</li>
-                <li>E22 数据风险事件记录（满分0分）：发生数据风险事件扣10分，未发生不扣分。</li>
+                <li>
+                  E21 数据安全合规与认证：根据学校平台建设管理模式，以及自建或混合平台通过国家安保等级认定的数量和比例进行计分；若完全接入外部平台，则按规则直接赋分。
+                </li>
+                <li>
+                  E22 数据风险事件记录：2023年至2025年未发生数据风险事件计较高分，发生过数据风险事件则计较低分。
+                </li>
               </ul>
             </li>
           </ul>
-          <p class="rule-note">注：观测点计分完成后，对每个观测点的分值进行归一化处理，转化为相同分值区间进评分计算。</p>
+
+          <p class="rule-note">
+            注：观测点计分完成后，对每个观测点分值进行归一化处理，转化为相同分值区间后参与加权计算。
+          </p>
         </div>
 
       </section>
@@ -632,6 +821,7 @@ import { ref, onMounted, computed, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getReportDataDetail  } from '@/api/assessment'
 import { getSchoolInfo } from '@/api/school'
+import { getAssessmentData } from '@/utils/assessments'
 import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
 import html2canvas from 'html2canvas'
@@ -651,7 +841,6 @@ const reportContent = ref(null)
 // 图表引用
 const overviewChart = ref(null)
 const teacherRadarChart = ref(null)
-const managerRadarChart = ref(null)
 const studentRadarChart = ref(null)
 const literacyComparisonChart = ref(null)
 const behaviorBarChart = ref(null)
@@ -659,7 +848,6 @@ const teacherEffectRadar = ref(null)
 const studentEffectRadar = ref(null)
 const assetAwarenessRadar = ref(null)
 
-const managerEffectCircle = ref(null)
 const studentEffectCircle = ref(null)
 const teacherEffectCircle = ref(null)
 
@@ -705,96 +893,67 @@ const toNum = (v, def = 0) => {
   return Number.isFinite(n) ? n : def
 }
 
+
+
 const loadReportData = async (assessmentId) => {
   loading.value = true
   try {
-    const res = await getReportDataDetail(assessmentId)
-    const raw = res || {} // res 本身就是你发的那个完整对象
-
-    const schoolRes = await getSchoolInfo()
-    const sInfo = schoolRes.data || {}
-    const typeMap = {
-      'primary': '小学',
-      'junior': '初中',
-      'senior': '高中',
-      'nine_year': '九年一贯制',
-      'twelve_year': '十二年一贯制'
-    }
-
-    // 辅助工具：确保转为数字，防止后端传字符串导致图表崩溃
+    const res = await getAssessmentData(assessmentId)
+    const raw = res.data || res 
     const toF = (v) => parseFloat(v || 0)
 
-    // 
+    // 1. 尝试从不同位置获取分数数据（兼容性处理）
+    // 后端 AssessmentSerializer 通常把分名字定为 literacy_score 等
+    const info = raw.assessment || {}
+
     const processedData = {
-      // 1. 基础信息
+      // --- A. 基础档案 ---
       school_name: raw.school_name || "学校名称",
-      report_date: raw.report_date,
-      maturity_level: raw.maturity_level || "未知",
+      school_type: raw.school_type_display || raw.school_type || '未填写',
+      area_display: raw.province ? `${raw.province}${raw.city}${raw.district}` : '未填写',
+      founding_year: raw.founding_year || '未填写',
+      teacher_count: raw.teacher_count || 0,
+      student_count: raw.student_count || 0,
 
-      school_type: typeMap[sInfo.school_type] || sInfo.school_type_display || sInfo.school_type || '未填写',
-      area_display: sInfo.province ? `${sInfo.province}${sInfo.city}${sInfo.district}` : '未填写',
-      founding_year: sInfo.founding_year || '未填写',
-      teacher_count: sInfo.teacher_count || 0,
-      student_count: sInfo.student_count || 0,
+      // --- B. 评估概况 ---
+      report_date: raw.report_date || info.updated_at,
+      maturity_level: raw.scores?.maturity_level_display || info.maturity_level_display || "未知",
+      total_score: 视觉处理(toF(raw.total_score || raw.scores?.total_score || info.total_score)),
       
-      // 2. 总分（保持5分制）
-      total_score:视觉处理(toF(raw.total_score || raw.scores?.total_score)),
-      total_score_percent: toF(raw.total_score || raw.scores?.total_score), // 模板里可能叫这个名
-
-      // 3. 五大维度得分对象（直接提取根部的 score 字段）
+      // --- C. 维度得分 (修正这里的路径) ---
+      // 这里的 key 需要对应你后端 AssessmentSerializer 里的真实字段名
       dimension_scores: {
-        literacy: toF(raw.dimension_scores.literacy),
-        institution: toF(raw.dimension_scores.institution),
-        behavior: toF(raw.dimension_scores.behavior),
-        asset: toF(raw.dimension_scores.asset),
-        technology: toF(raw.dimension_scores.technology)
+        literacy: toF(raw.dimension_scores?.literacy || info.literacy_score),
+        institution: toF(raw.dimension_scores?.institution || info.institution_score),
+        behavior: toF(raw.dimension_scores?.behavior || info.behavior_score),
+        asset: toF(raw.dimension_scores?.asset || info.asset_score),
+        technology: toF(raw.dimension_scores?.technology || info.technology_score)
       },
 
-      // 4. 二级指标得分（如果后端没给，先用大维度分填充，保证页面文字描述有数据）
-      secondary_scores: raw.secondary_scores || {
-        A1: toF(raw.literacy_score), A2: toF(raw.literacy_score), A3: toF(raw.literacy_score),
-        B1: toF(raw.institution_score), B2: toF(raw.institution_score), B3: toF(raw.institution_score),
-        C1: toF(raw.behavior_score), C2: toF(raw.behavior_score),
-        D1: toF(raw.asset_score), D2: toF(raw.asset_score),
-        E1: toF(raw.technology_score), E2: toF(raw.technology_score)
-      },
-
-      // 5. 详情子集（直接引用原对象，方便文字描述读取）
-      institution: raw.institution_details || {},
-      behavior: raw.behavior_details || {},
-      asset: raw.asset_details || {},
-      technology: raw.technology_details || {},
-
-      // 6. 补全缺失的雷达图观测点分
+      // --- D. 二级指标得分 (增加可选链防止崩掉) ---
+      secondary_scores: raw.secondary_scores || {},
       observation_scores: raw.observation_scores || {},
+      participant_counts: raw.participant_counts || { teacher: 0, student: 0 },
 
-      // 7. 补全AI建议
-      suggestions: raw.suggestions || {
-        overall: "AI诊断建议正在生成中...",
-        literacy: "...", institution: "...", behavior: "...", asset: "...", technology: "..."
-      },
-
-      // 8. 补全参评人数
-      participant_counts: raw.participant_counts || { teacher: 0, student: 0, manager: 0 },
-
-      // 9. 平均分（5分制下默认 3.0）
-      average_scores: raw.average_scores || {
-        literacy: 3.0, institution: 3.0, behavior: 3.0, asset: 3.0, technology: 3.0
-      }
-
+      // --- E. 其他详情 (使用可选链) ---
+      institution: raw.institution_details || raw.institution || {},
+      behavior: raw.behavior_details || raw.behavior || {},
+      asset: raw.asset_details || raw.asset || {},
+      technology: raw.technology_details || raw.technology || {},
+      observation_scores: raw.observation_scores || {},
+      suggestions: raw.suggestions || { overall: "正在分析中..." },
+      participant_counts: raw.participant_counts || { teacher: 0, student: 0},
+      average_scores: raw.average_scores || { literacy: 3.0, institution: 3.0, behavior: 3.0, asset: 3.0, technology: 3.0 }
     }
 
-    // ✅ 最终赋值给响应式变量
     reportData.value = processedData
+    loading.value = false
+    await nextTick()
+    initAllCharts()
 
-    // 只有数据装载完毕才初始化图表
-    nextTick(() => {
-      initAllCharts()
-    })
   } catch (error) {
     console.error('数据加工失败:', error)
-    ElMessage.error('报告数据加载异常')
-  } finally {
+    ElMessage.error('报告数据解析失败')
     loading.value = false
   }
 }
@@ -804,6 +963,10 @@ function 视觉处理(num) {
   return parseFloat(num.toFixed(2))
 }
 
+const formatScore = (score) => {
+  const n = Number(score)
+  return Number.isFinite(n) ? `${n.toFixed(2)}分` : '暂无得分'
+}
 
 const initAllCharts = () => {
   console.log('开始初始化图表...')
@@ -824,14 +987,14 @@ const initAllCharts = () => {
 }
 
 const initSubjectiveCharts = () => {
-  const getCircleOption = (score, color, label) => {
-    // 假设满分是 5 分，这里转为百分比或直接显示分数
-    const displayScore = parseFloat(score || 0).toFixed(1);
-    
+  const getCircleOption = (score, color) => {
+    const safeScore = Math.max(0, Math.min(5, Number(score) || 0))
+    const displayScore = safeScore.toFixed(1)
+
     return {
       series: [{
         type: 'pie',
-        radius: ['55%', '75%'], // 环形粗细
+        radius: ['55%', '75%'],
         center: ['50%', '50%'],
         silent: true,
         label: {
@@ -839,44 +1002,36 @@ const initSubjectiveCharts = () => {
           position: 'center',
           formatter: () => `{val|${displayScore}}{unit|分}`,
           rich: {
-            val: { fontSize: 26, fontWeight: 'bold', color: color },
-            unit: { fontSize: 14, color: color, padding: [0, 0, -5, 2] }
+            val: { fontSize: 26, fontWeight: 'bold', color },
+            unit: { fontSize: 14, color, padding: [0, 0, -5, 2] }
           }
         },
         data: [
-          { 
-            value: score, 
-            itemStyle: { color: color, borderRadius: 10 },
+          {
+            value: safeScore,
+            itemStyle: { color, borderRadius: 10 }
           },
-          { 
-            value: 5 - score, 
-            itemStyle: { color: '#ebf1fa' } 
+          {
+            value: Math.max(0, 5 - safeScore),
+            itemStyle: { color: '#ebf1fa' }
           }
         ]
       }]
-    };
-  };
-
-  // 初始化三个图
-  if (managerEffectCircle.value) {
-    const chart = echarts.init(managerEffectCircle.value, null, { renderer: 'svg' });
-    chartInstances.push(chart);
-    // 这里假设 C231 是管理者主观分，你可以根据实际数据调整 Key
-    chart.setOption(getCircleOption(observationScores.value['C23_manager'] || 0, '#409eff', '管理者'));
-  }
-
-  if (studentEffectCircle.value) {
-    const chart = echarts.init(studentEffectCircle.value, null, { renderer: 'svg' });
-    chartInstances.push(chart);
-    chart.setOption(getCircleOption(observationScores.value['C23_student'] || 0, '#67c23a', '学生'));
+    }
   }
 
   if (teacherEffectCircle.value) {
-    const chart = echarts.init(teacherEffectCircle.value, null, { renderer: 'svg' });
-    chartInstances.push(chart);
-    chart.setOption(getCircleOption(observationScores.value['C23_teacher'] || 0, '#909399', '教师'));
+    const chart = echarts.init(teacherEffectCircle.value, null, { renderer: 'svg' })
+    chartInstances.push(chart)
+
+    chart.setOption(
+      getCircleOption(
+        observationScores.value['C23'] || observationScores.value['C23_teacher'] || 0,
+        '#409eff'
+      )
+    )
   }
-};
+}
 
 // 概况柱状图
 const initOverviewChart = () => {
@@ -943,6 +1098,7 @@ const initOverviewChart = () => {
 }
 
 // 数据素养雷达图
+// 数据素养雷达图
 const initLiteracyRadarCharts = () => {
   const indicators = [
     { name: '数据意识与思维', max: 5 },
@@ -954,159 +1110,72 @@ const initLiteracyRadarCharts = () => {
 
   const getCommonOptions = (title, color, scores) => {
     return {
-      title: { 
-        text: title, 
-        left: 'center', 
-        top: 0, 
-        textStyle: { fontSize: 15, fontWeight: 'bold' } 
+      title: {
+        text: title,
+        left: 'center',
+        top: 5,
+        textStyle: { fontSize: 14, fontWeight: 'bold' }
       },
-      radar: { 
-        indicator: indicators, 
-        radius: '62%', 
-        center: ['50%', '60%'],
-        axisName: { color: '#333', fontSize: 11, fontWeight: 'bold' }
+      radar: {
+        indicator: indicators,
+        radius: '60%',
+        center: ['50%', '55%'],
+        axisName: { color: '#666', fontSize: 10 }
       },
       series: [{
         type: 'radar',
-        symbol: 'circle',
-        symbolSize: 8,
-        lineStyle: { width: 3 },
-        label: {
-          show: true, // 显示数值
-          position: 'inside',
-          formatter: (params) => params.value.toFixed(2),
-        },
         data: [{
           value: scores,
           name: title,
-          areaStyle: { 
-            color: color,    // 直接传色值
-            opacity: 0.3     // 官方推荐的透明度控制方式，最安全
+          areaStyle: {
+            color,
+            opacity: 0.3
+          },
+          label: {
+            show: true,
+            formatter: (params) => {
+              return params.value ? parseFloat(params.value).toFixed(2) : '0.00'
+            },
+            fontSize: 11,
+            color: '#000'
           }
         }],
-        itemStyle: { color: color }
+        itemStyle: { color }
       }]
-    }; // 结束 return
-  };
+    }
+  }
 
-  // 教师雷达图
+  // 教师雷达图：A11-A15
   if (teacherRadarChart.value) {
     try {
-      const chart = echarts.init(teacherRadarChart.value,null,{ renderer: 'svg' })
+      const chart = echarts.init(teacherRadarChart.value, null, { renderer: 'svg' })
       chartInstances.push(chart)
+
       chart.setOption(getCommonOptions('教师数据素养', '#409eff', [
-      observationScores.value['A11'] || 0,
-      observationScores.value['A12'] || 0,
-      observationScores.value['A13'] || 0,
-      observationScores.value['A14'] || 0,
-      observationScores.value['A15'] || 0
-    ]))
-      chart.setOption({
-        title: { text: '教师数据素养', left: 'center', top: 5, textStyle: { fontSize: 14 } },
-        radar: { 
-          indicator: indicators, 
-          radius: '60%', 
-          center: ['50%', '55%'],
-          axisName: { color: '#666', fontSize: 10 }
-        },
-        series: [{
-          type: 'radar',
-          data: [{
-            value: [
-              observationScores.value['A11'] || 0,
-              observationScores.value['A12'] || 0,
-              observationScores.value['A13'] || 0,
-              observationScores.value['A14'] || 0,
-              observationScores.value['A15'] || 0
-            ],
-            name: '教师',
-            areaStyle: { color: 'rgba(64, 158, 255, 0.3)' }
-          }],
-          itemStyle: { color: '#409eff' }
-        }]
-      })
+        observationScores.value['A11'] || 0,
+        observationScores.value['A12'] || 0,
+        observationScores.value['A13'] || 0,
+        observationScores.value['A14'] || 0,
+        observationScores.value['A15'] || 0
+      ]))
     } catch (e) {
       console.error('教师雷达图初始化失败:', e)
     }
   }
 
-  // 管理者雷达图
-  if (managerRadarChart.value) {
-    try {
-      const chart = echarts.init(managerRadarChart.value,null,{ renderer: 'svg' })
-      chartInstances.push(chart)
-      chart.setOption(getCommonOptions('管理者数据素养', '#67c23a', [
-      observationScores.value['A21'] || 0,
-      observationScores.value['A22'] || 0,
-      observationScores.value['A23'] || 0,
-      observationScores.value['A24'] || 0,
-      observationScores.value['A25'] || 0
-    ]))
-      chart.setOption({
-        title: { text: '管理者数据素养', left: 'center', top: 5, textStyle: { fontSize: 14 } },
-        radar: { 
-          indicator: indicators, 
-          radius: '60%', 
-          center: ['50%', '55%'],
-          axisName: { color: '#666', fontSize: 10 }
-        },
-        series: [{
-          type: 'radar',
-          data: [{
-            value: [
-              observationScores.value['A21'] || 0,
-              observationScores.value['A22'] || 0,
-              observationScores.value['A23'] || 0,
-              observationScores.value['A24'] || 0,
-              observationScores.value['A25'] || 0
-            ],
-            name: '管理者',
-            areaStyle: { color: 'rgba(103, 194, 58, 0.3)' }
-          }],
-          itemStyle: { color: '#67c23a' }
-        }]
-      })
-    } catch (e) {
-      console.error('管理者雷达图初始化失败:', e)
-    }
-  }
-
-  // 学生雷达图
+  // 学生雷达图：仍然读取 A31-A35 观测点
   if (studentRadarChart.value) {
     try {
-      const chart = echarts.init(studentRadarChart.value,null,{ renderer: 'svg' })
+      const chart = echarts.init(studentRadarChart.value, null, { renderer: 'svg' })
       chartInstances.push(chart)
+
       chart.setOption(getCommonOptions('学生数据素养', '#909399', [
-      observationScores.value['A31'] || 0,
-      observationScores.value['A32'] || 0,
-      observationScores.value['A33'] || 0,
-      observationScores.value['A34'] || 0,
-      observationScores.value['A35'] || 0
-    ]))
-      chart.setOption({
-        title: { text: '学生数据素养', left: 'center', top: 5, textStyle: { fontSize: 14 } },
-        radar: { 
-          indicator: indicators, 
-          radius: '60%', 
-          center: ['50%', '55%'],
-          axisName: { color: '#666', fontSize: 10 }
-        },
-        series: [{
-          type: 'radar',
-          data: [{
-            value: [
-              observationScores.value['A31'] || 0,
-              observationScores.value['A32'] || 0,
-              observationScores.value['A33'] || 0,
-              observationScores.value['A34'] || 0,
-              observationScores.value['A35'] || 0
-            ],
-            name: '学生',
-            areaStyle: { color: 'rgba(144, 147, 153, 0.3)' }
-          }],
-          itemStyle: { color: '#909399' }
-        }]
-      })
+        observationScores.value['A31'] || 0,
+        observationScores.value['A32'] || 0,
+        observationScores.value['A33'] || 0,
+        observationScores.value['A34'] || 0,
+        observationScores.value['A35'] || 0
+      ]))
     } catch (e) {
       console.error('学生雷达图初始化失败:', e)
     }
@@ -1114,27 +1183,35 @@ const initLiteracyRadarCharts = () => {
 }
 
 // 数据素养综合对比柱状图
+// 数据素养综合对比柱状图
 const initLiteracyComparisonChart = () => {
   if (!literacyComparisonChart.value) return
+
   try {
     const chart = echarts.init(literacyComparisonChart.value, null, { renderer: 'svg' })
     chartInstances.push(chart)
 
-    const categories = ['数据意识与思维', '数据知识与技能', '数据评价与交流', '数据应用与创新', '数据伦理与隐私']
+    const categories = [
+      '数据意识与思维',
+      '数据知识与技能',
+      '数据评价与交流',
+      '数据应用与创新',
+      '数据伦理与隐私'
+    ]
+
     const commonLabel = {
       show: true,
-      position: 'top', // 数值显示在柱子正上方
-      distance: 5,     // 距离柱顶的距离
-      formatter: (params) => params.value ? parseFloat(params.value).toFixed(2) : '0.00',
+      position: 'top',
+      distance: 5,
+      formatter: (params) => params.value ? parseFloat(params.value).toFixed(2) : '0.00'
     }
 
-
     chart.setOption({
-      tooltip: { 
+      tooltip: {
         trigger: 'axis',
-        valueFormatter: (value) => value ? value.toFixed(2) : '0.00'
+        valueFormatter: (value) => value ? parseFloat(value).toFixed(2) : '0.00'
       },
-      legend: { data: ['教师', '管理者', '学生'], top: 40 },
+      legend: { data: ['教师', '学生'], top: 40 },
       grid: { left: '3%', right: '4%', bottom: '3%', top: 80, containLabel: true },
       xAxis: { type: 'category', data: categories },
       yAxis: { type: 'value', max: 5, name: '分数(分)' },
@@ -1151,19 +1228,6 @@ const initLiteracyComparisonChart = () => {
             observationScores.value['A15'] || 0
           ],
           itemStyle: { color: '#409eff' }
-        },
-        {
-          name: '管理者',
-          type: 'bar',
-          label: commonLabel,
-          data: [
-            observationScores.value['A21'] || 0,
-            observationScores.value['A22'] || 0,
-            observationScores.value['A23'] || 0,
-            observationScores.value['A24'] || 0,
-            observationScores.value['A25'] || 0
-          ],
-          itemStyle: { color: '#67c23a' }
         },
         {
           name: '学生',
@@ -1186,42 +1250,53 @@ const initLiteracyComparisonChart = () => {
 }
 
 // 数据行为横向柱状图
+// 数据行为监测柱状图
 const initBehaviorBarChart = () => {
   if (!behaviorBarChart.value) return
+
   try {
     const chart = echarts.init(behaviorBarChart.value, null, { renderer: 'svg' })
     chartInstances.push(chart)
 
+    const c11 = Number(observationScores.value['C11'] || 0)
+    const c12 = Number(observationScores.value['C12'] || 0)
+
     chart.setOption({
-      title: { text: '年度数据行为频次统计', left: 'center', top: 5 },
-      tooltip: { trigger: 'axis' },
-      grid: { left: '22%', right: '15%', bottom: '10%', top: 50 },
-      xAxis: { type: 'value', name: '年均频次(次)', nameTextStyle: {
-      fontSize: 14,
-      fontWeight: 'bold',
-      padding: [0, 0, 0, 10]
-    },
-    // 2. 放大刻度数字
-    axisLabel: {
-      fontSize: 14,
-      color: '#333'
-    }},
+      title: { text: '数据行为监测得分', left: 'center', top: 5 },
+      tooltip: {
+        trigger: 'axis',
+        valueFormatter: (value) => `${Number(value || 0).toFixed(2)}分`
+      },
+      grid: { left: '20%', right: '12%', bottom: '12%', top: 55 },
+      xAxis: {
+        type: 'value',
+        max: 5,
+        name: '得分',
+        axisLabel: {
+          fontSize: 14,
+          color: '#333'
+        }
+      },
       yAxis: {
         type: 'category',
-        data: ['管理者数据行为', '学生数据行为', '教师数据行为'],
-         axisLabel: {
-      fontSize: 14,
-      color: '#333'
-    }
+        data: ['学生数据行为', '教师数据行为'],
+        axisLabel: {
+          fontSize: 14,
+          color: '#333'
+        }
       },
       series: [{
         type: 'bar',
         data: [
-          { value: behaviorDetails.value.manager_login_freq || 0, itemStyle: { color: '#909399' } },
-          { value: behaviorDetails.value.student_login_freq || 0, itemStyle: { color: '#67c23a' } },
-          { value: behaviorDetails.value.teacher_login_freq || 0, itemStyle: { color: '#409eff' } }
+          { value: c12, itemStyle: { color: '#67c23a' } },
+          { value: c11, itemStyle: { color: '#409eff' } }
         ],
-        label: { show: true, position: 'right' ,fontSize: 14}
+        label: {
+          show: true,
+          position: 'right',
+          fontSize: 14,
+          formatter: (params) => `${Number(params.value || 0).toFixed(2)}分`
+        }
       }]
     })
   } catch (e) {
@@ -1361,6 +1436,18 @@ const initBehaviorRadarCharts = () => {
   }
 }
 
+const schoolTypeLabel = (v) => {
+  const map = {
+    primary: '小学',
+    junior: '初中',
+    senior: '高中',
+    nine_year: '九年一贯制',
+    twelve_year: '十二年一贯制',
+  }
+
+  return map[v] || v || '未填写'
+}
+
 // 数据资产意识雷达图
 const initAssetAwarenessRadar = () => {
   if (!assetAwarenessRadar.value) return
@@ -1441,6 +1528,69 @@ const getTotalPracticeDocs = () => {
   return d.practice_doc_count || 0
 }
 
+const getLeadershipGroupText = () => {
+  const type = institutionDetails.value.leadership_group_type
+
+  if (type === 'standard') {
+    return '已设置规范管理小组'
+  }
+
+  if (type === 'basic') {
+    return '已设置基础管理小组'
+  }
+
+  if (type === 'none') {
+    return '未设置相关小组'
+  }
+
+  return '未填写'
+}
+
+const getTotalCertificates = () => {
+  const d = institutionDetails.value
+  return (
+    (d.national_cert_count || 0) +
+    (d.provincial_cert_count || 0) +
+    (d.city_cert_count || 0)
+  )
+}
+
+const getManagementDocStatusText = () => {
+  const status = institutionDetails.value.management_doc_status
+
+  if (status === 'clear_required') {
+    return '学校已在相关制度或规范文件中，对数据的采集、使用、存储与共享等环节作出明确规定。'
+  }
+
+  if (status === 'follow_policy') {
+    return '学校暂未在校内制度中作出明确要求，但遵循国家或区域相关文件执行。'
+  }
+
+  if (status === 'self_awareness') {
+    return '学校暂未在校内制度中作出明确要求，当前主要依靠师生自主意识开展数据管理相关工作。'
+  }
+
+  return '学校数据管理制度类文件情况未填写。'
+}
+
+const getPracticeDocStatusText = () => {
+  const status = institutionDetails.value.practice_doc_status
+
+  if (status === 'published') {
+    return '学校已发布指导师生使用数据的相关指南、操作说明或工作手册。'
+  }
+
+  if (status === 'internal_training') {
+    return '学校暂未发布相关指南或操作手册，但通过内部培训对师生数据实践进行指导。'
+  }
+
+  if (status === 'self_practice') {
+    return '学校暂未发布相关指南或操作手册，当前主要依靠师生自主实践开展数据应用。'
+  }
+
+  return '学校数据实践指导类文件情况未填写。'
+}
+
 const getTotalCases = () => {
   const d = behaviorDetails.value
   return (d.case_national_count || 0) + (d.case_provincial_count || 0) + (d.case_city_count || 0)
@@ -1461,61 +1611,191 @@ const getTotalConference = () => {
   return (d.conference_national_count || 0) + (d.conference_provincial_count || 0) + (d.conference_city_count || 0)
 }
 
+const getSelectedCount = (value) => {
+  if (Array.isArray(value)) {
+    return value.filter(Boolean).length
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.values(value).filter(Boolean).length
+  }
+
+  return 0
+}
+
+const getTeacherBehaviorCount = () => {
+  return getSelectedCount(behaviorDetails.value.teacher_data_behavior_items)
+}
+
+const getStudentBehaviorCount = () => {
+  return getSelectedCount(behaviorDetails.value.student_data_behavior_items)
+}
+
+const getStudentDeviceProvisionText = () => {
+  const value = behaviorDetails.value.student_device_provision
+
+  if (value === 'none') {
+    return '未配备数字化学习设备'
+  }
+
+  if (value === 'computer_room') {
+    return '仅建有计算机机房，供班级轮流上课使用'
+  }
+
+  if (value === 'computer_room_and_terminal') {
+    return '建有计算机机房，并为学生配备其他数字终端'
+  }
+
+  return '未填写'
+}
+
+const getStudentAccountStatusText = () => {
+  const value = behaviorDetails.value.student_account_status
+
+  if (value === 'none') {
+    return '未为学生开通账号'
+  }
+
+  if (value === 'partial') {
+    return '部分学生开通账号'
+  }
+
+  if (value === 'all') {
+    return '全校学生均开通账号'
+  }
+
+  return '未填写'
+}
+
 const formatDataVolume = (volume) => {
-  if (!volume) return '0 GB'
-  return `${volume.toFixed(2)} GB`
+  const n = Number(volume)
+
+  if (!Number.isFinite(n)) {
+    return '0.00 GB'
+  }
+
+  return `${n.toFixed(2)} GB`
+}
+
+const getTotalDataVolume = () => {
+  const d = assetDetails.value || {}
+
+  return [
+    d.teaching_data_volume,
+    d.teacher_student_data_volume,
+    d.digital_resource_data_volume,
+    d.campus_admin_data_volume,
+    d.other_type_data_volume
+  ].reduce((sum, value) => {
+    const n = Number(value)
+    return sum + (Number.isFinite(n) ? n : 0)
+  }, 0)
+}
+
+const getDataStatMethodText = (method) => {
+  if (method === 'unable') {
+    return '无法统计'
+  }
+
+  if (method === 'estimated') {
+    return '可部分估算'
+  }
+
+  if (method === 'system_query') {
+    return '可系统查询'
+  }
+
+  return '未填写'
 }
 
 const getPerCapitaVolume = () => {
-  const total = assetDetails.value.total_data_volume || 0
-  const people = (assetDetails.value.student_count || 0) + (assetDetails.value.staff_count || 0)
-  if (people === 0) return '0'
+  const total = getTotalDataVolume()
+  const people = Number(reportData.value.student_count || 0) + Number(reportData.value.teacher_count || 0)
+
+  if (!people) {
+    return '0.00'
+  }
+
   return (total / people).toFixed(2)
 }
 
 const getVolumePercentage = (value, max) => {
-  if (!value || !max) return 0
-  return Math.min(100, (value / max) * 100)
+  const v = Number(value)
+  const m = Number(max)
+
+  if (!Number.isFinite(v) || !Number.isFinite(m) || m <= 0) {
+    return 0
+  }
+
+  return Math.min(100, (v / m) * 100)
+}
+
+const getPlatformBuildModeText = () => {
+  const mode = technologyDetails.value.platform_build_mode
+
+  if (mode === 'self_built') {
+    return '完全自建平台'
+  }
+
+  if (mode === 'external') {
+    return '完全接入外部平台'
+  }
+
+  if (mode === 'mixed') {
+    return '接入外部和自建平台并行'
+  }
+
+  return '未填写'
 }
 
 const getDataCenterText = () => {
   const details = technologyDetails.value
-  
-  // 1. 如果有独立数据中心 (True)
+
   if (details.has_independent_data_center === true) {
     const standard = details.data_center_standard
-    
-    // 对应 DATA_CENTER_STANDARD_CHOICES 的值
+
     if (standard === 'fully_compliant') {
       return '学校建有独立数据中心，且相关指标完全达到B级要求'
-    } else if (standard === 'partially_compliant') {
+    }
+
+    if (standard === 'partially_compliant') {
       return '学校建有独立数据中心，相关指标部分达到B级要求'
-    } else {
+    }
+
+    if (standard === 'not_compliant') {
       return '学校建有独立数据中心，但相关指标未达到B级要求'
     }
-  } 
-  
-  // 2. 如果没有独立数据中心 (False) -> 讲云服务内容
-  else {
-    const cloud = details.cloud_dedicated_service
-    
-    // 这里的文案合并了“没有建立”和“云服务情况”
-    // 对应 CLOUD_DEDICATED_FULFILL_CHOICES 的值
-    if (cloud === 'fully_satisfies') {
-      return '学校未建有独立数据中心，但专享云服务能够完全满足学校数据应用需求'
-    } else if (cloud === 'partially_satisfies') {
-      return '学校未建有独立数据中心，专享云服务仅能部分满足学校数据应用需求'
-    } else {
-      return '学校未建有独立数据中心，且当前的云服务保障能力尚无法满足学校数据应用需求'
-    }
+
+    return '学校建有独立数据中心，但B级要求达成情况未填写'
   }
+
+  if (details.has_independent_data_center === false) {
+    return '学校未设立独立数据中心'
+  }
+
+  return '学校数据中心建设情况未填写'
 }
 
 const getSecurityRatioText = () => {
   const ratio = technologyDetails.value.security_certified_ratio
-  if (ratio === 'high') return '80%以上'
-  if (ratio === 'medium') return '40%-80%'
-  return '40%以下'
+
+  if (ratio === 'zero') {
+    return '认定比例 = 0'
+  }
+
+  if (ratio === 'low') {
+    return '0＜认定比例≤40%'
+  }
+
+  if (ratio === 'medium') {
+    return '40%＜认定比例≤80%'
+  }
+
+  if (ratio === 'high') {
+    return '认定比例＞80%'
+  }
+
+  return '未填写'
 }
 
 const goBack = () => {
@@ -1935,11 +2215,6 @@ const getTeacherRatioText = () => {
   background: #f0f9ff;
 }
 
-.literacy-score-card.manager {
-  border-bottom: 4px solid #67c23a;
-  background: #f0f9eb;
-}
-
 .literacy-score-card.student {
   border-bottom: 4px solid #909399;
   background: #f5f7fa;
@@ -1953,7 +2228,6 @@ const getTeacherRatioText = () => {
 }
 
 .literacy-score-card.teacher .score { color: #409eff; }
-.literacy-score-card.manager .score { color: #67c23a; }
 .literacy-score-card.student .score { color: #909399; }
 
 .literacy-score-card .label {
@@ -2283,6 +2557,281 @@ const getTeacherRatioText = () => {
 /* 分页符（PDF打印用） */
 .page-break {
   page-break-before: always;
+}
+
+.literacy-scores.two-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.radar-charts-row.two-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* 数据素养雷达图区域居中 */
+.literacy-radar-section {
+  text-align: center;
+}
+
+.radar-charts-row.two-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(320px, 420px));
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.radar-chart-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.radar-chart-item .chart-box {
+  width: 420px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* 数据素养柱状图居中 */
+.literacy-comparison-section {
+  text-align: center;
+}
+
+.literacy-comparison-section .chart-box {
+  width: 760px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* 两张得分卡片也居中 */
+.literacy-scores.two-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 320px));
+  justify-content: center;
+  gap: 24px;
+  margin: 20px auto;
+}
+
+.institution-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.institution-grid .info-item {
+  margin-bottom: 0;
+}
+
+.institution-grid .info-value p {
+  margin: 0 0 8px 0;
+  line-height: 1.7;
+  text-align: justify;
+}
+
+.behavior-monitor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.behavior-monitor-grid .info-item {
+  margin-bottom: 0;
+}
+
+.behavior-monitor-grid .info-value p {
+  margin: 0 0 8px 0;
+  line-height: 1.7;
+  text-align: justify;
+}
+
+.behavior-chart {
+  width: 760px;
+  max-width: 100%;
+  margin: 24px auto 0;
+}
+
+.subjective-eval-cards.single {
+  display: flex;
+  justify-content: center;
+}
+
+.subjective-eval-cards.single .eval-card {
+  max-width: 320px;
+}
+
+.asset-card-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 12px 20px;
+}
+
+.asset-card-header .card-subtitle {
+  position: absolute;
+  right: 20px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.asset-desc {
+  margin: 0 0 14px 0;
+  line-height: 1.8;
+  color: #606266;
+  text-align: center;
+}
+
+.asset-awareness-chart {
+  width: 520px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.asset-status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 36px;
+  margin-bottom: 24px;
+}
+
+.asset-status-grid .info-item {
+  margin-bottom: 0;
+}
+
+.asset-status-grid .info-value p {
+  margin: 0;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+.asset-volume-table {
+  width: 100%;
+  margin: 20px 0 28px;
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.asset-volume-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  align-items: center;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.asset-volume-row:last-child {
+  border-bottom: none;
+}
+
+.asset-volume-row span {
+  padding: 12px 16px;
+  line-height: 1.6;
+  color: #606266;
+}
+
+.asset-volume-row.header {
+  background: #f5f7fa;
+  font-weight: 600;
+}
+
+.asset-volume-row.header span {
+  color: #303133;
+}
+
+.technology-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.technology-grid .info-item {
+  margin-bottom: 0;
+}
+
+.technology-grid .info-value p {
+  margin: 0 0 8px 0;
+  line-height: 1.7;
+  text-align: justify;
+}
+
+@media (max-width: 768px) {
+  .technology-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .asset-card-header {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .asset-card-header .card-subtitle {
+    position: static;
+  }
+
+  .asset-status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .asset-volume-row {
+    grid-template-columns: 1fr;
+  }
+
+  .asset-volume-row span {
+    border-bottom: 1px solid #ebeef5;
+  }
+
+  .asset-volume-row span:last-child {
+    border-bottom: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .behavior-monitor-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .behavior-chart {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .institution-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .radar-charts-row.two-columns,
+  .literacy-scores.two-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .radar-chart-item .chart-box,
+  .literacy-comparison-section .chart-box {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .literacy-scores.two-columns,
+  .radar-charts-row.two-columns {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* 打印时隐藏操作栏 */

@@ -3,6 +3,8 @@
 """
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
 
 
@@ -55,6 +57,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
+
     
     class Meta:
         db_table = 'user'
@@ -68,7 +71,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     def __str__(self):
         return self.username
-    
+
+    def set_password(self, raw_password):
+        """重写设置密码方法，在内存中临时记录明文密码"""
+        super().set_password(raw_password)
+        # 将明文密码存入一个临时属性中（不会保存到数据库的用户表）
+        self._new_raw_password = raw_password
+
     def is_school_user(self):
         """是否为学校用户"""
         return self.role == 'school'
@@ -96,3 +105,25 @@ class User(AbstractBaseUser, PermissionsMixin):
                 return False
             return True
         return self.is_locked
+
+
+@receiver(post_save, sender=User)
+def sync_school_access_code(sender, instance, **kwargs):
+    """当 User 保存后，检查是否有新密码需要同步到 School 表"""
+    # 检查是否有刚才在 set_password 里留下的临时明文
+    raw_pwd = getattr(instance, '_new_raw_password', None)
+
+    if raw_pwd:
+        try:
+            # 找到关联的学校对象（related_name 是 'school'）
+            if hasattr(instance, 'school'):
+                school = instance.school
+                school.access_code = raw_pwd
+                school.save(update_fields=['access_code'])
+
+                # 同步完后清除标记，防止重复触发
+                delattr(instance, '_new_raw_password')
+        except Exception as e:
+            # 导入 logger 记录异常，防止因为同步失败导致整个保存流程崩溃
+            import logging
+            logging.getLogger(__name__).error(f"同步 access_code 失败: {e}")

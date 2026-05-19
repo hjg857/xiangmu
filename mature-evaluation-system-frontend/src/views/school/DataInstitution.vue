@@ -44,36 +44,46 @@
         <!-- 1. 数据组织机构 -->
         <div class="section-title">1. 数据组织机构</div>
         
-        <el-form-item prop="has_leadership_group">
-          <template #label>
-            <div class="label-with-hint">
-              <span>学校是否建立了数据领导小组/工作小组？</span>
-              <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
-                <template #reference>
-                  <span class="hint-tag">填写提示</span>
-                </template>
-                <div class="hint-body">
-                  <p class="hint-text">学校设立的统筹数据管理、应用、安全等相关工作的组织人员（领导小组或工作小组均可）。</p>
-                  <p class="hint-example"><em>示例：学校成立了由校长任组长、各部门负责人为成员的“数据治理小组”，则选择「已建立」；若学校未设立任何与数据管理相关的专项组织，则选择「未建立」。</em></p>
-                </div>
-              </el-popover>
-            </div>
-          </template>
-          <el-radio-group v-model="formData.has_leadership_group">
-            <el-radio :label="true">已建立</el-radio>
-            <el-radio :label="false">未建立</el-radio>
-          </el-radio-group>
-        </el-form-item>
+        <el-form-item prop="leadership_group_type">
+        <template #label>
+          <div class="label-with-hint">
+            <span>学校是否设置对数据进行收集、存储与管理或整体规划的领导小组或工作小组？</span>
+            <el-popover placement="top-start" :width="460" trigger="hover" popper-class="custom-hint-popper">
+              <template #reference>
+                <span class="hint-tag">填写提示</span>
+              </template>
+              <div class="hint-body">
+                <p class="hint-text">
+                  请根据学校数据工作小组的实际设置情况选择。规范管理小组强调专人分工、职责明确和全校数据工作的体系化管理；基础管理小组主要负责日常登记、整理和常规维护。
+                </p>
+              </div>
+            </el-popover>
+          </div>
+        </template>
+
+        <el-radio-group v-model="formData.leadership_group_type" class="vertical-radio-group">
+          <el-radio label="standard">已设置规范管理小组</el-radio>
+          <el-radio label="basic">已设置基础管理小组</el-radio>
+          <el-radio label="none">未设置相关小组</el-radio>
+        </el-radio-group>
+
+        <div class="form-tip">
+          规范管理型：专人分工负责全校数据的体系化管理，涵盖数据的收集、存储、分析、应用和整体规划，职责分工明确。
+        </div>
+        <div class="form-tip">
+          基础管理型：小组成员多为兼任人员，负责学校数据的日常登记、数据整理、常规维护等工作，但缺乏整体规划。
+        </div>
+      </el-form-item>
         <el-form-item prop="meeting_activity_count">
           <template #label>
             <div class="label-with-hint">
-              <span>2020年到2025年，学校数据组织相关会议、活动开展次数？</span>
+              <span>2023年到2025年，上述数据小组围绕学校数据收集、分析、应用等方面开展会议或研讨的次数？</span>
               <el-popover placement="top-start" :width="300" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
                   <span class="hint-tag">填写提示</span>
                 </template>
                 <div class="hint-body">
-                  <p class="hint-text">2020年到2025年期间，由学校组织的各类数据相关会议、培训、研讨、专项活动等的总次数。</p>
+                  <p class="hint-text">2023年到2025年期间，由学校组织的各类数据相关会议、培训、研讨、专项活动等的总次数。</p>
                   <p class="hint-example"><em>示例：学校2022年开展1次数据安全专项会议、2023年开展2次数据应用研讨、2024年开展3次数据素养培训，则共计6次，填写「6」。</em></p>
                 </div>
               </el-popover>
@@ -81,6 +91,9 @@
           </template>
           <el-input-number v-model="formData.meeting_activity_count" :min="0" :controls="false" />
           <span class="unit">次</span>
+          <div class="form-tip">
+            数据工作会议或研讨：包括但不限于数据存储与管理规范化、智慧校园数据体系建设规划、学籍数据质量自查、跨部门数据协同与应用、设备台账与信息化资产登记规范化等会议或研讨。
+          </div>
         </el-form-item>
         <!-- 2. 数据人员配备 -->
         <div class="section-title">2. 数据人员配备</div>
@@ -88,7 +101,7 @@
         <el-form-item prop="has_data_staff">
         <template #label>
           <div class="label-with-hint">
-            <span>学校是否配备数据专职/兼职管理人员？</span>
+            <span>学校是否安排专人或兼职人员，负责校内数据工作？</span>
             <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
               <template #reference>
                 <span class="hint-tag">填写提示</span>
@@ -125,17 +138,21 @@
             </el-radio-group>
           </el-form-item>
         </template>
-
+                  <div class="form-tip">
+           专职人员：如首席信息官、首席数据官、信息中心负责人等，专门负责数据管理工作；<br>
+           兼职人员：如信息技术教师、教务管理人员等，兼任数据管理相关工作。<br>
+           数据工作：包括但不限于数据收集、存储、整理，数据分析（如成绩分析、学情分析），数据安全与隐私保护，系统平台运维与技术保障，教学资源整理与数据赋能等。
+          </div>
         <el-form-item prop="has_training">
         <template #label>
           <div class="label-with-hint">
-            <span>2020年到2025年，相关人员是否参与数据相关的进修或培训？</span>
+            <span>2023年至2025年，学校数据专职或兼职人员是否参加过数据管理、数据分析、数据安全、数据应用等方面的培训或进修？</span>
             <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
               <template #reference>
                 <span class="hint-tag">填写提示</span>
               </template>
               <div class="hint-body">
-                <p class="hint-text">2020年到2025年期间 ，学校数据相关人员参加的与数据管理、数据分析、数据安全等主题相关的外部进修或校内培训。</p>
+                <p class="hint-text">2023年到2025年期间 ，学校数据相关人员参加的与数据管理、数据分析、数据安全等主题相关的外部进修或校内培训。</p>
                 <p class="hint-example"><em>示例：数据管理员2023年参加了市级“数据分析”培训、2024年参加了校内“数据安全规范”培训，则选择「有参与」；若未参加任何相关进修、培训，则选择「未参与」。</em></p>
               </div>
             </el-popover>
@@ -148,12 +165,12 @@
       </el-form-item>
 
         <template v-if="formData.has_training">
-          <el-form-item label="2020年到2025年，学校数据人员进修或培训的次数？" prop="training_count">
+          <el-form-item label="2023年至2025年，学校数据专职或兼职人员进修或培训的次数？" prop="training_count">
             <el-input-number v-model="formData.training_count" :min="0" :controls="false" />
             <span class="unit">次</span>
           </el-form-item>
 
-          <el-form-item label="2020年到2025年，相关人员获得的数据相关认证或考核证书数量？">
+          <el-form-item label="2023年至2025年，相关人员获得的数据相关培训或进修证书数量？">
             <div class="inline-inputs">
               <span>国家级</span>
               <el-input-number v-model="formData.national_cert_count" :min="0" :controls="false" />
@@ -166,120 +183,131 @@
               <span>个</span>
             </div>
           </el-form-item>
+          <div class="form-tip">
+            国家级认证或考核证书：国家部委/全国性行业统考认证，如BDA 数据分析师、CDA 数据分析师（Ⅰ/Ⅱ/Ⅲ 级）、DCMM 个人数据管理师、全国中小学教师数据素养能力等级证书（由国家级教培平台、全国教师发展机构统一颁发）<br>
+            省级认证或考核证书：省教育厅、省人社厅、省大数据局等省级行政机关发证或备案认定，如省级教师信息技术 / 数据素养专项培训证书。<br>
+            市级及以下认证或考核证书：市教育局、市人社局、市大数据局等市级行政机关发证，如市级数据安全、校园数据合规培训证书、高校 MOOC 结业证书。
+          </div>
         </template>
 
         <!-- 3. 数据管理文件 -->
         <div class="section-title">3. 数据管理文件</div>
         
-        <el-form-item prop="has_management_doc">
+        <el-form-item prop="management_doc_status">
         <template #label>
           <div class="label-with-hint">
-            <span>学校是否出台与数据管理制度相关的文件？</span>
-            <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+            <span>学校是否在相关管理制度或规范文件中，对数据的采集、使用、存储与共享等环节作出明确规定？</span>
+            <el-popover placement="top-start" :width="460" trigger="hover" popper-class="custom-hint-popper">
               <template #reference>
                 <span class="hint-tag">填写提示</span>
               </template>
               <div class="hint-body">
-                <p class="hint-text">学校发布的规范数据采集、存储、使用、安全、共亨等流程的正式制度性文件（如管理办法、规定。细则等）。</p>
-                <p class="hint-example"><em>示例：学校印发了《校园数据安全管理办法》《教育数据采集与共享规定》，则选择「已出台」；若未发布任何数据管理制度类文件，则选择未出台」。</em></p>
+                <p class="hint-text">
+                  这里主要考察学校是否通过制度、办法、细则等文件，对师生信息、教学数据、管理数据等的采集、使用、存储和共享作出明确要求。
+                </p>
               </div>
             </el-popover>
           </div>
         </template>
-        <el-radio-group v-model="formData.has_management_doc">
-          <el-radio :label="true">已出台</el-radio>
-          <el-radio :label="false">未出台</el-radio>
+
+        <el-radio-group v-model="formData.management_doc_status" class="vertical-radio-group">
+          <el-radio label="clear_required">已在相关制度或规范文件中作出明确要求</el-radio>
+          <el-radio label="follow_policy">未作明确要求，但遵循国家或区域相关文件执行</el-radio>
+          <el-radio label="self_awareness">未作明确要求，主要依靠师生自主意识</el-radio>
         </el-radio-group>
       </el-form-item>
 
-        <template v-if="formData.has_management_doc">
-          <el-form-item label="学校出台的与数据管理相关文件的份数？">
-            <div class="inline-inputs">
-              <el-input-number v-model="formData.management_doc_count" :min="0" :controls="false" />
-              <span>份</span>
-            </div>
-          </el-form-item>
-
-          <el-form-item label="上传数据管理相关文件：">
-            <div class="upload-section">
-              <el-upload
-                v-if="!isReadonly"
-                :action="uploadUrl"
-                :headers="uploadHeaders"
-                :data="{ file_type: 'management' }"
-                :on-success="handleManagementUploadSuccess"
-                :on-error="handleUploadError"
-                :on-remove="handleManagementFileRemove"
-                :file-list="managementFileList"
-                :before-upload="beforeUpload"
-              >
-                <el-button type="primary">点击上传</el-button>
-              </el-upload>
-              <div v-else class="readonly-file-list">
-                <div v-for="file in managementFileList" :key="file.uid" class="file-item">
-                  <el-link :href="file.url" target="_blank">{{ file.name }}</el-link>
-                </div>
-                <span v-if="!managementFileList.length" class="no-file">暂无文件</span>
-              </div>
-              <div class="upload-tip" v-if="!isReadonly">支持上传PDF、Word、图片等格式，单个文件不超过10MB</div>
-            </div>
-          </el-form-item>
-        </template>
-
-        <el-form-item prop="has_practice_doc">
-        <template #label>
-          <div class="label-with-hint">
-            <span>学校是否出台与数据实践指导相关的文件？</span>
-            <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
-              <template #reference>
-                <span class="hint-tag">填写提示</span>
-              </template>
-              <div class="hint-body">
-                <p class="hint-text">学校发布的指导教师、各部门在教学、管理、评价等场景中具体应用数据的操作性文件（如应用指南、实施细则、操作手册等）。</p>
-                <p class="hint-example"><em>示例：学校发布了《教学数据分析与应用指南》《学生成长数据解读操作手册》，则选择「已出台」；若未发布任何数据实践指导类文件，则选择「未出台」。</em></p>
-              </div>
-            </el-popover>
+      <template v-if="formData.management_doc_status === 'clear_required'">
+        <el-form-item label="学校出台的与数据管理相关文件的份数？">
+          <div class="inline-inputs">
+            <el-input-number v-model="formData.management_doc_count" :min="0" :controls="false" />
+            <span>份</span>
           </div>
-        </template>
-        <el-radio-group v-model="formData.has_practice_doc">
-          <el-radio :label="true">已出台</el-radio>
-          <el-radio :label="false">未出台</el-radio>
-        </el-radio-group>
-      </el-form-item>
+        </el-form-item>
 
-        <template v-if="formData.has_practice_doc">
-          <el-form-item label="学校出台的与数据实践指导相关文件的份数？">
-            <div class="inline-inputs">
-              <el-input-number v-model="formData.practice_doc_count" :min="0" :controls="false" />
-              <span>份</span>
-            </div>
-          </el-form-item>
-
-          <el-form-item label="上传数据实践指导相关文件：">
-            <div class="upload-section">
-              <el-upload
-                v-if="!isReadonly"
-                :action="uploadUrl"
-                :headers="uploadHeaders"
-                :data="{ file_type: 'practice' }"
-                :on-success="handlePracticeUploadSuccess"
-                :on-error="handleUploadError"
-                :on-remove="handlePracticeFileRemove"
-                :file-list="practiceFileList"
-                :before-upload="beforeUpload"
-              >
-                <el-button type="primary">点击上传</el-button>
-              </el-upload>
-              <div v-else class="readonly-file-list">
-                <div v-for="file in practiceFileList" :key="file.uid" class="file-item">
-                  <el-link :href="file.url" target="_blank">{{ file.name }}</el-link>
-                </div>
-                <span v-if="!practiceFileList.length" class="no-file">暂无文件</span>
+        <el-form-item label="上传数据管理相关文件：">
+          <div class="upload-section">
+            <el-upload
+              v-if="!isReadonly"
+              :action="uploadUrl"
+              :headers="uploadHeaders"
+              :data="{ file_type: 'management' }"
+              :on-success="handleManagementUploadSuccess"
+              :on-error="handleUploadError"
+              :on-remove="handleManagementFileRemove"
+              :file-list="managementFileList"
+              :before-upload="beforeUpload"
+            >
+              <el-button type="primary">点击上传</el-button>
+            </el-upload>
+            <div v-else class="readonly-file-list">
+              <div v-for="file in managementFileList" :key="file.uid" class="file-item">
+                <el-link :href="file.url" target="_blank">{{ file.name }}</el-link>
               </div>
-              <div class="upload-tip" v-if="!isReadonly">支持上传PDF、Word、图片等格式，单个文件不超过10MB</div>
+              <span v-if="!managementFileList.length" class="no-file">暂无文件</span>
             </div>
-          </el-form-item>
+            <div class="upload-tip" v-if="!isReadonly">支持上传PDF、Word、图片等格式，单个文件不超过10MB</div>
+          </div>
+        </el-form-item>
+      </template>
+
+        <el-form-item prop="practice_doc_status">
+  <template #label>
+    <div class="label-with-hint">
+      <span>学校是否发布指导师生使用数据的相关指南、操作说明或工作手册？</span>
+      <el-popover placement="top-start" :width="460" trigger="hover" popper-class="custom-hint-popper">
+        <template #reference>
+          <span class="hint-tag">填写提示</span>
         </template>
+        <div class="hint-body">
+          <p class="hint-text">
+            相关材料可包括一体机使用手册、平台操作说明、学情分析指南、利用数据优化教学的操作手册等。
+          </p>
+        </div>
+      </el-popover>
+    </div>
+  </template>
+
+  <el-radio-group v-model="formData.practice_doc_status" class="vertical-radio-group">
+    <el-radio label="published">已发布指南、操作说明或工作手册</el-radio>
+    <el-radio label="internal_training">未发布，但有内部培训进行指导</el-radio>
+    <el-radio label="self_practice">未发布，主要依靠师生自主实践</el-radio>
+  </el-radio-group>
+</el-form-item>
+
+<template v-if="formData.practice_doc_status === 'published'">
+  <el-form-item label="学校出台的与数据实践指导相关文件的份数？">
+    <div class="inline-inputs">
+      <el-input-number v-model="formData.practice_doc_count" :min="0" :controls="false" />
+      <span>份</span>
+    </div>
+  </el-form-item>
+
+  <el-form-item label="上传数据实践指导相关文件：">
+    <div class="upload-section">
+      <el-upload
+        v-if="!isReadonly"
+        :action="uploadUrl"
+        :headers="uploadHeaders"
+        :data="{ file_type: 'practice' }"
+        :on-success="handlePracticeUploadSuccess"
+        :on-error="handleUploadError"
+        :on-remove="handlePracticeFileRemove"
+        :file-list="practiceFileList"
+        :before-upload="beforeUpload"
+      >
+        <el-button type="primary">点击上传</el-button>
+      </el-upload>
+      <div v-else class="readonly-file-list">
+        <div v-for="file in practiceFileList" :key="file.uid" class="file-item">
+          <el-link :href="file.url" target="_blank">{{ file.name }}</el-link>
+        </div>
+        <span v-if="!practiceFileList.length" class="no-file">暂无文件</span>
+      </div>
+      <div class="upload-tip" v-if="!isReadonly">支持上传PDF、Word、图片等格式，单个文件不超过10MB</div>
+    </div>
+  </el-form-item>
+</template>
       </el-form>
     </el-card>
   </div>
@@ -334,20 +362,37 @@ const isReadonly = ref(false)  // 只读模式
 
 // 表单数据
 const formData = ref({
+  // B11 新版字段
+  leadership_group_type: '',
+
+  // 旧字段先保留，避免旧数据报错
   has_leadership_group: null,
+
   meeting_activity_count: null,
+
   has_data_staff: null,
   fulltime_staff_count: null,
   parttime_staff_count: null,
   has_clear_responsibilities: null,
+
   has_training: null,
   training_count: null,
   national_cert_count: null,
   provincial_cert_count: null,
   city_cert_count: null,
+
+  // B31 新版字段
+  management_doc_status: '',
+
+  // 旧字段先保留
   has_management_doc: null,
   management_doc_count: null,
   management_doc_files: [],
+
+  // B32 新版字段
+  practice_doc_status: '',
+
+  // 旧字段先保留
   has_practice_doc: null,
   practice_doc_count: null,
   practice_doc_files: []
@@ -391,6 +436,15 @@ const uploadHeaders = computed(() => {
   }
 })
 
+const isAssessmentExpired = (assessmentData) => {
+  if (!assessmentData?.created_at) return false
+
+  const startTime = new Date(assessmentData.created_at).getTime()
+  const expireTime = startTime + 72 * 60 * 60 * 1000
+
+  return Date.now() > expireTime
+}
+
 // 加载数据
 const loadData = async () => {
   loading.value = true
@@ -402,7 +456,7 @@ const loadData = async () => {
       }
     })
     const assessmentData = await assessmentResponse.json()
-    isReadonly.value = assessmentData.status !== 'draft'
+    isReadonly.value = assessmentData.status !== 'draft' || isAssessmentExpired(assessmentData)
     
     // 获取数据制度数据
     const response = await fetch(`/api/assessments/${assessmentId.value}/institution/`, {
@@ -412,6 +466,27 @@ const loadData = async () => {
     })
     const data = await response.json()
     Object.assign(formData.value, data)
+
+    // 兼容旧数据，避免新字段为空时影响表单显示
+    if (!formData.value.leadership_group_type) {
+      formData.value.leadership_group_type = ''
+    }
+
+    if (!formData.value.management_doc_status) {
+      formData.value.management_doc_status = ''
+    }
+
+    if (!formData.value.practice_doc_status) {
+      formData.value.practice_doc_status = ''
+    }
+
+    if (!Array.isArray(formData.value.management_doc_files)) {
+      formData.value.management_doc_files = []
+    }
+
+    if (!Array.isArray(formData.value.practice_doc_files)) {
+      formData.value.practice_doc_files = []
+    }
   } catch (error) {
     console.error('加载数据失败:', error)
   } finally {
@@ -829,5 +904,45 @@ onBeforeUnmount(() => {
 
 .hint-example em {
   font-style: italic;
+}
+
+.vertical-radio-group {
+  width: 100%;
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.vertical-radio-group :deep(.el-radio) {
+  width: 100%;
+  height: auto;
+  margin-right: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.vertical-radio-group :deep(.el-radio__label) {
+  white-space: normal;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.form-tip {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 14px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #909399;
+  box-sizing: border-box;
+}
+
+:deep(.el-form-item__content) {
+  flex-wrap: wrap;
+  align-items: flex-start;
 }
 </style>

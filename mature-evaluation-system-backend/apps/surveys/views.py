@@ -42,6 +42,11 @@ class SurveyInstanceViewSet(viewsets.ModelViewSet):
         """创建问卷实例"""
         assessment_id = request.data.get('assessment_id')
         survey_type = request.data.get('survey_type')
+        if survey_type not in ['teacher', 'student']:
+            return Response(
+                {'error': '当前仅支持创建教师问卷和学生问卷'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
         # 验证评估记录
         assessment = get_object_or_404(Assessment, id=assessment_id)
@@ -70,7 +75,7 @@ class SurveyInstanceViewSet(viewsets.ModelViewSet):
         
         # 计算截止时间：学校用户创建时间 + 48小时
         school_user = assessment.school.user
-        expired_at = timezone.now() + timedelta(hours=48)
+        expired_at = timezone.now() + timedelta(hours=72)
         
         # 创建问卷实例（不需要设置目标数量）
         instance = SurveyInstance.objects.create(
@@ -261,11 +266,9 @@ def publish_literacy_surveys(request, assessment_id):
             )
 
     # 三类问卷
-    survey_types = ['teacher', 'manager', 'student']
+    survey_types = ['teacher', 'student']
 
-    # 计算截止时间：学校用户创建时间 + 48小时（与你 create() 一致）
-    school_user = assessment.school.user
-    expired_at = timezone.now() + timedelta(hours=48)
+    expired_at = timezone.now() + timedelta(hours=72)
 
     instances = {}
     with transaction.atomic():

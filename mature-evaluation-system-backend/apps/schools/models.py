@@ -49,6 +49,8 @@ class School(models.Model):
     teacher_count = models.IntegerField("教职工总数", default=0, null=True)
     founding_year = models.IntegerField('建校年份', null=True, blank=True)
 
+    access_code = models.CharField('访问校验码', max_length=128, blank=True, null=True)
+
 
     class Meta:
         db_table = 'school'
@@ -66,13 +68,19 @@ class School(models.Model):
 
 class AccountApplication(models.Model):
     """账号申请模型"""
-    
+
+    ROLE_CHOICES = [
+        ('school', '学校用户'),
+        ('region_admin', '区域管理员'),
+    ]
+
     STATUS_CHOICES = [
         ('pending', '待审批'),
         ('approved', '已通过'),
         ('rejected', '已拒绝'),
     ]
-    
+
+    apply_role = models.CharField('申请角色', max_length=20, choices=ROLE_CHOICES, default='school')
     school_name = models.CharField('学校全称', max_length=200)
     school_type = models.CharField('学校类型', max_length=50)
     province = models.CharField('省份', max_length=50)

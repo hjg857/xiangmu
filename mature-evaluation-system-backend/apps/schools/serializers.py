@@ -66,7 +66,7 @@ class AccountApplicationCreateSerializer(serializers.ModelSerializer):
         model = AccountApplication
         fields = [
             'school_name', 'school_type', 'province', 'city', 'district', 'district_code',
-            'contact_name', 'contact_position', 'contact_phone', 'contact_email'
+            'contact_name', 'contact_position', 'contact_phone', 'contact_email', 'apply_role'
         ]
 
     def validate_district_code(self, value):

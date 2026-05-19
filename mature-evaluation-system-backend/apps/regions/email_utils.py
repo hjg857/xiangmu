@@ -6,7 +6,7 @@ from django.core.mail import send_mail
 
 def send_school_account_email(*, school_name: str, to_email: str, username: str, password: str) -> bool:
     try:
-        subject = "【数据文化成熟度评估系统】账号创建通知"
+        subject = "【中小学数据文化成熟度评估监测系统】账号创建通知"
         message = f"""尊敬的 {school_name} 用户：
 
 您好！

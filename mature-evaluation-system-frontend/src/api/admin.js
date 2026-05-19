@@ -66,3 +66,10 @@ export function getAssessmentReports(params) {
     params
   })
 }
+
+export function getAllAccountsData() {
+  return request({
+    url: '/schools/export-accounts/', // 与后端 path 保持一致
+    method: 'get'
+  })
+}

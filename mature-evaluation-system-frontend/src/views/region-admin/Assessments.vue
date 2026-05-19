@@ -1,206 +1,598 @@
 <template>
-  <div>
-    <el-card>
+  <div class="page">
+    <!-- 顶部：区域信息 + 统计 -->
+
+    <!-- 底部：学校评估列表 -->
+    <el-card class="block">
       <template #header>
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div>区域评估</div>
-          <el-button @click="load" :loading="loading">刷新</el-button>
+        <div class="card-header">
+          <div class="title">学校评估列表</div>
         </div>
       </template>
 
-      <el-alert
-        v-if="respRegion"
-        type="info"
-        show-icon
-        :closable="false"
-        style="margin-bottom:12px;"
-        :title="`当前区域：${respRegion.province} / ${respRegion.city} / ${respRegion.name}`"
-      />
+      <div class="filter-panel">
+        <el-form class="filter-form" :model="query" @submit.prevent>
+          <el-form-item label="学校名称">
+            <el-input
+              v-model="query.school_name"
+              placeholder="学校名称"
+              clearable
+              class="w-name"
+              @keyup.enter="handleSearch"
+            />
+          </el-form-item>
 
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-        <el-input v-model="filters.school_name" placeholder="学校名称" clearable style="width:220px" />
-        <el-select v-model="filters.status" placeholder="状态" clearable style="width:160px">
-          <el-option label="草稿" value="draft" />
-          <el-option label="数据收集中" value="collecting" />
-          <el-option label="分析中" value="analyzing" />
-          <el-option label="已完成" value="completed" />
-        </el-select>
-        <el-select v-model="filters.maturity_level" placeholder="成熟度等级" clearable style="width:160px">
-          <el-option label="引领级" value="leading" />
-          <el-option label="成熟级" value="mature" />
-          <el-option label="成长级" value="growing" />
-          <el-option label="初始级" value="initial" />
-        </el-select>
-        <el-select v-model="filters.has_report" placeholder="是否有报告" clearable style="width:160px">
-          <el-option label="有报告" value="true" />
-          <el-option label="无报告" value="false" />
-        </el-select>
+          <el-form-item label="学校类型">
+            <el-select v-model="query.school_type" clearable class="w-select" placeholder="全部类型">
+              <el-option label="小学" value="primary" />
+              <el-option label="初中" value="junior" />
+              <el-option label="高中" value="senior" />
+              <el-option label="九年一贯制" value="nine_year" />
+              <el-option label="十二年一贯制" value="twelve_year" />
+            </el-select>
+          </el-form-item>
 
-        <el-select v-model="ordering" placeholder="排序" style="width:220px">
-          <el-option label="完成时间倒序" value="-completed_at" />
-          <el-option label="完成时间正序" value="completed_at" />
-          <el-option label="创建时间倒序" value="-created_at" />
-          <el-option label="总分倒序" value="-total_score" />
-          <el-option label="学校名A-Z" value="school__name" />
-        </el-select>
+          <el-form-item label="评估状态">
+            <el-select v-model="query.status" clearable class="w-select" placeholder="全部状态">
+              <el-option label="草稿" value="draft" />
+              <el-option label="数据收集中" value="collecting" />
+              <el-option label="分析中" value="analyzing" />
+              <el-option label="已完成" value="completed" />
+            </el-select>
+          </el-form-item>
 
-        <el-button type="primary" @click="search">查询</el-button>
-        <el-button @click="reset">重置</el-button>
+          <el-form-item label="评估时间">
+            <el-date-picker
+              v-model="query.time_range"
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              value-format="YYYY-MM-DD"
+              class="w-date"
+            />
+          </el-form-item>
+
+          <el-form-item label="成熟度等级">
+            <el-select v-model="query.maturity_level" clearable class="w-select" placeholder="全部等级">
+              <el-option label="引领级" value="leading" />
+              <el-option label="成熟级" value="mature" />
+              <el-option label="成长级" value="growing" />
+              <el-option label="初始级" value="initial" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item class="actions">
+            <el-button type="primary" @click="handleSearch" :loading="loadingList">查询</el-button>
+            <el-button @click="handleReset">重置</el-button>
+          </el-form-item>
+        </el-form>
       </div>
 
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
-        <el-statistic title="学校数" :value="summary.school_count || 0" />
-        <el-statistic title="评估数" :value="summary.has_assessment_count || 0" />
-        <el-statistic title="完成数" :value="summary.completed_count || 0" />
-        <el-statistic title="报告数" :value="summary.report_count || 0" />
-      </div>
+      <el-table
+        class="table"
+        :data="list"
+        v-loading="loadingList"
+        stripe
+        @sort-change="handleSortChange"
+      >
+        <el-table-column prop="id" label="ID" width="80" />
 
-      <el-table :data="rows" border v-loading="loading" style="width:100%;">
-        <el-table-column prop="id" label="评估ID" width="90" />
-        <el-table-column label="学校" min-width="220">
+        <el-table-column prop="school_name" label="学校名称" min-width="220" show-overflow-tooltip />
+
+        <el-table-column prop="school_type" label="学校类型" width="140">
           <template #default="{ row }">
-            {{ row.school?.name || row.school_name || '-' }}
+            {{ schoolTypeLabel(row.school_type) }}
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="120" />
-        <el-table-column prop="maturity_level" label="等级" width="120" />
-        <el-table-column label="总分" width="120">
+
+        <el-table-column prop="status" label="评估状态" width="130">
           <template #default="{ row }">
-            {{ row.scores?.total_score ?? row.total_score ?? '-' }}
+            <el-tag :type="statusTagType(row.status)">
+              {{ statusLabel(row.status) }}
+            </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="完成时间" min-width="170">
+
+        <el-table-column prop="total_score" label="总分" width="120" sortable="custom">
           <template #default="{ row }">
-            {{ row.times?.completed_at || row.completed_at || '-' }}
+            <span class="score">{{ formatScore(row.total_score) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="报告" width="110">
+
+        <el-table-column prop="maturity_level" label="成熟度等级" width="140">
           <template #default="{ row }">
-            <el-tag v-if="row.report?.has_report" type="success">有</el-tag>
-            <el-tag v-else type="info">无</el-tag>
+            <el-tag v-if="row.maturity_level" type="info" effect="plain">
+              {{ maturityLabel(row.maturity_level) }}
+            </el-tag>
+            <span v-else class="muted">-</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="160">
+
+        <el-table-column prop="created_at" label="创建时间" width="190" sortable="custom">
           <template #default="{ row }">
-            <el-button size="small" type="primary" @click="goDetail(row.id)">详情</el-button>
+            {{ row.created_at || "-" }}
+          </template>
+        </el-table-column>
+
+        <el-table-column label="操作" width="120" fixed="right">
+          <template #default="{ row }">
+            <el-button
+              v-if="row.status === 'completed'"
+              type="primary"
+              link
+              @click="viewReport(row.id)"
+            >
+              查看报告
+            </el-button>
+            <span v-else class="muted">暂无报告</span>
           </template>
         </el-table-column>
       </el-table>
 
-      <div style="margin-top:14px;display:flex;justify-content:flex-end;">
+      <div class="pager">
         <el-pagination
           background
-          layout="total, sizes, prev, pager, next"
-          :total="pagination.total"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+          :page-size="query.page_size"
+          :current-page="query.page"
           :page-sizes="[10, 20, 50]"
-          :page-size="pagination.page_size"
-          :current-page="pagination.page"
-          @size-change="onSizeChange"
-          @current-change="onPageChange"
+          @current-change="handlePageChange"
+          @size-change="handleSizeChange"
         />
       </div>
     </el-card>
   </div>
+  <footer class="footer">
+  <div class="footer-bar">
+    <div class="footer-inner">
+      <!-- 左侧：LOGO + 文案 -->
+      <div class="footer-left">
+        <div class="footer-logo">
+          <img src="@/assets/images/ila_logo.png" class="logo-img" alt="ILA" /> 
+        </div>
+
+        <div class="footer-text">
+          <div class="line">
+            Copyright © 2026 版权所有：智能学习与评价江苏省产业技术工程化中心
+          </div>
+          <div class="line">
+            邮箱：2020250606@jsnu.edu.cn　
+            地址：江苏省徐州市铜山新区上海路101号
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：二维码 -->
+      <div class="footer-right">
+        <img
+          src="@/assets/images/Official_Account1.png"
+          alt="官方公众号"
+          class="footer-qrcode"
+        />
+      </div>
+    </div>
+  </div>
+</footer>
 </template>
 
 <script setup>
 import { onMounted, reactive, ref } from "vue";
-import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { apiGet } from "@/utils/api";
+import { useRouter } from "vue-router";
+import { useRegionStore } from "@/stores/region";
 
 const router = useRouter();
-const loading = ref(false);
+const regionStore = useRegionStore();
 
-const rows = ref([]);
-const respRegion = ref(null);
+const loadingOverview = ref(false);
+const loadingList = ref(false);
 
-const summary = reactive({
+const overview = ref({
+  region: null,
   school_count: 0,
   has_assessment_count: 0,
   completed_count: 0,
   report_count: 0
 });
 
-const pagination = reactive({
-  page: 1,
-  page_size: 10,
-  total: 0,
-  total_pages: 0
-});
+const list = ref([]);
+const total = ref(0);
 
-const ordering = ref("-completed_at");
-
-const filters = reactive({
-  status: "",
-  maturity_level: "",
+const query = reactive({
   school_name: "",
-  has_report: ""
+  school_type: "",
+  status: "",
+  time_range: [],
+  maturity_level: "",
+  page: 1,
+  page_size: 20,
+  ordering: ""
 });
 
-function buildQuery() {
-  const q = new URLSearchParams();
-  q.set("page", String(pagination.page));
-  q.set("page_size", String(pagination.page_size));
-  q.set("ordering", ordering.value);
+function buildQueryString() {
+  const params = new URLSearchParams();
 
-  if (filters.status) q.set("status", filters.status);
-  if (filters.maturity_level) q.set("maturity_level", filters.maturity_level);
-  if (filters.school_name) q.set("school_name", filters.school_name);
-  if (filters.has_report) q.set("has_report", filters.has_report);
+  if (query.school_name) params.set("school_name", query.school_name);
+  if (query.school_type) params.set("school_type", query.school_type);
+  if (query.status) params.set("status", query.status);
+  if (query.maturity_level) params.set("maturity_level", query.maturity_level);
 
-  return q.toString();
+  if (query.time_range && query.time_range.length === 2) {
+    params.set("start_at", query.time_range[0]);
+    params.set("end_at", query.time_range[1]);
+  }
+
+  params.set("page", String(query.page));
+  params.set("page_size", String(query.page_size));
+
+  if (query.ordering) params.set("ordering", query.ordering);
+
+  return params.toString();
 }
 
-async function load() {
-  loading.value = true;
+async function loadOverview() {
+  loadingOverview.value = true;
   try {
-    const { data: resp } = await apiGet(`/api/region-admin/assessments/?${buildQuery()}`);
-    if (!resp.success) throw new Error(resp.message || "加载失败");
+    const { data: resp } = await apiGet("/api/region-admin/overview/");
+    if (!resp?.success) throw new Error(resp?.message || "加载失败");
 
-    const d = resp.data || {};
-    respRegion.value = d.region || null;
-    rows.value = d.assessments || [];
+    overview.value = resp.data || {};
 
-    Object.assign(summary, d.summary || {});
-    Object.assign(pagination, d.pagination || pagination);
+    if (overview.value.region) {
+      regionStore.setRegion(overview.value.region);
+    }
   } catch (e) {
-    ElMessage.error(e.message || "加载失败");
+    ElMessage.error(e?.message || "加载失败");
   } finally {
-    loading.value = false;
+    loadingOverview.value = false;
   }
 }
 
-function search() {
-  pagination.page = 1;
-  load();
+async function loadList() {
+  loadingList.value = true;
+  try {
+    const qs = buildQueryString();
+    const { data: resp } = await apiGet(`/api/region-admin/assessments/?${qs}`);
+    if (!resp?.success) throw new Error(resp?.message || "加载失败");
+
+    const raw = resp.data?.assessments || [];
+
+    list.value = raw.map((it) => ({
+      id: it.id,
+      status: it.status,
+      maturity_level: it.maturity_level,
+
+      school_id: it.school?.id,
+      school_name: it.school?.name || it.school_name || "-",
+      school_type: it.school?.school_type || it.school_type || "",
+
+      total_score: it.scores?.total_score ?? it.total_score,
+      created_at: it.times?.created_at || it.created_at,
+
+      report_available: !!it.report?.has_report,
+      report_url: it.report?.report_url || null
+    }));
+
+    total.value = resp.data?.pagination?.total || 0;
+  } catch (e) {
+    console.error(e);
+    ElMessage.error(e?.message || "加载失败");
+  } finally {
+    loadingList.value = false;
+  }
 }
 
-function reset() {
-  filters.status = "";
-  filters.maturity_level = "";
-  filters.school_name = "";
-  filters.has_report = "";
-  ordering.value = "-completed_at";
-  pagination.page = 1;
-  pagination.page_size = 10;
-  load();
+async function reloadAll() {
+  await Promise.all([loadOverview(), loadList()]);
 }
 
-function onSizeChange(size) {
-  pagination.page_size = size;
-  pagination.page = 1;
-  load();
+async function handleSearch() {
+  query.page = 1;
+  await loadList();
 }
 
-function onPageChange(page) {
-  pagination.page = page;
-  load();
+async function handleReset() {
+  query.school_name = "";
+  query.school_type = "";
+  query.status = "";
+  query.time_range = [];
+  query.maturity_level = "";
+  query.page = 1;
+  query.page_size = 20;
+  query.ordering = "";
+  await loadList();
 }
 
-function goDetail(id) {
-  router.push(`/region-admin/assessments/${id}`);
+async function handlePageChange(p) {
+  query.page = p;
+  await loadList();
 }
 
-onMounted(load);
+async function handleSizeChange(s) {
+  query.page_size = s;
+  query.page = 1;
+  await loadList();
+}
+
+async function handleSortChange({ prop, order }) {
+  if (!order) {
+    query.ordering = "";
+  } else {
+    query.ordering = order === "ascending" ? prop : `-${prop}`;
+  }
+  await loadList();
+}
+
+function viewReport(id) {
+  if (!id) {
+    ElMessage.warning("报告 ID 不存在");
+    return;
+  }
+  router.push(`/school/report/${id}`);
+}
+
+function statusLabel(s) {
+  const map = {
+    draft: "草稿",
+    collecting: "数据收集中",
+    analyzing: "分析中",
+    completed: "已完成"
+  };
+  return map[s] || "-";
+}
+
+function statusTagType(s) {
+  if (s === "completed") return "success";
+  if (s === "draft") return "info";
+  if (s === "collecting") return "warning";
+  if (s === "analyzing") return "primary";
+  return "info";
+}
+
+function maturityLabel(v) {
+  const map = {
+    leading: "引领级",
+    mature: "成熟级",
+    growing: "成长级",
+    initial: "初始级"
+  };
+  return map[v] || v || "-";
+}
+
+function schoolTypeLabel(v) {
+  const map = {
+    primary: "小学",
+    junior: "初中",
+    senior: "高中",
+    nine_year: "九年一贯制",
+    twelve_year: "十二年一贯制"
+  };
+  return map[v] || v || "-";
+}
+
+function formatScore(v) {
+  if (v === null || v === undefined || v === "") return "-";
+  const n = Number(v);
+  if (Number.isNaN(n)) return "-";
+  return n.toFixed(1);
+}
+
+onMounted(async () => {
+  await reloadAll();
+});
 </script>
+
+<style scoped>
+.page {
+  padding: 16px;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
+.block {
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  margin-bottom: 14px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-weight: 600;
+  color: #303133;
+}
+
+.stat-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.stat-card {
+  background: #fff;
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
+  padding: 14px 10px;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f5fbf;
+  line-height: 1.1;
+}
+
+.stat-label {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #606266;
+}
+
+.filter-panel {
+  padding: 6px 2px 10px;
+  border-bottom: 1px solid #ebeef5;
+  margin-bottom: 10px;
+}
+
+.filter-form {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filter-form .el-form-item {
+  margin-bottom: 0;
+}
+
+.w-name {
+  width: 220px;
+}
+
+.w-select {
+  width: 140px;
+}
+
+.w-date {
+  width: 260px !important;
+}
+
+.actions {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.actions :deep(.el-form-item__content) {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.table {
+  width: 100%;
+}
+
+.score {
+  font-weight: 600;
+  color: #303133;
+}
+
+.muted {
+  color: #909399;
+  font-size: 12px;
+}
+
+.pager {
+  padding: 12px 4px 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 底部页脚 */
+/* ===== Footer（深色条，按截图）===== */
+.footer {
+  margin-top: auto;
+  width: 100%;
+}
+
+.footer-bar {
+  background: #2f3d4a; /* 深蓝灰色背景 */
+  padding: 8px 0;    /* 增加上下内边距，让比例更协调 */
+}
+
+.footer-inner {
+  /* 核心：必须与 header-content 的宽度和对齐逻辑完全一致 */
+  max-width: 99%;
+  margin: 0 auto;
+  padding: 0 20px;    /* 与 header 保持一致的左右内边距 */
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* 彻底删除之前的 margin-left: -200px */
+}
+
+.footer-logo .logo-img {
+  height: 80px;
+  width: auto;
+  display: block;
+}
+
+.footer-text {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;      /* 标准页脚字号 */
+  line-height: 1.8;
+  text-align: left;
+}
+
+.footer-text .line {
+  white-space: nowrap; /* 强制不换行，保持整齐 */
+}
+
+.footer-right {
+  /* 彻底删除之前的 margin-right: -200px */
+  display: flex;
+  align-items: center;
+}
+
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-qrcode {
+  width: 80px;
+  height: 80px;
+  border-radius: 4px;
+  background: #ffffff;
+  padding: 3px;
+}
+
+.qr-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+.contact-note {
+  margin-top: 18px;          /* 与邮箱拉开距离 */
+  font-size: 13px;           /* 比正文小 */
+  color: #9ca3af;            /* 浅灰色 */
+  font-style: italic;        /* 微斜体，学术/说明感 */
+  line-height: 1.6;
+}
+
+@media (max-width: 1200px) {
+  .stat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .actions {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

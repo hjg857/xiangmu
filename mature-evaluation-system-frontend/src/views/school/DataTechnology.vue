@@ -46,19 +46,19 @@
         <el-form-item prop="has_independent_data_center">
           <template #label>
             <div class="label-with-hint">
-              <span>学校是否设有独立数据中心（如独立机房等）？</span>
+              <span>学校是否设有独立数据中心且指标达到B级要求？</span>
             </div>
           </template>
           <el-radio-group v-model="formData.has_independent_data_center" class="horizontal-radio">
-            <el-radio :value="true">是</el-radio>
-            <el-radio :value="false">否</el-radio>
+              <el-radio :value="false">未设立独立数据中心</el-radio>
+              <el-radio :value="true">已设立独立数据中心</el-radio>
           </el-radio-group>
         </el-form-item>
         
                 <el-form-item v-if="formData.has_independent_data_center === true" prop="data_center_standard">
           <template #label>
             <div class="label-with-hint">
-              <span>学校设有独立数据中心（如独立机房等）且中心各项指标符合GB50174-2017《数据中心设计规范》的相应标准？</span>
+              <span>已设立独立数据中心的情况下，数据中心指标达到B级要求的程度？</span>
               <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
                   <span class="hint-tag">填写提示</span>
@@ -83,64 +83,33 @@
           <el-radio-group v-model="formData.data_center_standard" class="horizontal-radio-with-desc">
             <el-radio value="fully_compliant">
               <div class="radio-content">
-                <div class="radio-title">完全符合</div>
+                <div class="radio-title">完全达到B级要求</div>
                 <div class="radio-desc">设有独立数据中心且完全符合B级要求</div>
               </div>
             </el-radio>
             <el-radio value="partially_compliant">
               <div class="radio-content">
-                <div class="radio-title">部分符合</div>
+                <div class="radio-title">部分达到B级要求</div>
                 <div class="radio-desc">设有独立数据中心且部分符合B级要求</div>
               </div>
             </el-radio>
             <el-radio value="not_compliant">
               <div class="radio-content">
-                <div class="radio-title">不符合</div>
+                <div class="radio-title">未达到B级要求</div>
                 <div class="radio-desc">设有独立数据中心但不符合B级要求</div>
               </div>
             </el-radio>
           </el-radio-group>
         </el-form-item>
-
-        <el-form-item v-if="formData.has_independent_data_center === false" prop="cloud_dedicated_service">
-        <template #label>
-          <div class="label-with-hint">
-            <span>学校未设有独立数据中心，但使用专享云服务，且完全满足学校的数据应用需求？</span>
-            <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
-              <template #reference>
-                <span class="hint-tag">填写提示</span>
-              </template>
-              <div class="hint-body">
-                <p class="hint-text">若学校无独立数据中心，需考虑学校是否使用专享云服务，且该服务是否能满足学校全部数据应用需求，按实际情况选择对应选项。</p>
-                <p class="hint-example"><em>示例：学校无独立数据中心，使用教育局统一部署的专享云服务且能满足所有数据存储、处理需求，则选择「完全达到」；仅能满足大部分数据需求则选择「部分达到」；无法满足核心数据应用需求则选择「未达到」。</em></p>
+                            <div class="volume-hint">
+                说明：数据中心指专门用于承载学校各类业务数据的集中存储、服务器部署、网络运维与安全保障的专用物理机房或云端专属服务环境。
               </div>
-            </el-popover>
-          </div>
-        </template>
-        <el-radio-group v-model="formData.cloud_dedicated_service" class="horizontal-radio-with-desc">
-          <el-radio value="fully_meets">
-            <div class="radio-content">
-              <div class="radio-title">完全达到</div>
-            </div>
-          </el-radio>
-          <el-radio value="partially_meets">
-            <div class="radio-content">
-              <div class="radio-title">部分达到</div>
-            </div>
-          </el-radio>
-          <el-radio value="not_meets">
-            <div class="radio-content">
-              <div class="radio-title">未达到</div>
-            </div>
-          </el-radio>
-        </el-radio-group>
-      </el-form-item>
 
       <!-- 3. 生机比 -->
       <el-form-item prop="student_device_ratio">
         <template #label>
           <div class="label-with-hint">
-            <span>学校数字终端配备生机比（学生用机数量与在校生人数之比）？</span>
+            <span>学校数字终端（如教学一体机、智能黑板、希沃白板）配备生机比（学生用机数量与在校生人数之比）？</span>
             <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
               <template #reference>
                 <span class="hint-tag">填写提示</span>
@@ -163,7 +132,7 @@
       <el-form-item prop="teacher_device_ratio">
         <template #label>
           <div class="label-with-hint">
-            <span>学校数字终端配备师机比（专任教师用机数量与专任教师人数之比）？</span>
+            <span>学校数字终端（如教学一体机、智能黑板、希沃白板）配备师机比（专任教师用机数量与专任教师人数之比） ？</span>
             <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
               <template #reference>
                 <span class="hint-tag">填写提示</span>
@@ -182,10 +151,14 @@
         </el-radio-group>
       </el-form-item>
 
+                                  <div class="volume-hint">
+                说明：数字终端包括多媒体一体机、智能黑板、希沃交互终端、教师办公电脑、学生机房计算机、学生平板等各类教学与学习智能终端设备。
+              </div>
+
                 <el-form-item prop="has_data_platform">
           <template #label>
             <div class="label-with-hint">
-              <span>学校是否建设数据治理平台，如数据中台、数据交换中心等？</span>
+              <span>学校是否建设数据治理平台，如云平台、专享云服务等，进行数据集中归集、统一管理、共享调用？</span>
               <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
                   <span class="hint-tag">填写提示</span>
@@ -212,15 +185,42 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
-
+              <div class="volume-hint">
+                说明：依托区级统一教育平台、校外租用专业教育云服务、学校自主搭建校级云管理平台，实现校内数据集中管控与业务共享，均视为已建设数据治理平台。
+              </div>
 
         <!-- 2. 数据安全水平 -->
         <div class="section-title">2. 数据安全水平</div>
+
+        <el-form-item prop="platform_build_mode">
+        <template #label>
+          <div class="label-with-hint">
+            <span>学校各类业务管理与教学平台的建设管理模式属于：</span>
+            <el-popover placement="top-start" :width="420" trigger="hover" popper-class="custom-hint-popper">
+              <template #reference>
+                <span class="hint-tag">填写提示</span>
+              </template>
+              <div class="hint-body">
+                <p class="hint-text">
+                  请根据学校各类业务管理与教学平台的实际建设方式选择。若完全接入外部平台，则后续安保认证数量和比例不再填写，系统将按照计分规则直接赋分。
+                </p>
+              </div>
+            </el-popover>
+          </div>
+        </template>
+
+        <el-radio-group v-model="formData.platform_build_mode" class="vertical-radio-group">
+          <el-radio value="self_built">完全自建平台</el-radio>
+          <el-radio value="external">完全接入外部平台</el-radio>
+          <el-radio value="mixed">接入外部和自建平台并行</el-radio>
+        </el-radio-group>
+      </el-form-item>
         
+        <template v-if="formData.platform_build_mode === 'self_built' || formData.platform_build_mode === 'mixed'">
         <el-form-item prop="security_certified_count">
             <template #label>
               <div class="label-with-hint">
-                <span>学校部署的各类平台通过国家安保等级认定的数量？</span>
+                <span>学校自建的各类平台通过国家安保等级认证的数量？</span>
                 <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
                   <template #reference>
                     <span class="hint-tag">填写提示</span>
@@ -243,36 +243,50 @@
           <el-form-item prop="security_certified_ratio">
             <template #label>
               <div class="label-with-hint">
-                <span>学校部署的各类平台通过国家安保等级认定的比例？</span>
-                <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+                <span>学校部署的各类平台通过国家安保等级认定的比例</span>
+                <el-popover placement="top-start" :width="380" trigger="hover" popper-class="custom-hint-popper">
                   <template #reference>
                     <span class="hint-tag">填写提示</span>
                   </template>
                   <div class="hint-body">
-                    <p class="hint-text">计算 “通过国家安保等级认定的平台数量 ÷ 学校部署的所有平台总数” 的百分比，按结果选择对应区间选项。</p>
-                    <p class="hint-example"><em>示例：学校共部署 5 个平台，3 个通过等保认证（认定比例 = 60%，40% < 认定比例 ≤ 80%），则选择「40% < 认定比例 ≤ 80%」；仅 1 个通过（认定比例 = 20% < 40%），则选择「认定比例 < 40%」。</em></p>
+                    <p class="hint-text">
+                      请根据“通过国家安保等级认定的平台数量 ÷ 学校部署的所有平台总数”计算认定比例，并按区间选择对应选项。
+                    </p>
+                    <p class="hint-example">
+                      <em>示例：学校共部署 5 个平台，其中 3 个通过认定，则认定比例为 60%，选择“40%＜认定比例≤80%”。</em>
+                    </p>
                   </div>
                 </el-popover>
               </div>
             </template>
-            <el-radio-group v-model="formData.security_certified_ratio" class="horizontal-radio">
-              <el-radio value="low">认定比例 < 40%</el-radio>
-              <el-radio value="medium">40% < 认定比例 ≤ 80%</el-radio>
-              <el-radio value="high">认定比例 > 80%</el-radio>
-            </el-radio-group>
+
+            <el-radio-group
+                v-model="formData.security_certified_ratio"
+                class="horizontal-radio ratio-radio-group"
+              >
+                <el-radio value="zero">认定比例 = 0</el-radio>
+                <el-radio value="low">0＜认定比例≤40%</el-radio>
+                <el-radio value="medium">40%＜认定比例≤80%</el-radio>
+                <el-radio value="high">认定比例＞80%</el-radio>
+              </el-radio-group>
           </el-form-item>
+              <div class="volume-hint">
+                说明：以上主要包括学校自主部署的各类服务平台，如教务系统、校园一卡通、综合素质评价平台、校园门禁出入管理系统、考试管理与题库组卷平台等。
+              </div>
+
+          </template>
 
           <!-- 8. 数据风险事件 -->
           <el-form-item prop="has_security_incident">
             <template #label>
               <div class="label-with-hint">
-                <span>2020年到2025年，学校是否发生数据风险事件？</span>
+                <span>2023年到2025年，学校是否发生数据风险事件？</span>
                 <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
                   <template #reference>
                     <span class="hint-tag">填写提示</span>
                   </template>
                   <div class="hint-body">
-                    <p class="hint-text">2020年到 2025 年期间， 学校是否发生过数据泄露、数据篡改、数据丢失、数据被非法访问等数据安全风险事件。</p>
+                    <p class="hint-text">2023年到2025年期间， 学校是否发生过数据泄露、数据篡改、数据丢失、数据被非法访问等数据安全风险事件。</p>
                     <p class="hint-example"><em>示例：2023 年学校发生过学生信息泄露事件，则选择「有发生」；2020-2025年期间未发生任何数据安全问题，则选择「未发生」。</em></p>
                   </div>
                 </el-popover>
@@ -293,6 +307,9 @@
               </el-radio>
             </el-radio-group>
           </el-form-item>
+          <div class="volume-hint">
+                说明：数据风险事件举例，如学生个人信息、家长联系方式、学籍档案等隐私数据外泄，学校的系统平台遭到外部攻击（如DDoS攻击、病毒攻击等），导致系统宕机或篡改。
+              </div>
       </el-form>
     </el-card>
   </div>
@@ -350,14 +367,30 @@ const isReadonly = ref(false)  // 只读模式
 const formData = ref({
   has_independent_data_center: null,
   data_center_standard: null,
+
+  // 旧字段先保留，但新版前端不再展示、不再参与计分
   cloud_dedicated_service: null,
+
   student_device_ratio: null,
   teacher_device_ratio: null,
   has_data_platform: null,
+
+  // E21 新增：平台建设管理模式
+  platform_build_mode: '',
+
   security_certified_count: null,
   security_certified_ratio: null,
   has_security_incident: null
 })
+
+const isAssessmentExpired = (assessmentData) => {
+  if (!assessmentData?.created_at) return false
+
+  const startTime = new Date(assessmentData.created_at).getTime()
+  const expireTime = startTime + 72 * 60 * 60 * 1000
+
+  return Date.now() > expireTime
+}
 
 // 加载数据
 const loadData = async () => {
@@ -370,7 +403,7 @@ const loadData = async () => {
       }
     })
     const assessmentData = await assessmentResponse.json()
-    isReadonly.value = assessmentData.status !== 'draft'
+    isReadonly.value = assessmentData.status !== 'draft' || isAssessmentExpired(assessmentData)
     
     // 获取数据技术数据
     const response = await fetch(`/api/assessments/${assessmentId.value}/technology/`, {
@@ -380,6 +413,11 @@ const loadData = async () => {
     })
     const data = await response.json()
     Object.assign(formData.value, data)
+
+    // 兼容旧数据，避免新增字段为空时影响页面联动
+    if (!formData.value.platform_build_mode) {
+      formData.value.platform_build_mode = ''
+    }
   } catch (error) {
     console.error('加载数据失败:', error)
   } finally {
@@ -443,9 +481,17 @@ onBeforeUnmount(() => {
 
 watch(() => formData.value.has_independent_data_center, (newVal) => {
   if (newVal === true) {
-    formData.value.cloud_dedicated_service = null;
+    formData.value.cloud_dedicated_service = null
   } else if (newVal === false) {
-    formData.value.data_center_standard = null;
+    formData.value.data_center_standard = null
+    formData.value.cloud_dedicated_service = null
+  }
+})
+
+watch(() => formData.value.platform_build_mode, (newVal) => {
+  if (newVal === 'external') {
+    formData.value.security_certified_count = null
+    formData.value.security_certified_ratio = null
   }
 })
 </script>
@@ -731,6 +777,60 @@ watch(() => formData.value.has_independent_data_center, (newVal) => {
 
 .hint-example em {
   font-style: italic;
+}
+
+.volume-hint,
+.form-tip {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 14px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #909399;
+  box-sizing: border-box;
+}
+
+.vertical-radio-group {
+  width: 100%;
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.vertical-radio-group :deep(.el-radio) {
+  width: 100%;
+  height: auto;
+  margin-right: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.vertical-radio-group :deep(.el-radio__label) {
+  white-space: normal;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.form-tip {
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 18px;
+  padding: 10px 14px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #909399;
+  box-sizing: border-box;
+}
+
+:deep(.el-form-item__content) {
+  flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 </style>

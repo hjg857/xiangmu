@@ -1,3 +1,4 @@
+import request from '@/api/request'
 
 // 获取评估详细数据的 API
 export function getAssessmentData(id) {

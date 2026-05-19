@@ -11,7 +11,7 @@ def send_account_approval_email(username, password, email, school_name):
     """
     发送账号审批通过邮件
     """
-    subject = '【数据文化成熟度评估系统】账号审批通过通知'
+    subject = '【中小学数据文化成熟度评估监测系统】账号审批通过通知'
     
     message = f"""尊敬的 {school_name} 用户：
 

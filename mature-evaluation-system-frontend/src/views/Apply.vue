@@ -33,156 +33,101 @@
         label-width="100px"
         size="large"
       >
-        <!-- 学校基本信息 -->
-        <div class="form-section">
-          <h3 class="section-title">学校基本信息</h3>
-          
-          <el-form-item label="学校全称" prop="school_name">
-            <el-input
-              v-model="applyForm.school_name"
-              placeholder="请输入学校官方全称"
-            />
-          </el-form-item>
+        <!-- 1. 新增：身份选择 -->
+          <div class="form-section">
+            <el-form-item label="申请身份" prop="apply_role">
+              <el-select v-model="applyForm.apply_role" placeholder="请选择您的申请身份" style="width: 100%">
+                <el-option label="学校用户" value="school" />
+                <el-option label="区域管理者" value="region_admin" />
+              </el-select>
+            </el-form-item>
+          </div>
 
-          <el-form-item label="学校类型" prop="school_type">
-            <el-select
-              v-model="applyForm.school_type"
-              placeholder="请选择学校类型"
-              style="width: 100%"
-            >
-              <el-option label="小学" value="primary" />
-              <el-option label="初中" value="junior" />
-              <el-option label="高中" value="senior" />
-              <el-option label="九年一贯制" value="nine_year" />
-              <el-option label="十二年一贯制" value="twelve_year" />
-            </el-select>
-          </el-form-item>
+          <!-- 2. 信息区块：根据身份动态调整 -->
+          <div class="form-section">
+            <h3 class="section-title">
+              {{ applyForm.apply_role === 'school' ? '学校基本信息' : '区域管理信息' }}
+            </h3>
+            
+            <!-- 仅学校显示 -->
+            <template v-if="applyForm.apply_role === 'school'">
+              <el-form-item label="学校全称" prop="school_name">
+                <el-input v-model="applyForm.school_name" placeholder="请输入学校官方全称" />
+              </el-form-item>
 
-          <el-form-item label="省份" prop="provinceCode">
-            <el-select
-              v-model="applyForm.provinceCode"
-              placeholder="请选择省份"
-              style="width: 100%"
-              @change="onProvinceChange"
-            >
-              <el-option
-                v-for="item in provinceOptions"
-                :key="item.code"
-                :label="item.name"
-                :value="item.code"
-              />
-            </el-select>
-          </el-form-item>
-
-          <!-- 市 -->
-          <el-form-item label="城市" prop="cityCode">
-            <el-select
-              v-model="applyForm.cityCode"
-              placeholder="请选择城市"
-              style="width: 100%"
-              :disabled="!applyForm.provinceCode"
-              @change="onCityChange"
-            >
-              <el-option
-                v-for="item in cityOptions"
-                :key="item.code"
-                :label="item.name"
-                :value="item.code"
-              />
-            </el-select>
-          </el-form-item>
-
-          <!-- 区县 -->
-          <el-form-item label="区县" prop="districtCode">
-            <el-select
-              v-model="applyForm.districtCode"
-              placeholder="请选择区县"
-              style="width: 100%"
-              :disabled="!applyForm.cityCode"
-            >
-              <el-option
-                v-for="item in districtOptions"
-                :key="item.code"
-                :label="item.name"
-                :value="item.code"
-              />
-            </el-select>
-          </el-form-item>
-        </div>
-        <!-- 联系人信息 -->
-        <div class="form-section">
-          <h3 class="section-title">联系人信息</h3>
-          
-          <el-form-item label="联系人姓名" prop="contact_name">
-            <el-input
-              v-model="applyForm.contact_name"
-              placeholder="负责系统的主要联系人"
-            />
-          </el-form-item>
-
-          <el-form-item label="职务" prop="contact_position">
-            <el-input
-              v-model="applyForm.contact_position"
-              placeholder="请输入您的职务或岗位"
-            />
-          </el-form-item>
-
-          <el-form-item label="联系电话" prop="contact_phone">
-            <el-input
-              v-model="applyForm.contact_phone"
-              placeholder="请填写真实联系电话"
-            />
-          </el-form-item>
-
-          <el-form-item prop="contact_email">
-            <template #label>
-              <span class="email-label">
-                <span>电子邮箱</span>
-                <el-tooltip
-                  content="温馨提示：一个邮箱只能申请一个账号，请勿重复申请"
-                  placement="top"
-                  effect="light"
-                >
-                  <span class="email-tip-icon">?</span>
-                </el-tooltip>
-              </span>
+              <el-form-item label="办学类型" prop="school_type">
+                <el-select v-model="applyForm.school_type" placeholder="请选择学校类型" style="width: 100%">
+                  <el-option label="小学" value="primary" />
+                  <el-option label="初中" value="junior" />
+                  <el-option label="高中" value="senior" />
+                  <el-option label="九年一贯制" value="nine_year" />
+                  <el-option label="十二年一贯制" value="twelve_year" />
+                </el-select>
+              </el-form-item>
             </template>
 
-            <el-input
-              v-model="applyForm.contact_email"
-              placeholder="常用邮箱地址"
-            />
+            <!-- 共同部分：地区选择 -->
+            <el-form-item label="省份" prop="provinceCode">
+              <el-select v-model="applyForm.provinceCode" placeholder="请选择省份" style="width: 100%" @change="onProvinceChange">
+                <el-option v-for="item in provinceOptions" :key="item.code" :label="item.name" :value="item.code" />
+              </el-select>
+            </el-form-item>
 
-            <div class="form-tip">
-              审核通过后，系统将自动生成账号和密码并发送至此邮箱
-            </div>
-          </el-form-item>
-        </div>
+            <el-form-item label="城市" prop="cityCode">
+              <el-select v-model="applyForm.cityCode" placeholder="请选择城市" style="width: 100%" :disabled="!applyForm.provinceCode" @change="onCityChange">
+                <el-option v-for="item in cityOptions" :key="item.code" :label="item.name" :value="item.code" />
+              </el-select>
+            </el-form-item>
 
+            <el-form-item label="区县" prop="districtCode">
+              <el-select v-model="applyForm.districtCode" placeholder="请选择区县" style="width: 100%" :disabled="!applyForm.cityCode">
+                <el-option v-for="item in districtOptions" :key="item.code" :label="item.name" :value="item.code" />
+              </el-select>
+            </el-form-item>
+          </div>
 
+          <!-- 3. 联系人信息：始终显示 -->
+          <div class="form-section">
+            <h3 class="section-title">联系人信息</h3>
+            <el-form-item label="联系人姓名" prop="contact_name">
+              <el-input v-model="applyForm.contact_name" placeholder="负责系统的主要联系人" />
+            </el-form-item>
 
-        <!-- 提交按钮 -->
-        <el-button
-          type="warning"
-          size="large"
-          :loading="loading"
-          @click="handleSubmit"
-          class="submit-button"
-        >
-          提交申请
-        </el-button>
-      </el-form>
-    </div>
-    </main>
-    <!-- 底部页脚 -->
-    <div class="copyright">
-          © 智能学习与评价江苏省产业技术工程化中心 版权所有
+            <el-form-item label="职务" prop="contact_position">
+              <el-input v-model="applyForm.contact_position" placeholder="请输入您的职务或岗位" />
+            </el-form-item>
+
+            <el-form-item label="联系电话" prop="contact_phone">
+              <el-input v-model="applyForm.contact_phone" placeholder="请填写真实联系电话" />
+            </el-form-item>
+
+            <el-form-item prop="contact_email">
+              <template #label>
+                <span class="email-label">
+                  <span>电子邮箱</span>
+                  <el-tooltip content="温馨提示：一个邮箱只能申请一个账号，请勿重复申请" placement="top" effect="light">
+                    <span class="email-tip-icon">?</span>
+                  </el-tooltip>
+                </span>
+              </template>
+              <el-input v-model="applyForm.contact_email" placeholder="常用邮箱地址" />
+              <div class="form-tip">审核通过后，系统将自动生成账号和密码并发送至此邮箱</div>
+            </el-form-item>
+          </div>
+
+          <!-- 提交按钮 -->
+          <el-button type="warning" size="large" :loading="loading" @click="handleSubmit" class="submit-button">
+            提交申请
+          </el-button>
+        </el-form>
       </div>
+    </main>
+    <div class="copyright">© 智能学习与评价江苏省产业技术工程化中心 版权所有</div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch ,computed} from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { createApplication } from '@/api/school'
@@ -200,6 +145,7 @@ const loading = ref(false)
  * ✅ 新增 provinceCode/cityCode/districtCode（选择联动用）
  */
 const applyForm = reactive({
+  apply_role: 'school',
   school_name: '',
   school_type: '',
 
@@ -325,33 +271,38 @@ const validateEmail = (rule, value, callback) => {
   else callback()
 }
 
-const applyRules = {
-  school_name: [{ required: true, message: '请输入学校全称', trigger: 'blur' }],
-  school_type: [{ required: true, message: '请选择学校类型', trigger: 'change' }],
+const applyRules = computed(() => {
+  const baseRules = {
+    apply_role: [{ required: true, message: '请选择申请身份', trigger: 'change' }],
+    provinceCode: [{ required: true, message: '请选择省份', trigger: 'change' }],
+    cityCode: [{ required: true, message: '请选择城市', trigger: 'change' }],
+    districtCode: [{ required: true, message: '请选择区县', trigger: 'change' }],
+    contact_name: [{ required: true, message: '请输入联系人姓名', trigger: 'blur' }],
+    contact_position: [{ required: true, message: '请输入职务', trigger: 'blur' }],
+    contact_phone: [{ required: true, validator: validatePhone, trigger: 'blur' }],
+    contact_email: [{ required: true, validator: validateEmail, trigger: 'blur' }]
+  }
 
-  // 这里把 trigger 从 blur 改成 change（因为是 select）
-  provinceCode: [{ required: true, message: '请选择省份', trigger: 'change' }],
-  cityCode: [{ required: true, message: '请选择城市', trigger: 'change' }],
-  districtCode: [{ required: true, message: '请选择区县', trigger: 'change' }],
+  // 如果是学校身份，额外增加规则
+  if (applyForm.apply_role === 'school') {
+    baseRules.school_name = [{ required: true, message: '请输入学校全称', trigger: 'blur' }]
+    baseRules.school_type = [{ required: true, message: '请选择学校类型', trigger: 'change' }]
+  }
 
-  contact_name: [{ required: true, message: '请输入联系人姓名', trigger: 'blur' }],
-  contact_position: [{ required: true, message: '请输入职务', trigger: 'blur' }],
-  contact_phone: [{ required: true, validator: validatePhone, trigger: 'blur' }],
-  contact_email: [{ required: true, validator: validateEmail, trigger: 'blur' }]
-}
+  return baseRules
+})
 
 // 提交申请（你原逻辑基本不动）
 const handleSubmit = async () => {
   if (!applyFormRef.value) return
-
   await applyFormRef.value.validate(async (valid) => {
     if (!valid) return
-
     loading.value = true
     try {
       const res = await createApplication({
-        school_name: applyForm.school_name,
-        school_type: applyForm.school_type,
+        apply_role: applyForm.apply_role, // 传给后端身份
+        school_name: applyForm.apply_role === 'school' ? applyForm.school_name : `${applyForm.district}区域管理`, // 如果是区域，自动生成一个名称
+        school_type: applyForm.apply_role === 'school' ? applyForm.school_type : 'region_admin',
         province: applyForm.province,
         city: applyForm.city,
         district: applyForm.district,
@@ -361,18 +312,12 @@ const handleSubmit = async () => {
         contact_phone: applyForm.contact_phone,
         contact_email: applyForm.contact_email
       })
-
       if (res.success) {
         router.push({ name: 'apply-success', params: { id: res.data.id } })
       }
     } catch (error) {
       const msg = error.response?.data?.error?.message || '提交失败'
-
-      if (msg.includes('待审批的申请') || msg.includes('已被注册')) {
-        ElMessage.warning(msg)
-      } else {
-        ElMessage.error(msg)
-      }
+      ElMessage.error(msg)
     } finally {
       loading.value = false
     }

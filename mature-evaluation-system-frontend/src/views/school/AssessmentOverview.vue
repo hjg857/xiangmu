@@ -189,7 +189,7 @@ const pageSize = ref(10) // 对应你图片中显示的每页3条
 const getDeadline = (startTime) => {
   if (!startTime) return ''
   const date = new Date(startTime)
-  date.setHours(date.getHours() + 48) // 增加48小时
+  date.setHours(date.getHours() + 72) // 增加48小时
   
   // 格式化输出 YYYY-MM-DD HH:mm:ss
   const y = date.getFullYear()

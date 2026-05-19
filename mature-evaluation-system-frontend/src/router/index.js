@@ -211,6 +211,16 @@ const router = createRouter({
       component: () => import('@/views/region-admin/AssessmentDetail.vue'),
       meta: { requiresAuth: true, roles: ['region_admin'] }
     },
+    {
+      path: '/region-admin/school-count',
+      component: () => import('@/views/region-admin/SchoolCount.vue'),
+      meta: { requiresAuth: true, roles: ['region_admin'] }
+    },
+    {
+      path: "region-report",
+      component: () => import("@/views/region-admin/RegionReport.vue"),
+      meta: { requiresAuth: true, roles: ['region_admin'] }
+    },
   ]
 },
 

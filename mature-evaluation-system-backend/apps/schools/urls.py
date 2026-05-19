@@ -26,4 +26,6 @@ urlpatterns = [
     path('school/update-count/', views.update_school_info_count, name='update_school_info'),
     path('send-email/', send_contact_email, name='send_contact_email'),
     path('contact-collaboration/', submit_collaboration),
+
+    path('export-accounts/', views.export_accounts, name='export_accounts'),
 ]

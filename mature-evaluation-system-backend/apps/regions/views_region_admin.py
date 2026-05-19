@@ -318,6 +318,8 @@ class RegionAdminApplicationApproveView(RegionAdminBaseAPIView):
                 username = gen_unique_school_username(app.school_name, User)
                 password = gen_strong_password(8)
 
+                access_code=password
+
                 user = User.objects.create_user(
                     username=username,
                     email=app.contact_email,
@@ -337,6 +339,7 @@ class RegionAdminApplicationApproveView(RegionAdminBaseAPIView):
                     contact_position=app.contact_position,
                     contact_phone=app.contact_phone,
                     contact_email=app.contact_email,
+                    access_code=access_code
                 )
 
                 app.status = "approved"
@@ -570,6 +573,8 @@ class RegionAdminCreateSchoolView(RegionAdminBaseAPIView):
 
         password = (data.get("password") or "").strip() or gen_strong_password(8)
 
+        access_code=password
+
         custom_username = (data.get("username") or "").strip()
         if custom_username:
             if not USERNAME_RE.match(custom_username):
@@ -609,6 +614,7 @@ class RegionAdminCreateSchoolView(RegionAdminBaseAPIView):
             contact_position=data["contact_position"],
             contact_phone=data["contact_phone"],
             contact_email=contact_email,
+            access_code=access_code
         )
 
         email_sent = try_send_account_email(
@@ -654,6 +660,7 @@ class RegionAdminSchoolResetPasswordView(RegionAdminBaseAPIView):
         ser.is_valid(raise_exception=True)
 
         pwd = ser.validated_data["password"]
+        school.access_code = pwd
         school.user.set_password(pwd)
         school.user.save(update_fields=["password"])
 
@@ -904,6 +911,8 @@ class RegionAdminSchoolImportView(RegionAdminBaseAPIView):
             username = (data.get("username") or "").strip() or gen_unique_school_username(name, User)
             password = (data.get("password") or "").strip() or gen_strong_password(8)
 
+            access_code = password
+
             # username 唯一
             if User.objects.filter(username=username).exists():
                 username = gen_unique_school_username(name, User)
@@ -935,6 +944,7 @@ class RegionAdminSchoolImportView(RegionAdminBaseAPIView):
                         contact_position=data["contact_position"],
                         contact_phone=data["contact_phone"],
                         contact_email=contact_email,
+                        access_code=access_code
                     )
 
                 report["created"] += 1

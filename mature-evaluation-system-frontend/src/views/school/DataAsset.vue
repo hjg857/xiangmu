@@ -43,64 +43,182 @@
         <!-- 1. 数据资产意识 -->
         <div class="section-title">1. 数据资产意识</div>
         
-        <div class="section-subtitle">管理者的数据资产意识</div>
+        <div class="section-subtitle">教师的数据资产意识</div>
         
         <el-alert
           type="success"
           :closable="false"
           style="margin-bottom: 20px"
         >
-          <p>该维度将通过问卷调查的方式，了解管理者的数据资产意识。为便于数据采集，同卷（<strong>中小学校管理者数据资产意识调查问卷</strong>）已全部整合到"数据素养评价"板块。</p>
+          <p>该维度将通过问卷调查的方式，了解教师的数据资产意识。为便于数据采集，同卷（<strong>中小学校教师数据资产意识调查问卷</strong>）已全部整合到"数据素养评价"板块。</p>
         </el-alert>
 
         <!-- 2. 数据资产积累 -->
-        <div class="section-title">2. 数据资产积累</div>
+      <!-- 2. 数据资产积累 -->
+      <div class="section-title">2. 数据资产积累</div>
 
-        <div class="form-section">
-          <div class="form-section-label">学校现有的数据累积总量（包括数据库、各种文档视频资源等，请分别列出各类数据的总量）？</div>
-          
+      <div class="form-section">
+        <el-form-item>
+          <template #label>
+            <div class="label-with-hint">
+              <span>学校是否对校内数据资产进行统一管理或统筹管理（包括区域平台统一管理、学校自主管理）？</span>
+            </div>
+          </template>
+
+          <el-radio-group v-model="formData.has_unified_data_management" class="inline-radio-group">
+            <el-radio :label="true">是</el-radio>
+            <el-radio :label="false">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item v-if="formData.has_unified_data_management === true">
+          <template #label>
+            <div class="label-with-hint">
+              <span>学校是否能够通过相关平台、系统等，对校内主要数据资源进行统计查询？</span>
+            </div>
+          </template>
+
+          <el-radio-group v-model="formData.can_query_data_assets" class="inline-radio-group">
+            <el-radio :label="true">是</el-radio>
+            <el-radio :label="false">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <div
+          v-if="formData.has_unified_data_management === false || formData.can_query_data_assets === false"
+          class="form-tip"
+        >
+          当前选择下，系统将根据计分规则直接赋予数据资产总量对应分值，无需继续填写各类数据总量。
+        </div>
+
+        <template v-if="formData.has_unified_data_management === true && formData.can_query_data_assets === true">
+          <div class="form-section-label">
+            数据资产统计：教育教学、师生管理、数字资源、校园管理与行政以及其他类型数据总量：
+          </div>
+
           <div class="data-volume-section">
-            <div class="data-volume-item">
-              <span class="volume-label">教学管理数据总量：</span>
-              <el-input-number v-model="formData.management_data_volume" :min="0" :controls="false" />
-              <span>GB</span>
-            </div>
-            <div class="volume-hint">
-              数据来源示例：学校存储的与师生相关的数据，如基本信息、教学安排等；<br>
-              统计方式示例：可通过查看学校教学管理系统的数据库，得到教学管理数据总量，具体统计方式可根据学校实际情况进行调整。
+            <!-- 教育教学数据 -->
+            <div class="data-volume-block">
+              <div class="volume-title">教育教学数据总量</div>
+
+              <el-radio-group v-model="formData.teaching_data_stat_method" class="stat-method-group">
+                <el-radio label="unable">无法统计</el-radio>
+                <el-radio label="estimated">可部分估算</el-radio>
+                <el-radio label="system_query">可系统查询</el-radio>
+              </el-radio-group>
+
+              <div
+                v-if="formData.teaching_data_stat_method === 'estimated' || formData.teaching_data_stat_method === 'system_query'"
+                class="data-volume-item"
+              >
+                <span class="volume-label">数据总量</span>
+                <el-input-number v-model="formData.teaching_data_volume" :min="0" :controls="false" />
+                <span>GB</span>
+              </div>
+
+              <div class="volume-hint">
+                数据来源示例：中小学日常教学相关数据，如课程安排、授课计划、考试成绩、作业信息、课堂考勤、教研活动记录等。<br>
+                统计方式示例：可通过学校教学管理系统、学习平台或成绩管理系统的数据库，统计教育教学数据的总量；具体统计方式可根据学校实际情况进行调整。
+              </div>
             </div>
 
-            <div class="data-volume-item">
-              <span class="volume-label">教学资源数据总量：</span>
-              <el-input-number v-model="formData.resource_data_volume" :min="0" :controls="false" />
-              <span>GB</span>
-            </div>
-            <div class="volume-hint">
-              数据来源示例：学校存储的教案、课件、教学视频等资源的总量；<br>
-              统计方式示例：可通过登录学校教学资源平台，查看平台当前存储教案、课件、教学视频等的总量，具体统计方式可根据学校实际情况进行调整。
+            <!-- 师生管理数据 -->
+            <div class="data-volume-block">
+              <div class="volume-title">师生管理数据总量</div>
+
+              <el-radio-group v-model="formData.teacher_student_data_stat_method" class="stat-method-group">
+                <el-radio label="unable">无法统计</el-radio>
+                <el-radio label="estimated">可部分估算</el-radio>
+                <el-radio label="system_query">可系统查询</el-radio>
+              </el-radio-group>
+
+              <div
+                v-if="formData.teacher_student_data_stat_method === 'estimated' || formData.teacher_student_data_stat_method === 'system_query'"
+                class="data-volume-item"
+              >
+                <span class="volume-label">数据总量</span>
+                <el-input-number v-model="formData.teacher_student_data_volume" :min="0" :controls="false" />
+                <span>GB</span>
+              </div>
+
+              <div class="volume-hint">
+                数据来源示例：师生个人信息、班级花名册、出勤记录、奖惩记录、健康与安全信息等。<br>
+                统计方式示例：可通过人事管理系统、学生管理系统或电子班牌等，汇总所有师生管理相关数据总量；具体统计方式可根据学校实际情况进行调整。
+              </div>
             </div>
 
-            <div class="data-volume-item">
-              <span class="volume-label">校园服务数据总量：</span>
-              <el-input-number v-model="formData.service_data_volume" :min="0" :controls="false" />
-              <span>GB</span>
-            </div>
-            <div class="volume-hint">
-              数据来源示例：学校存储的校园监控视频、门禁记录等的数据总量；<br>
-              统计方式示例：可通过登录校园一卡通、校园安防平台等，查看存储监控视频、学生消费记录等的总量，具体统计方式可根据学校实际情况进行调整。
+            <!-- 数字资源数据 -->
+            <div class="data-volume-block">
+              <div class="volume-title">数字资源数据总量</div>
+
+              <el-radio-group v-model="formData.digital_resource_data_stat_method" class="stat-method-group">
+                <el-radio label="unable">无法统计</el-radio>
+                <el-radio label="estimated">可部分估算</el-radio>
+                <el-radio label="system_query">可系统查询</el-radio>
+              </el-radio-group>
+
+              <div
+                v-if="formData.digital_resource_data_stat_method === 'estimated' || formData.digital_resource_data_stat_method === 'system_query'"
+                class="data-volume-item"
+              >
+                <span class="volume-label">数据总量</span>
+                <el-input-number v-model="formData.digital_resource_data_volume" :min="0" :controls="false" />
+                <span>GB</span>
+              </div>
+
+              <div class="volume-hint">
+                数据来源示例：学校存储的各类数字教学资源，如课件教案、微课视频、习题题库、电子图书、校本教材、研学资料等。<br>
+                统计方式示例：可查看学校资源库平台、校园云盘、校本资源服务器存储后台，统计资源存储总量；具体统计方式可根据学校实际情况进行调整。
+              </div>
             </div>
 
-            <div class="data-volume-item">
-              <span class="volume-label">其他沉淀数据总量：</span>
-              <el-input-number v-model="formData.other_data_volume" :min="0" :controls="false" />
-              <span>GB</span>
+            <!-- 校园管理与行政数据 -->
+            <div class="data-volume-block">
+              <div class="volume-title">校园管理与行政数据总量</div>
+
+              <el-radio-group v-model="formData.campus_admin_data_stat_method" class="stat-method-group">
+                <el-radio label="unable">无法统计</el-radio>
+                <el-radio label="estimated">可部分估算</el-radio>
+                <el-radio label="system_query">可系统查询</el-radio>
+              </el-radio-group>
+
+              <div
+                v-if="formData.campus_admin_data_stat_method === 'estimated' || formData.campus_admin_data_stat_method === 'system_query'"
+                class="data-volume-item"
+              >
+                <span class="volume-label">数据总量</span>
+                <el-input-number v-model="formData.campus_admin_data_volume" :min="0" :controls="false" />
+                <span>GB</span>
+              </div>
+
+              <div class="volume-hint">
+                数据来源示例：校园后勤安保、校舍资产、设备耗材、食堂管理、门禁出入、会议通知、公文流转、财务报销、安全台账等校园行政后勤数据。<br>
+                统计方式示例：可通过校园后勤管理系统、行政办公系统、资产台账系统等，统计校园管理与行政数据总量；具体统计方式可根据学校实际情况进行调整。
+              </div>
             </div>
-            <div class="volume-hint">
-              数据来源示例：学校存储的未分类数据的总量，如校史资料、行政文件等；<br>
-              统计方式示例：将学校未分类数据量相加，得到其他沉淀数据总量，具体统计方式可根据学校实际情况进行调整。
+
+            <!-- 其他类型数据 -->
+            <div class="data-volume-block">
+              <div class="volume-title">其他类型数据（选填）</div>
+
+              <div class="data-volume-item">
+                <span class="volume-label">数据总量</span>
+                <el-input-number v-model="formData.other_type_data_volume" :min="0" :controls="false" />
+                <span>GB</span>
+              </div>
+
+              <div class="volume-hint">
+                数据来源示例：如校园安防数据、图书馆借阅数据、食堂消费数据、校车使用记录等。<br>
+                统计方式示例：可将学校未分类数据量进行汇总，得到其他类型数据总量；具体统计方式可根据学校实际情况进行调整。
+              </div>
             </div>
           </div>
-        </div>
+
+          <div class="form-tip">
+            说明：数据资产包括教育教学数据、师生管理数据、数字资源数据、校园管理与行政数据等。若某类数据选择“无法统计”，该类数据量按 0 处理，但不影响其他类别继续填写。
+          </div>
+        </template>
+      </div>
       </el-form>
     </el-card>
   </div>
@@ -155,11 +273,44 @@ const isReadonly = ref(false)  // 只读模式
 
 // 表单数据
 const formData = ref({
+  // D21 前置判断
+  has_unified_data_management: null,
+  can_query_data_assets: null,
+
+  // 教育教学数据
+  teaching_data_stat_method: '',
+  teaching_data_volume: null,
+
+  // 师生管理数据
+  teacher_student_data_stat_method: '',
+  teacher_student_data_volume: null,
+
+  // 数字资源数据
+  digital_resource_data_stat_method: '',
+  digital_resource_data_volume: null,
+
+  // 校园管理与行政数据
+  campus_admin_data_stat_method: '',
+  campus_admin_data_volume: null,
+
+  // 其他类型数据
+  other_type_data_volume: null,
+
+  // 旧字段先保留，避免旧数据或后端兼容问题
   management_data_volume: null,
   resource_data_volume: null,
   service_data_volume: null,
   other_data_volume: null
 })
+
+const isAssessmentExpired = (assessmentData) => {
+  if (!assessmentData?.created_at) return false
+
+  const startTime = new Date(assessmentData.created_at).getTime()
+  const expireTime = startTime + 72 * 60 * 60 * 1000
+
+  return Date.now() > expireTime
+}
 
 // 加载数据
 const loadData = async () => {
@@ -172,7 +323,7 @@ const loadData = async () => {
       }
     })
     const assessmentData = await assessmentResponse.json()
-    isReadonly.value = assessmentData.status !== 'draft'
+    isReadonly.value = assessmentData.status !== 'draft' || isAssessmentExpired(assessmentData)
     
     // 获取数据资产数据
     const response = await fetch(`/api/assessments/${assessmentId.value}/asset/`, {
@@ -182,6 +333,20 @@ const loadData = async () => {
     })
     const data = await response.json()
     Object.assign(formData.value, data)
+
+    // 兼容旧数据，避免新版字段为 null 时影响表单显示
+    const statMethodFields = [
+      'teaching_data_stat_method',
+      'teacher_student_data_stat_method',
+      'digital_resource_data_stat_method',
+      'campus_admin_data_stat_method'
+    ]
+
+    statMethodFields.forEach((field) => {
+      if (!formData.value[field]) {
+        formData.value[field] = ''
+      }
+    })
   } catch (error) {
     console.error('加载数据失败:', error)
   } finally {
@@ -430,6 +595,78 @@ onBeforeUnmount(() => {
 .qr-label {
   color: rgba(255, 255, 255, 0.6);
   font-size: 12px;
+}
+
+.label-with-hint {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.inline-radio-group {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.stat-method-group {
+  width: 100%;
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.data-volume-section {
+  width: 100%;
+  padding-left: 0;
+}
+
+.data-volume-block {
+  margin-bottom: 22px;
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid #ebeef5;
+  border-radius: 6px;
+}
+
+.volume-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 12px;
+}
+
+.data-volume-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.volume-label {
+  font-weight: 500;
+  color: #606266;
+  min-width: 80px;
+}
+
+.volume-hint,
+.form-tip {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 14px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #909399;
+  box-sizing: border-box;
+}
+
+:deep(.el-form-item__content) {
+  flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 </style>

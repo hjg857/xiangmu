@@ -40,6 +40,25 @@ class ScoringService:
         self.secondary_scores = {}    # 二级指标得分（5分制）
         self.dimension_scores = {}    # 一级维度得分（5分制）
 
+    def _count_selected_items(self, value) -> int:
+        """
+        统计多选题已选数量。
+        前端一般传 list；如果旧数据传 dict 或字符串，也尽量兼容。
+        """
+        if value is None:
+            return 0
+
+        if isinstance(value, list):
+            return len([item for item in value if item])
+
+        if isinstance(value, dict):
+            return len([k for k, v in value.items() if v])
+
+        if isinstance(value, str):
+            return 1 if value.strip() else 0
+
+        return 0
+
     def calculate_all_scores(self) -> Dict[str, Decimal]:
         """
         计算所有维度得分
@@ -134,41 +153,52 @@ class ScoringService:
     def calculate_literacy_score(self) -> float:
         """
         计算A维度-数据素养得分（5分制）
-        包含: A1教师、A2管理者、A3学生
+        新版包含:
+        A1 教师数据素养
+        A2 学生数据素养
         """
         logger.info("计算数据素养得分")
-        from apps.surveys.models import SurveyInstance, SurveyResponse
+        from apps.surveys.models import SurveyInstance
 
-        # 获取问卷实例
         teacher_instances = SurveyInstance.objects.filter(
-            assessment=self.assessment, template__survey_type='teacher')
-        manager_instances = SurveyInstance.objects.filter(
-            assessment=self.assessment, template__survey_type='manager')
+            assessment=self.assessment,
+            template__survey_type='teacher'
+        )
         student_instances = SurveyInstance.objects.filter(
-            assessment=self.assessment, template__survey_type='student')
+            assessment=self.assessment,
+            template__survey_type='student'
+        )
 
-        # 计算各观测点得分（5分制）
+        # 计算教师、学生问卷观测点得分
         self._calc_literacy_observations('teacher', teacher_instances)
-        self._calc_literacy_observations('manager', manager_instances)
         self._calc_literacy_observations('student', student_instances)
 
-        # 计算二级指标得分
+        # A1 教师数据素养
         a1_score = self._calculate_secondary_score(
-            self.observation_scores, ['A11', 'A12', 'A13', 'A14', 'A15'])
+            self.observation_scores,
+            ['A11', 'A12', 'A13', 'A14', 'A15']
+        )
+
+        # A2 学生数据素养
+        # 注意：学生观测点编号使用正式权重表中的 A31-A35
         a2_score = self._calculate_secondary_score(
-            self.observation_scores, ['A21', 'A22', 'A23', 'A24', 'A25'])
-        a3_score = self._calculate_secondary_score(
-            self.observation_scores, ['A31', 'A32', 'A33', 'A34', 'A35'])
+            self.observation_scores,
+            ['A31', 'A32', 'A33', 'A34', 'A35']
+        )
 
         self.secondary_scores['A1'] = a1_score
         self.secondary_scores['A2'] = a2_score
-        self.secondary_scores['A3'] = a3_score
 
-        # 计算一级维度得分
         dimension_score = self._calculate_dimension_score(
-            self.secondary_scores, ['A1', 'A2', 'A3'])
+            self.secondary_scores,
+            ['A1', 'A2']
+        )
 
-        logger.info(f"A维度: A1={a1_score:.4f}, A2={a2_score:.4f}, A3={a3_score:.4f}, 维度得分={dimension_score:.4f}")
+        logger.info(
+            f"A维度: A1教师={a1_score:.4f}, A2学生={a2_score:.4f}, "
+            f"维度得分={dimension_score:.4f}"
+        )
+
         return dimension_score
 
     def _calc_literacy_observations(self, survey_type: str, instances) -> None:
@@ -236,8 +266,16 @@ class ScoringService:
         rules = config.INSTITUTION_SCORING_RULES
 
         # B11: 数据领导/工作小组
-        b11_raw = rules['B11']['rules'].get(inst.has_leadership_group, 0)
-        self.observation_scores['B11'] = self._normalize_score(b11_raw, rules['B11']['max_score'])
+        b11_raw = rules['B11']['rules'].get(inst.leadership_group_type, 0)
+
+        # 兼容旧数据：如果新字段为空，则使用旧布尔字段兜底
+        if not inst.leadership_group_type:
+            b11_raw = 10 if inst.has_leadership_group else 0
+
+        self.observation_scores['B11'] = self._normalize_score(
+            b11_raw,
+            rules['B11']['max_score']
+        )
 
         # B12: 数据组织运行情况
         b12_raw = self._apply_range_rules(inst.meeting_activity_count or 0, rules['B12']['rules'])
@@ -263,24 +301,85 @@ class ScoringService:
         self.observation_scores['B22'] = self._normalize_score(b22_raw, rules['B22']['max_score'])
 
         # B31: 数据管理制度类文件
-        if not inst.has_management_doc:
-            b31_raw = 0
-        else:
+        # B31: 数据管理制度类文件
+        management_status = inst.management_doc_status
+
+        if management_status == 'clear_required':
             doc_count = inst.management_doc_count or 0
             doc_score = min(doc_count * 5, 20)
-            quality_score = self._score_documents_with_llm(inst.management_doc_files, 'management', 20, inst)
+            quality_score = self._score_documents_with_llm(
+                inst.management_doc_files,
+                'management',
+                20,
+                inst
+            )
             b31_raw = doc_score + quality_score
-        self.observation_scores['B31'] = self._normalize_score(b31_raw, rules['B31']['max_score'])
+
+        elif management_status == 'follow_policy':
+            b31_raw = 20
+
+        elif management_status == 'self_awareness':
+            b31_raw = 10
+
+        else:
+            # 兼容旧数据：如果新字段为空，则使用旧布尔字段兜底
+            if not inst.has_management_doc:
+                b31_raw = 0
+            else:
+                doc_count = inst.management_doc_count or 0
+                doc_score = min(doc_count * 5, 20)
+                quality_score = self._score_documents_with_llm(
+                    inst.management_doc_files,
+                    'management',
+                    20,
+                    inst
+                )
+                b31_raw = doc_score + quality_score
+
+        self.observation_scores['B31'] = self._normalize_score(
+            b31_raw,
+            rules['B31']['max_score']
+        )
 
         # B32: 数据实践指导类文件
-        if not inst.has_practice_doc:
-            b32_raw = 0
-        else:
+        practice_status = inst.practice_doc_status
+
+        if practice_status == 'published':
             doc_count = inst.practice_doc_count or 0
             doc_score = min(doc_count * 5, 20)
-            quality_score = self._score_documents_with_llm(inst.practice_doc_files, 'practice', 20, inst)
+            quality_score = self._score_documents_with_llm(
+                inst.practice_doc_files,
+                'practice',
+                20,
+                inst
+            )
             b32_raw = doc_score + quality_score
-        self.observation_scores['B32'] = self._normalize_score(b32_raw, rules['B32']['max_score'])
+
+        elif practice_status == 'internal_training':
+            b32_raw = 20
+
+        elif practice_status == 'self_practice':
+            b32_raw = 10
+
+        else:
+            # 兼容旧数据：如果新字段为空，则使用旧布尔字段兜底
+            if not inst.has_practice_doc:
+                b32_raw = 0
+            else:
+                doc_count = inst.practice_doc_count or 0
+                doc_score = min(doc_count * 5, 20)
+                quality_score = self._score_documents_with_llm(
+                    inst.practice_doc_files,
+                    'practice',
+                    20,
+                    inst
+                )
+                b32_raw = doc_score + quality_score
+
+        self.observation_scores['B32'] = self._normalize_score(
+            b32_raw,
+            rules['B32']['max_score']
+        )
 
         # 计算二级指标得分
         b1_score = self._calculate_secondary_score(self.observation_scores, ['B11', 'B12'])
@@ -313,16 +412,65 @@ class ScoringService:
         rules = config.BEHAVIOR_SCORING_RULES
 
         # C11: 教师数据行为
-        c11_raw = self._apply_range_rules(behavior.teacher_login_freq or 0, rules['C11']['rules'])
-        self.observation_scores['C11'] = self._normalize_score(c11_raw, rules['C11']['max_score'])
+        # C11: 教师数据行为
+        c11_raw = 0
+
+        # 1. 教师每周使用数字化设备开展教学的人均频次
+        c11_raw += self._apply_range_rules(
+            behavior.teacher_device_use_freq or 0,
+            rules['C11']['sub_items'][0]['rules']
+        )
+
+        # 2. 教师每周使用数据相关平台的人均频次
+        c11_raw += self._apply_range_rules(
+            behavior.teacher_platform_use_freq or 0,
+            rules['C11']['sub_items'][1]['rules']
+        )
+
+        # 3. 教师常态化开展的数据行为数量
+        teacher_behavior_count = self._count_selected_items(
+            behavior.teacher_data_behavior_items
+        )
+        c11_raw += self._apply_range_rules(
+            teacher_behavior_count,
+            rules['C11']['sub_items'][2]['rules']
+        )
+
+        self.observation_scores['C11'] = self._normalize_score(
+            c11_raw,
+            rules['C11']['max_score']
+        )
 
         # C12: 学生数据行为
-        c12_raw = self._apply_range_rules(behavior.student_login_freq or 0, rules['C12']['rules'])
-        self.observation_scores['C12'] = self._normalize_score(c12_raw, rules['C12']['max_score'])
+        c12_raw = 0
 
-        # C13: 管理者数据行为
-        c13_raw = self._apply_range_rules(behavior.manager_login_freq or 0, rules['C13']['rules'])
-        self.observation_scores['C13'] = self._normalize_score(c13_raw, rules['C13']['max_score'])
+        # 1. 学生数字化学习设备配备情况
+        student_device_rules = rules['C12']['sub_items'][0]['rules']
+        c12_raw += student_device_rules.get(
+            behavior.student_device_provision,
+            0
+        )
+
+        # 2. 学生平台账号开通情况
+        student_account_rules = rules['C12']['sub_items'][1]['rules']
+        c12_raw += student_account_rules.get(
+            behavior.student_account_status,
+            0
+        )
+
+        # 3. 学生常态化实现的数据行为数量
+        student_behavior_count = self._count_selected_items(
+            behavior.student_data_behavior_items
+        )
+        c12_raw += self._apply_range_rules(
+            student_behavior_count,
+            rules['C12']['sub_items'][2]['rules']
+        )
+
+        self.observation_scores['C12'] = self._normalize_score(
+            c12_raw,
+            rules['C12']['max_score']
+        )
 
         # C21: 数据应用特色成果
         c21_raw = 0
@@ -332,22 +480,43 @@ class ScoringService:
         self.observation_scores['C21'] = self._normalize_score(c21_raw, rules['C21']['max_score'])
 
         # C22: 数据应用社会影响
+        # C22: 数据应用社会影响
         c22_raw = 0
+
         for sub_item in rules['C22']['sub_items']:
             if 'fields' in sub_item:
-                sub_score = sum((getattr(behavior, f, None) or 0) * s for f, s in sub_item['fields'].items())
+                sub_score = sum(
+                    (getattr(behavior, field_name, None) or 0) * score
+                    for field_name, score in sub_item['fields'].items()
+                )
                 c22_raw += min(sub_score, sub_item['max_score'])
+
             elif 'field' in sub_item:
                 field_val = getattr(behavior, sub_item['field'], None) or 0
-                c22_raw += min(field_val * sub_item['score_per_visit'], sub_item['max_score'])
-        self.observation_scores['C22'] = self._normalize_score(c22_raw, rules['C22']['max_score'])
+
+                if 'score_per_post' in sub_item:
+                    c22_raw += min(
+                        field_val * sub_item['score_per_post'],
+                        sub_item['max_score']
+                    )
+
+                elif 'score_per_visit' in sub_item:
+                    c22_raw += min(
+                        field_val * sub_item['score_per_visit'],
+                        sub_item['max_score']
+                    )
+
+        self.observation_scores['C22'] = self._normalize_score(
+            c22_raw,
+            rules['C22']['max_score']
+        )
 
         # C23: 应用效果主观评价（来自问卷）
         c23_raw = self._calc_application_effect_score()
         self.observation_scores['C23'] = self._normalize_score(c23_raw, rules['C23']['max_score'])
 
         # 计算二级指标得分
-        c1_score = self._calculate_secondary_score(self.observation_scores, ['C11', 'C12', 'C13'])
+        c1_score = self._calculate_secondary_score(self.observation_scores, ['C11', 'C12'])
         c2_score = self._calculate_secondary_score(self.observation_scores, ['C21', 'C22', 'C23'])
 
         self.secondary_scores['C1'] = c1_score
@@ -360,39 +529,85 @@ class ScoringService:
         return dimension_score
 
     def _calc_application_effect_score(self) -> float:
-        """计算C23应用效果主观评价得分并记录分类分值"""
+        """
+        计算C23 教师对数据应用效果的主观评价得分。
+        新版仅来自教师问卷 q49-q54，共6题，满分30分。
+        """
         from apps.surveys.models import SurveyInstance, SurveyResponse
 
         c23_config = config.BEHAVIOR_SCORING_RULES['C23']
-        survey_ranges = c23_config['survey_ranges']
+        start, end = c23_config['survey_ranges']['teacher']
+
+        instances = SurveyInstance.objects.filter(
+            assessment=self.assessment,
+            template__survey_type='teacher'
+        )
+
+        responses = []
+        for inst in instances:
+            responses.extend(SurveyResponse.objects.filter(instance=inst))
+
+        raw_score = self._calc_survey_raw_score(
+            responses,
+            list(range(start, end + 1))
+        )
+
+        # 记录教师C23的5分制得分，供前端图表或报告使用
+        self.observation_scores['C23_teacher'] = self._normalize_score(
+            raw_score,
+            c23_config['max_score']
+        )
+
+        return raw_score
+
+    def _get_data_volume_value(self, stat_method, volume) -> float:
+        """
+        根据统计方式返回有效数据量。
+        unable：无法统计，计为0
+        estimated/system_query：使用填写的数据量
+        """
+        if stat_method == 'unable':
+            return 0.0
+
+        try:
+            return float(volume or 0)
+        except (TypeError, ValueError):
+            return 0.0
+
+    def _calculate_total_data_volume(self, asset) -> float:
+        """
+        计算新版数据资产总量。
+        包含：
+        1. 教育教学数据
+        2. 师生管理数据
+        3. 数字资源数据
+        4. 校园管理与行政数据
+        5. 其他类型数据
+        """
         total = 0.0
 
-        # 定义每个群体的子项满分（基于5点量表，每题5分）
-        # 教师：6题=30分，学生：6题=30分，管理者：5题=25分
-        sub_max_mapping = {
-            'teacher': 30.0,
-            'student': 30.0,
-            'manager': 25.0
-        }
+        total += self._get_data_volume_value(
+            asset.teaching_data_stat_method,
+            asset.teaching_data_volume
+        )
+        total += self._get_data_volume_value(
+            asset.teacher_student_data_stat_method,
+            asset.teacher_student_data_volume
+        )
+        total += self._get_data_volume_value(
+            asset.digital_resource_data_stat_method,
+            asset.digital_resource_data_volume
+        )
+        total += self._get_data_volume_value(
+            asset.campus_admin_data_stat_method,
+            asset.campus_admin_data_volume
+        )
 
-        for survey_type, (start, end) in survey_ranges.items():
-            instances = SurveyInstance.objects.filter(
-                assessment=self.assessment, template__survey_type=survey_type)
-            responses = []
-            for inst in instances:
-                responses.extend(SurveyResponse.objects.filter(instance=inst))
-
-            # 1. 计算该群体的原始平均分 (例如教师组可能得 24.5 / 30)
-            group_raw_score = self._calc_survey_raw_score(responses, list(range(start, end + 1)))
-
-            # 2. 【核心新增】：将该群体的分数转为 5 分制并记录，供前端环形图使用
-            # 存入的键名为 C23_teacher, C23_student, C23_manager
-            sub_max = sub_max_mapping.get(survey_type, 30.0)
-            normalized_score = (group_raw_score / sub_max) * 5.0 if sub_max > 0 else 0
-            self.observation_scores[f'C23_{survey_type}'] = normalized_score
-
-            # 3. 累加到总原始分（最高 85 分）
-            total += group_raw_score
+        # 其他类型数据为选填项，有值就计入
+        try:
+            total += float(asset.other_type_data_volume or 0)
+        except (TypeError, ValueError):
+            pass
 
         return total
 
@@ -413,39 +628,92 @@ class ScoringService:
         from apps.surveys.models import SurveyInstance, SurveyResponse
         rules = config.ASSET_SCORING_RULES
 
-        # 获取管理者问卷回答
-        manager_instances = SurveyInstance.objects.filter(
-            assessment=self.assessment, template__survey_type='manager')
-        manager_responses = []
-        for inst in manager_instances:
-            manager_responses.extend(SurveyResponse.objects.filter(instance=inst))
+        # 获取教师问卷回答
+        teacher_instances = SurveyInstance.objects.filter(
+            assessment=self.assessment,
+            template__survey_type='teacher'
+        )
 
-        # D11: 数据资产价值意识
+        teacher_responses = []
+        for inst in teacher_instances:
+            teacher_responses.extend(SurveyResponse.objects.filter(instance=inst))
+
+        # D11: 教师数据资产价值意识
         start, end = rules['D11']['survey_range']
-        d11_raw = self._calc_survey_raw_score(manager_responses, list(range(start, end + 1)))
-        self.observation_scores['D11'] = self._normalize_score(d11_raw, rules['D11']['max_score'])
+        d11_raw = self._calc_survey_raw_score(
+            teacher_responses,
+            list(range(start, end + 1))
+        )
+        self.observation_scores['D11'] = self._normalize_score(
+            d11_raw,
+            rules['D11']['max_score']
+        )
 
-        # D12: 数据资产应用意识
+        # D12: 教师数据资产应用意识
         start, end = rules['D12']['survey_range']
-        d12_raw = self._calc_survey_raw_score(manager_responses, list(range(start, end + 1)))
-        self.observation_scores['D12'] = self._normalize_score(d12_raw, rules['D12']['max_score'])
+        d12_raw = self._calc_survey_raw_score(
+            teacher_responses,
+            list(range(start, end + 1))
+        )
+        self.observation_scores['D12'] = self._normalize_score(
+            d12_raw,
+            rules['D12']['max_score']
+        )
 
-        # D13: 数据资产治理意识
+        # D13: 教师数据资产治理意识
         start, end = rules['D13']['survey_range']
-        d13_raw = self._calc_survey_raw_score(manager_responses, list(range(start, end + 1)))
-        self.observation_scores['D13'] = self._normalize_score(d13_raw, rules['D13']['max_score'])
+        d13_raw = self._calc_survey_raw_score(
+            teacher_responses,
+            list(range(start, end + 1))
+        )
+        self.observation_scores['D13'] = self._normalize_score(
+            d13_raw,
+            rules['D13']['max_score']
+        )
 
         # D21: 数据资产总量
-        total_volume = float((asset.management_data_volume or 0) + (asset.resource_data_volume or 0) + 
-                            (asset.service_data_volume or 0) + (asset.other_data_volume or 0))
-        d21_raw = self._apply_range_rules(total_volume, rules['D21']['rules'])
-        self.observation_scores['D21'] = self._normalize_score(d21_raw, rules['D21']['max_score'])
+        # 新规则：
+        # 1. 未统一管理，D21 原始分直接给 fallback_raw_score
+        # 2. 已统一管理但不能统计查询，D21 原始分直接给 fallback_raw_score
+        # 3. 已统一管理且能够统计查询，则按数据总量区间计分
+        can_calculate_asset_volume = (
+                asset.has_unified_data_management is True
+                and asset.can_query_data_assets is True
+        )
+
+        if not can_calculate_asset_volume:
+            d21_raw = rules['D21'].get('fallback_raw_score', 4)
+            total_volume = 0.0
+        else:
+            total_volume = self._calculate_total_data_volume(asset)
+            d21_raw = self._apply_range_rules(
+                total_volume,
+                rules['D21']['rules']
+            )
+
+        self.observation_scores['D21'] = self._normalize_score(
+            d21_raw,
+            rules['D21']['max_score']
+        )
 
         # D22: 人均数据资产量
-        total_people = (school.student_count or 0) + (school.teacher_count or 0)
-        per_capita = total_volume / total_people if total_people > 0 else 0
-        d22_raw = self._apply_range_rules(per_capita, rules['D22']['rules'])
-        self.observation_scores['D22'] = self._normalize_score(d22_raw, rules['D22']['max_score'])
+        # 只有学校能够统计查询数据资产总量时，才计算人均数据资产量；
+        # 前置条件不满足时，D22 直接计 0 分，避免 0GB 被区间规则误判为低档得分。
+        if not can_calculate_asset_volume:
+            d22_raw = 0
+        else:
+            total_people = (school.student_count or 0) + (school.teacher_count or 0)
+            per_capita = total_volume / total_people if total_people > 0 else 0
+
+            d22_raw = self._apply_range_rules(
+                per_capita,
+                rules['D22']['rules']
+            )
+
+        self.observation_scores['D22'] = self._normalize_score(
+            d22_raw,
+            rules['D22']['max_score']
+        )
 
         # 计算二级指标得分
         d1_score = self._calculate_secondary_score(self.observation_scores, ['D11', 'D12', 'D13'])
@@ -463,7 +731,9 @@ class ScoringService:
     def calculate_technology_score(self) -> float:
         """
         计算E维度-数据技术得分（5分制）
-        包含: E1数据基础设施、E2数据安保水平
+        包含:
+        E1 数据基础设施
+        E2 数据安保水平
         """
         logger.info("计算数据技术得分")
 
@@ -476,48 +746,100 @@ class ScoringService:
         rules = config.TECHNOLOGY_SCORING_RULES
 
         # E11: 数据硬件设施
+        # 新规则：
+        # 1. 未设立独立数据中心：数据中心标准项计0分
+        # 2. 已设立独立数据中心：按完全达到/部分达到/未达到计分
+        # 3. 生机比、师机比分别计分
         e11_raw = 0
-        for sub_item in rules['E11']['sub_items']:
-            field_value = getattr(tech, sub_item['field'], None)
-            if field_value and field_value in sub_item['rules']:
-                e11_raw += sub_item['rules'][field_value]
-        self.observation_scores['E11'] = self._normalize_score(e11_raw, rules['E11']['max_score'])
+
+        if tech.has_independent_data_center is True:
+            data_center_value = tech.data_center_standard
+            if data_center_value in rules['E11']['sub_items'][0]['rules']:
+                e11_raw += rules['E11']['sub_items'][0]['rules'][data_center_value]
+        else:
+            # 未设立独立数据中心，该子项0分
+            e11_raw += 0
+
+        # 生机比
+        student_ratio_rules = rules['E11']['sub_items'][1]['rules']
+        if tech.student_device_ratio in student_ratio_rules:
+            e11_raw += student_ratio_rules[tech.student_device_ratio]
+
+        # 师机比
+        teacher_ratio_rules = rules['E11']['sub_items'][2]['rules']
+        if tech.teacher_device_ratio in teacher_ratio_rules:
+            e11_raw += teacher_ratio_rules[tech.teacher_device_ratio]
+
+        self.observation_scores['E11'] = self._normalize_score(
+            e11_raw,
+            rules['E11']['max_score']
+        )
 
         # E12: 数据系统平台
         e12_raw = rules['E12']['rules'].get(tech.has_data_platform, 0)
-        self.observation_scores['E12'] = self._normalize_score(e12_raw, rules['E12']['max_score'])
+        self.observation_scores['E12'] = self._normalize_score(
+            e12_raw,
+            rules['E12']['max_score']
+        )
 
         # E21: 数据安全合规与认证
-        e21_raw = 0
-        for sub_item in rules['E21']['sub_items']:
-            field_value = getattr(tech, sub_item['field'], None)
-            if sub_item['field'] == 'security_certified_count':
-                e21_raw += self._apply_range_rules(field_value or 0, sub_item['rules'])
-            elif field_value and field_value in sub_item['rules']:
-                e21_raw += sub_item['rules'][field_value]
-        self.observation_scores['E21'] = self._normalize_score(e21_raw, rules['E21']['max_score'])
-
-        # E22: 数据风险事件记录（扣分项）
-        # 如果发生过风险事件，E22得分为0；否则满分
-        # 注意：这里不用负分，而是用0分表示扣分效果
-        if tech.has_security_incident:
-            self.observation_scores['E22'] = 0.0  # 发生过事件，该项0分
+        # 平台建设管理模式：
+        # self_built / mixed：继续按认证数量和认证比例计分
+        # external：直接给5分制2.5分，也就是原始分10/20
+        if tech.platform_build_mode == 'external':
+            e21_raw = rules['E21'].get('external_platform_raw_score', 10)
         else:
-            self.observation_scores['E22'] = 5.0  # 未发生或未填写，满分5分
+            e21_raw = 0
+
+            # 安保认证数量
+            count_rules = rules['E21']['sub_items'][0]['rules']
+            e21_raw += self._apply_range_rules(
+                tech.security_certified_count or 0,
+                count_rules
+            )
+
+            # 安保认证比例
+            ratio_rules = rules['E21']['sub_items'][1]['rules']
+            if tech.security_certified_ratio in ratio_rules:
+                e21_raw += ratio_rules[tech.security_certified_ratio]
+
+        self.observation_scores['E21'] = self._normalize_score(
+            e21_raw,
+            rules['E21']['max_score']
+        )
+
+        # E22: 数据风险事件记录
+        # 新规则：发生过=0分，未发生=10分
+        e22_raw = rules['E22']['rules'].get(tech.has_security_incident, 0)
+        self.observation_scores['E22'] = self._normalize_score(
+            e22_raw,
+            rules['E22']['max_score']
+        )
 
         # 计算二级指标得分
-        e1_score = self._calculate_secondary_score(self.observation_scores, ['E11', 'E12'])
-        e2_score = self._calculate_secondary_score(self.observation_scores, ['E21', 'E22'])
-        e3_score = self._calculate_secondary_score(self.observation_scores, ['E13'])
+        e1_score = self._calculate_secondary_score(
+            self.observation_scores,
+            ['E11', 'E12']
+        )
+        e2_score = self._calculate_secondary_score(
+            self.observation_scores,
+            ['E21', 'E22']
+        )
 
         self.secondary_scores['E1'] = e1_score
         self.secondary_scores['E2'] = e2_score
-        self.secondary_scores['E3'] = e3_score
 
         # 计算一级维度得分
-        dimension_score = self._calculate_dimension_score(self.secondary_scores, ['E1', 'E2', 'E3'])
+        dimension_score = self._calculate_dimension_score(
+            self.secondary_scores,
+            ['E1', 'E2']
+        )
 
-        logger.info(f"E维度: E1={e1_score:.4f}, E2={e2_score:.4f}, E3={e3_score:.4f}, 维度得分={dimension_score:.4f}")
+        logger.info(
+            f"E维度: E1={e1_score:.4f}, E2={e2_score:.4f}, "
+            f"维度得分={dimension_score:.4f}"
+        )
+
         return dimension_score
 
     def _apply_range_rules(self, value: float, rules: List[Dict]) -> float:

@@ -67,7 +67,7 @@ class AccountApplicationAdmin(admin.ModelAdmin):
                     # 生成用户名和密码
                     username = generate_username(application.school_name)
                     password = generate_strong_password()
-                    
+                    access_code = password
                     # 创建用户
                     user = User.objects.create_user(
                         username=username,
@@ -87,7 +87,8 @@ class AccountApplicationAdmin(admin.ModelAdmin):
                         contact_name=application.contact_name,
                         contact_position=application.contact_position,
                         contact_phone=application.contact_phone,
-                        contact_email=application.contact_email
+                        contact_email=application.contact_email,
+                        access_code=access_code
                     )
                     
                     # 更新申请状态

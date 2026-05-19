@@ -286,6 +286,37 @@
       </div>
     </el-card>
   </div>
+    <footer class="footer">
+  <div class="footer-bar">
+    <div class="footer-inner">
+      <!-- 左侧：LOGO + 文案 -->
+      <div class="footer-left">
+        <div class="footer-logo">
+          <img src="@/assets/images/ila_logo.png" class="logo-img" alt="ILA" /> 
+        </div>
+
+        <div class="footer-text">
+          <div class="line">
+            Copyright © 2026 版权所有：智能学习与评价江苏省产业技术工程化中心
+          </div>
+          <div class="line">
+            邮箱：2020250606@jsnu.edu.cn　
+            地址：江苏省徐州市铜山新区上海路101号
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：二维码 -->
+      <div class="footer-right">
+        <img
+          src="@/assets/images/Official_Account1.png"
+          alt="官方公众号"
+          class="footer-qrcode"
+        />
+      </div>
+    </div>
+  </div>
+</footer>
 </template>
 
 <script setup>
@@ -1041,6 +1072,88 @@ flex: none !important;}
   margin-top: 12px;
   display: flex;
   justify-content: flex-end;
+}
+
+/* 底部页脚 */
+/* ===== Footer（深色条，按截图）===== */
+.footer {
+  margin-top: auto;
+  width: 100%;
+}
+
+.footer-bar {
+  background: #2f3d4a; /* 深蓝灰色背景 */
+  padding: 8px 0;    /* 增加上下内边距，让比例更协调 */
+}
+
+.footer-inner {
+  /* 核心：必须与 header-content 的宽度和对齐逻辑完全一致 */
+  max-width: 99%;
+  margin: 0 auto;
+  padding: 0 20px;    /* 与 header 保持一致的左右内边距 */
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* 彻底删除之前的 margin-left: -200px */
+}
+
+.footer-logo .logo-img {
+  height: 80px;
+  width: auto;
+  display: block;
+}
+
+.footer-text {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;      /* 标准页脚字号 */
+  line-height: 1.8;
+  text-align: left;
+}
+
+.footer-text .line {
+  white-space: nowrap; /* 强制不换行，保持整齐 */
+}
+
+.footer-right {
+  /* 彻底删除之前的 margin-right: -200px */
+  display: flex;
+  align-items: center;
+}
+
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-qrcode {
+  width: 80px;
+  height: 80px;
+  border-radius: 4px;
+  background: #ffffff;
+  padding: 3px;
+}
+
+.qr-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+.contact-note {
+  margin-top: 18px;          /* 与邮箱拉开距离 */
+  font-size: 13px;           /* 比正文小 */
+  color: #9ca3af;            /* 浅灰色 */
+  font-style: italic;        /* 微斜体，学术/说明感 */
+  line-height: 1.6;
 }
 </style>
 

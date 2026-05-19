@@ -16,6 +16,8 @@ from apps.assessments.models import Assessment
 from apps.regions.pagination import StandardPagePagination
 from .permissions import IsRegionAdmin
 from .serializers_region_admin import RegionAssessmentListItemSerializer
+from .region_report_ai_service import RegionReportAIService
+import logging
 
 from apps.assessments.serializers import (
     InstitutionAssessmentSerializer,
@@ -24,7 +26,7 @@ from apps.assessments.serializers import (
     TechnologyAssessmentSerializer,
 )
 
-
+logger = logging.getLogger(__name__)
 class RegionAssessmentListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -223,3 +225,147 @@ class RegionAdminAssessmentListView(APIView):
         }
         return api_ok(data)
 
+
+import hashlib
+import json
+from .models import RegionReportSuggestionCache
+
+class RegionReportAISuggestionsView(APIView):
+    """
+    区域报告 AI 建议接口。
+
+    逻辑：
+    1. 前端提交当前区域报告数据；
+    2. 后端根据数据生成 data_hash；
+    3. 如果缓存存在且 data_hash 一致，直接返回缓存；
+    4. 如果缓存不存在或 data_hash 变化，则调用大模型重新生成并保存。
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            report_data = request.data or {}
+
+            region = report_data.get("region") or {}
+            region_code = self._get_region_code(region)
+            region_name = self._get_region_name(region)
+
+            if not region_code:
+                return Response({
+                    "success": False,
+                    "message": "缺少区域信息，无法生成区域报告建议",
+                    "data": {}
+                }, status=400)
+
+            data_hash = self._make_data_hash(report_data)
+
+            cache = RegionReportSuggestionCache.objects.filter(
+                region_code=region_code
+            ).first()
+
+            # 命中缓存：不调用大模型
+            if cache and cache.data_hash == data_hash and cache.suggestions:
+                return Response({
+                    "success": True,
+                    "message": "success",
+                    "cache_hit": True,
+                    "data_hash": data_hash,
+                    "updated_at": cache.updated_at,
+                    "data": cache.suggestions
+                })
+
+            # 未命中缓存：调用大模型
+            service = RegionReportAIService()
+            suggestions = service.generate_all_suggestions(report_data)
+
+            if cache:
+                cache.region_name = region_name
+                cache.data_hash = data_hash
+                cache.suggestions = suggestions
+                cache.payload_snapshot = self._safe_snapshot(report_data)
+                cache.save()
+            else:
+                RegionReportSuggestionCache.objects.create(
+                    region_code=region_code,
+                    region_name=region_name,
+                    data_hash=data_hash,
+                    suggestions=suggestions,
+                    payload_snapshot=self._safe_snapshot(report_data)
+                )
+
+            return Response({
+                "success": True,
+                "message": "success",
+                "cache_hit": False,
+                "data_hash": data_hash,
+                "data": suggestions
+            })
+
+        except Exception as e:
+            logger.exception("区域报告 AI 建议生成失败")
+
+            return Response({
+                "success": False,
+                "message": str(e) or "区域报告 AI 建议生成失败",
+                "data": {
+                    "level_suggestions": {
+                        "initial": "",
+                        "growing": "",
+                        "mature": "",
+                        "leading": ""
+                    },
+                    "development": {
+                        "summary": "",
+                        "items": [],
+                        "conclusion": ""
+                    }
+                }
+            }, status=500)
+
+    def _get_region_code(self, region):
+        """
+        优先使用行政编码 code。
+        如果没有 code，则退化使用 id。
+        """
+        code = region.get("code") or region.get("id")
+        return str(code) if code else ""
+
+    def _get_region_name(self, region):
+        return "".join([
+            str(region.get("province") or ""),
+            str(region.get("city") or ""),
+            str(region.get("name") or "")
+        ])
+
+    def _make_data_hash(self, report_data):
+        """
+        计算区域报告数据指纹。
+
+        前端如果传了 _hash_base，则优先用 _hash_base。
+        这样可以避免把样式、颜色、无关字段纳入 hash。
+        """
+        hash_base = report_data.get("_hash_base") or report_data
+
+        normalized = json.dumps(
+            hash_base,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":")
+        )
+
+        return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
+    def _safe_snapshot(self, report_data):
+        """
+        保存生成时的数据快照。
+        避免后续排查时不知道 AI 建议是基于什么数据生成的。
+        """
+        return {
+            "region": report_data.get("region") or {},
+            "summary": report_data.get("summary") or {},
+            "dimension_average": report_data.get("dimension_average") or {},
+            "level_distribution": report_data.get("level_distribution") or [],
+            "level_analysis": report_data.get("level_analysis") or [],
+            "_hash_base": report_data.get("_hash_base") or {}
+        }

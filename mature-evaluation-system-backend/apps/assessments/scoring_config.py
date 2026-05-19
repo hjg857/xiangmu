@@ -2,26 +2,23 @@
 计分配置文件
 所有计分规则集中管理，便于后续调整
 """
-
+# 问卷题目范围和满分配置
 # ==================== 数据素养维度 (A) ====================
 
 # 问卷题目范围和满分配置
+# 注意：题号按照系统保存的 q1、q2、q3... 连续编号计算
 LITERACY_SURVEY_CONFIG = {
     'teacher': {
+        # 教师问卷：q1-q5 为基本信息，q6-q34 为数据素养量表
         'A11': {'range': (6, 13), 'max_score': 40, 'name': '教师数据意识与思维'},
         'A12': {'range': (14, 20), 'max_score': 35, 'name': '教师数据知识与技能'},
         'A13': {'range': (21, 23), 'max_score': 15, 'name': '教师数据评价与交流'},
         'A14': {'range': (24, 31), 'max_score': 40, 'name': '教师数据应用与创新'},
         'A15': {'range': (32, 34), 'max_score': 15, 'name': '教师数据伦理与隐私'},
     },
-    'manager': {
-        'A21': {'range': (7, 14), 'max_score': 40, 'name': '管理者数据意识与思维'},
-        'A22': {'range': (15, 22), 'max_score': 40, 'name': '管理者数据知识与技能'},
-        'A23': {'range': (23, 25), 'max_score': 15, 'name': '管理者数据评价与交流'},
-        'A24': {'range': (26, 33), 'max_score': 40, 'name': '管理者数据应用与创新'},
-        'A25': {'range': (34, 37), 'max_score': 20, 'name': '管理者数据伦理与隐私'},
-    },
     'student': {
+        # 学生问卷：q1-q3 为基本信息，q4-q28 为数据素养量表
+        # 注意：学生属于 A2 二级指标，但观测点编号仍按正式权重表使用 A31-A35
         'A31': {'range': (4, 10), 'max_score': 35, 'name': '学生数据意识与思维'},
         'A32': {'range': (11, 17), 'max_score': 35, 'name': '学生数据知识与技能'},
         'A33': {'range': (18, 19), 'max_score': 10, 'name': '学生数据评价与交流'},
@@ -46,11 +43,12 @@ INSTITUTION_SCORING_RULES = {
     # B1 数据组织机构
     'B11': {
         'name': '数据领导/工作小组',
-        'field': 'has_leadership_group',
+        'field': 'leadership_group_type',
         'max_score': 10,
         'rules': {
-            True: 10,
-            False: 0
+            'standard': 10,
+            'basic': 5,
+            'none': 0
         }
     },
     'B12': {
@@ -58,7 +56,8 @@ INSTITUTION_SCORING_RULES = {
         'field': 'meeting_activity_count',
         'max_score': 10,
         'rules': [
-            {'condition': 'lte', 'value': 5, 'score': 3},
+            {'condition': 'lte', 'value': 0, 'score': 0},
+            {'condition': 'between', 'min': 0, 'max': 5, 'score': 3},
             {'condition': 'between', 'min': 5, 'max': 15, 'score': 6},
             {'condition': 'gt', 'value': 15, 'score': 10}
         ]
@@ -104,7 +103,8 @@ INSTITUTION_SCORING_RULES = {
                 'type': 'range',
                 'max_score': 10,
                 'rules': [
-                    {'condition': 'lt', 'value': 10, 'score': 3},
+                    {'condition': 'lte', 'value': 0, 'score': 0},
+                    {'condition': 'between', 'min': 0, 'max': 10, 'score': 3},
                     {'condition': 'between', 'min': 10, 'max': 20, 'score': 6},
                     {'condition': 'gt', 'value': 20, 'score': 10}
                 ]
@@ -126,12 +126,13 @@ INSTITUTION_SCORING_RULES = {
     'B31': {
         'name': '数据管理制度类文件',
         'max_score': 40,
+        'status_field': 'management_doc_status',
+        'rules': {
+            'clear_required': 'continue',
+            'follow_policy': 20,
+            'self_awareness': 10
+        },
         'sub_items': [
-            {
-                'field': 'has_management_doc',
-                'type': 'boolean',
-                'rules': {True: 'continue', False: 0}
-            },
             {
                 'field': 'management_doc_count_total',
                 'type': 'doc_count',
@@ -149,12 +150,13 @@ INSTITUTION_SCORING_RULES = {
     'B32': {
         'name': '数据实践指导类文件',
         'max_score': 40,
+        'status_field': 'practice_doc_status',
+        'rules': {
+            'published': 'continue',
+            'internal_training': 20,
+            'self_practice': 10
+        },
         'sub_items': [
-            {
-                'field': 'has_practice_doc',
-                'type': 'boolean',
-                'rules': {True: 'continue', False: 0}
-            },
             {
                 'field': 'practice_doc_count_total',
                 'type': 'doc_count',
@@ -168,7 +170,7 @@ INSTITUTION_SCORING_RULES = {
                 'llm_prompt': '请从规范性、完整性、可操作性、实用性四个维度分析该数据实践指导文件的整体质量，给出0-20分的评分。'
             }
         ]
-    }
+    },
 }
 
 
@@ -178,32 +180,80 @@ BEHAVIOR_SCORING_RULES = {
     # C1 数据行为监测
     'C11': {
         'name': '教师数据行为',
-        'field': 'teacher_login_freq',
-        'max_score': 10,
-        'rules': [
-            {'condition': 'lt', 'value': 200, 'score': 3},
-            {'condition': 'between', 'min': 200, 'max': 300, 'score': 6},
-            {'condition': 'gt', 'value': 300, 'score': 10}
+        'max_score': 30,
+        'sub_items': [
+            {
+                'name': '教师数字化设备使用频次',
+                'field': 'teacher_device_use_freq',
+                'max_score': 10,
+                'rules': [
+                    {'condition': 'lte', 'value': 0, 'score': 0},
+                    {'condition': 'between', 'min': 0, 'max': 10, 'score': 3},
+                    {'condition': 'between', 'min': 10, 'max': 20, 'score': 6},
+                    {'condition': 'gt', 'value': 20, 'score': 10}
+                ]
+            },
+            {
+                'name': '教师数据相关平台使用频次',
+                'field': 'teacher_platform_use_freq',
+                'max_score': 10,
+                'rules': [
+                    {'condition': 'lte', 'value': 0, 'score': 0},
+                    {'condition': 'between', 'min': 0, 'max': 10, 'score': 3},
+                    {'condition': 'between', 'min': 10, 'max': 20, 'score': 6},
+                    {'condition': 'gt', 'value': 20, 'score': 10}
+                ]
+            },
+            {
+                'name': '教师常态化数据行为',
+                'field': 'teacher_data_behavior_items',
+                'max_score': 10,
+                'type': 'multi_count',
+                'rules': [
+                    {'condition': 'lte', 'value': 0, 'score': 0},
+                    {'condition': 'between', 'min': 0, 'max': 2, 'score': 3},
+                    {'condition': 'between', 'min': 2, 'max': 4, 'score': 6},
+                    {'condition': 'gt', 'value': 4, 'score': 10}
+                ]
+            }
         ]
     },
     'C12': {
         'name': '学生数据行为',
-        'field': 'student_login_freq',
-        'max_score': 10,
-        'rules': [
-            {'condition': 'lt', 'value': 100, 'score': 3},
-            {'condition': 'between', 'min': 100, 'max': 200, 'score': 6},
-            {'condition': 'gt', 'value': 200, 'score': 10}
-        ]
-    },
-    'C13': {
-        'name': '管理者数据行为',
-        'field': 'manager_login_freq',
-        'max_score': 10,
-        'rules': [
-            {'condition': 'lt', 'value': 200, 'score': 3},
-            {'condition': 'between', 'min': 200, 'max': 300, 'score': 6},
-            {'condition': 'gt', 'value': 300, 'score': 10}
+        'max_score': 30,
+        'sub_items': [
+            {
+                'name': '学生数字化设备配备情况',
+                'field': 'student_device_provision',
+                'max_score': 10,
+                'rules': {
+                    'none': 3,
+                    'computer_room': 6,
+                    'computer_room_and_terminal': 10
+                }
+            },
+            {
+                'name': '学生平台账号开通情况',
+                'field': 'student_account_status',
+                'max_score': 10,
+                'rules': {
+                    'none': 3,
+                    'partial': 6,
+                    'all': 10
+                }
+            },
+            {
+                'name': '学生常态化数据行为',
+                'field': 'student_data_behavior_items',
+                'max_score': 10,
+                'type': 'multi_count',
+                'rules': [
+                    {'condition': 'lte', 'value': 0, 'score': 0},
+                    {'condition': 'between', 'min': 0, 'max': 1, 'score': 3},
+                    {'condition': 'between', 'min': 1, 'max': 3, 'score': 6},
+                    {'condition': 'gt', 'value': 3, 'score': 10}
+                ]
+            }
         ]
     },
     
@@ -242,7 +292,7 @@ BEHAVIOR_SCORING_RULES = {
     },
     'C22': {
         'name': '数据应用社会影响',
-        'max_score': 50,
+        'max_score': 60,
         'sub_items': [
             {
                 'name': '媒体宣传报道',
@@ -263,6 +313,12 @@ BEHAVIOR_SCORING_RULES = {
                 }
             },
             {
+                'name': '公众号经验分享或创新实践',
+                'field': 'public_account_post_count',
+                'max_score': 10,
+                'score_per_post': 2
+            },
+            {
                 'name': '参观学习',
                 'field': 'visit_count',
                 'max_score': 10,
@@ -271,13 +327,12 @@ BEHAVIOR_SCORING_RULES = {
         ]
     },
     'C23': {
-        'name': '应用效果主观评价',
+        'name': '教师对数据应用效果的主观评价',
         'type': 'survey',
-        'max_score': 85,
+        'max_score': 30,
         'survey_ranges': {
-            'teacher': (35, 40),   # 教师问卷35-40题
-            'student': (29, 34),   # 学生问卷29-34题
-            'manager': (52, 56)    # 管理者问卷52-56题
+            # 教师问卷第四部分：数据应用效果主观评价量表，共6题
+            'teacher': (49, 54)
         }
     }
 }
@@ -288,48 +343,56 @@ BEHAVIOR_SCORING_RULES = {
 ASSET_SCORING_RULES = {
     # D1 数据资产意识
     'D11': {
-        'name': '数据资产价值意识',
+        'name': '教师数据资产价值意识',
         'type': 'survey',
         'max_score': 20,
-        'survey_range': (38, 41),  # 管理者问卷38-41题
-        'survey_type': 'manager'
+        # 教师问卷第三部分：q35-q38，共4题
+        'survey_range': (35, 38),
+        'survey_type': 'teacher'
     },
     'D12': {
-        'name': '数据资产应用意识',
+        'name': '教师数据资产应用意识',
         'type': 'survey',
         'max_score': 20,
-        'survey_range': (42, 45),  # 管理者问卷42-45题
-        'survey_type': 'manager'
+        # 教师问卷第三部分：q39-q42，共4题
+        'survey_range': (39, 42),
+        'survey_type': 'teacher'
     },
     'D13': {
-        'name': '数据资产治理意识',
+        'name': '教师数据资产治理意识',
         'type': 'survey',
         'max_score': 30,
-        'survey_range': (46, 51),  # 管理者问卷46-51题
-        'survey_type': 'manager'
+        # 教师问卷第三部分：q43-q48，共6题
+        'survey_range': (43, 48),
+        'survey_type': 'teacher'
     },
-    
+
     # D2 数据资产积累
-    'D21': {
+        'D21': {
         'name': '数据资产总量',
-        'field': 'total_data_volume',  # 需要计算总量
+        'field': 'total_data_volume',
         'max_score': 10,
+        # 当前规则单位为 GB：
+        # 10TB=10000GB，55TB=55000GB，90TB=90000GB
         'rules': [
             {'condition': 'lte', 'value': 10000, 'score': 2},
             {'condition': 'between', 'min': 10000, 'max': 55000, 'score': 4},
             {'condition': 'between', 'min': 55000, 'max': 90000, 'score': 6},
             {'condition': 'gt', 'value': 90000, 'score': 10}
-        ]
+        ],
+        # 新增：不能统一管理或不能统计查询时，D21 原始分直接给 4 分
+        'fallback_raw_score': 4
     },
 
     'D22': {
         'name': '人均数据资产量',
-        'field': 'per_capita_data_volume',  # 需要计算人均
+        'field': 'per_capita_data_volume',
         'max_score': 10,
         'rules': [
-            {'condition': 'lte', 'value': 10, 'score': 3},
-            {'condition': 'between', 'min': 10, 'max': 20, 'score': 6},
-            {'condition': 'between', 'min': 20, 'max': 40, 'score': 10},
+            {'condition': 'lte', 'value': 0, 'score': 0},
+            {'condition': 'between', 'min': 0, 'max': 10, 'score': 2},
+            {'condition': 'between', 'min': 10, 'max': 20, 'score': 4},
+            {'condition': 'between', 'min': 20, 'max': 40, 'score': 6},
             {'condition': 'gt', 'value': 40, 'score': 10}
         ]
     }
@@ -355,21 +418,12 @@ TECHNOLOGY_SCORING_RULES = {
                 }
             },
             {
-                'name': '云服务情况',  # 新增
-                'field': 'cloud_dedicated_service',
-                'rules': {
-                    'fully_satisfies': 10,
-                    'partially_satisfies': 6,
-                    'not_satisfies': 3
-                }
-            },
-            {
                 'name': '生机比',
                 'field': 'student_device_ratio',
                 'max_score': 10,
                 'rules': {
-                    'high': 3,    # >15:1
-                    'medium': 6,  # 15:1~6:1
+                    'high': 3,    # ≥15:1
+                    'medium': 6,  # 6:1≤生机比<15:1
                     'low': 10     # <6:1
                 }
             },
@@ -378,13 +432,14 @@ TECHNOLOGY_SCORING_RULES = {
                 'field': 'teacher_device_ratio',
                 'max_score': 10,
                 'rules': {
-                    'high': 3,    # >4:1
-                    'medium': 6,  # 1:1~4:1
+                    'high': 3,    # ≥4:1
+                    'medium': 6,  # 1:1≤师机比<4:1
                     'low': 10     # <1:1
                 }
             }
         ]
     },
+
     'E12': {
         'name': '数据系统平台',
         'field': 'has_data_platform',
@@ -394,17 +449,21 @@ TECHNOLOGY_SCORING_RULES = {
             False: 0
         }
     },
-    
+
     # E2 数据安保水平
     'E21': {
         'name': '数据安全合规与认证',
         'max_score': 20,
+        # 完全接入外部平台时，5分制直接给2.5分。
+        # 因为后面会做 raw / max_score * 5，所以这里 raw_score = 10。
+        'external_platform_raw_score': 10,
         'sub_items': [
             {
                 'name': '安保认证数量',
                 'field': 'security_certified_count',
                 'max_score': 10,
                 'rules': [
+                    {'condition': 'lte', 'value': 0, 'score': 0},
                     {'condition': 'between', 'min': 1, 'max': 2, 'score': 3},
                     {'condition': 'between', 'min': 3, 'max': 4, 'score': 6},
                     {'condition': 'gte', 'value': 5, 'score': 10}
@@ -415,20 +474,22 @@ TECHNOLOGY_SCORING_RULES = {
                 'field': 'security_certified_ratio',
                 'max_score': 10,
                 'rules': {
-                    'low': 3,
-                    'medium': 6,
-                    'high': 10
+                    'zero': 0,
+                    'low': 3,     # 0<比例≤40%
+                    'medium': 6,  # 40%<比例≤80%
+                    'high': 10    # >80%
                 }
             }
         ]
     },
+
     'E22': {
         'name': '数据风险事件记录',
         'field': 'has_security_incident',
-        'max_score': 0,  # 这是扣分项
+        'max_score': 10,
         'rules': {
-            True: -10,   # 发生过扣10分
-            False: 0     # 未发生不扣分
+            True: 0,    # 发生过风险事件
+            False: 10   # 未发生风险事件
         }
     }
 }
@@ -438,9 +499,9 @@ TECHNOLOGY_SCORING_RULES = {
 
 # 一级指标权重（五个维度）
 DIMENSION_WEIGHTS = {
-    'A': 0.3543,  # 数据素养
-    'B': 0.1578,  # 数据制度
-    'C': 0.1930,  # 数据行为
+    'A': 0.3501,  # 数据素养
+    'B': 0.1609,  # 数据制度
+    'C': 0.1920,  # 数据行为
     'D': 0.1549,  # 数据资产
     'E': 0.1400   # 数据技术
 }
@@ -448,50 +509,42 @@ DIMENSION_WEIGHTS = {
 # 二级指标权重（在各自一级指标内的权重）
 SECONDARY_WEIGHTS = {
     # A 数据素养
-    'A1': 0.3748,  # 教师数据素养
-    'A2': 0.3443,  # 管理者数据素养
-    'A3': 0.2809,  # 学生数据素养
+    'A1': 0.5716,  # 教师数据素养
+    'A2': 0.4284,  # 学生数据素养
 
     # B 数据制度
-    'B1': 0.3599,  # 数据组织机构
-    'B2': 0.4131,  # 数据人员配备
-    'B3': 0.2270,  # 数据管理文件
+    'B1': 0.3599,
+    'B2': 0.4131,
+    'B3': 0.2270,
 
     # C 数据行为
-    'C1': 0.4679,  # 数据行为监测
-    'C2': 0.5321,  # 数据应用成效
+    'C1': 0.4679,
+    'C2': 0.5321,
 
     # D 数据资产
-    'D1': 0.4795,  # 数据资产意识
-    'D2': 0.5205,  # 数据资产积累
+    'D1': 0.4795,
+    'D2': 0.5205,
 
     # E 数据技术
-    'E1': 0.5449,  # 数据基础设施
-    'E2': 0.4551   # 数据安保水平
+    'E1': 0.5440,
+    'E2': 0.4551,
 }
 
 # 观测点权重（在各自二级指标内的权重）
 OBSERVATION_WEIGHTS = {
     # A1 教师数据素养
-    'A11': 0.2156,  # 教师数据意识与思维
-    'A12': 0.2066,  # 教师数据知识与技能
-    'A13': 0.1505,  # 教师数据评价与交流
-    'A14': 0.2551,  # 教师数据应用与创新
-    'A15': 0.1722,  # 教师数据伦理与隐私
+    'A11': 0.2184,
+    'A12': 0.2060,
+    'A13': 0.1503,
+    'A14': 0.2532,
+    'A15': 0.1721,
 
-    # A2 管理者数据素养
-    'A21': 0.2462,  # 管理者数据意识与思维
-    'A22': 0.1769,  # 管理者数据知识与技能
-    'A23': 0.1716,  # 管理者数据评价与交流
-    'A24': 0.2297,  # 管理者数据应用与创新
-    'A25': 0.1756,  # 管理者数据伦理与隐私
-
-    # A3 学生数据素养
-    'A31': 0.1937,  # 学生数据意识与思维
-    'A32': 0.2178,  # 学生数据知识与技能
-    'A33': 0.1933,  # 学生数据评价与交流
-    'A34': 0.2306,  # 学生数据应用与创新
-    'A35': 0.1646,  # 学生数据伦理与隐私
+    # A2 学生数据素养
+    'A31': 0.1907,
+    'A32': 0.2176,
+    'A33': 0.1910,
+    'A34': 0.2340,
+    'A35': 0.1666,
 
     # B1 数据组织机构
     'B11': 0.4757,  # 数据领导/工作小组
@@ -506,9 +559,8 @@ OBSERVATION_WEIGHTS = {
     'B32': 0.4653,  # 数据实践指导类文件
 
     # C1 数据行为监测
-    'C11': 0.3656,  # 教师数据行为
-    'C12': 0.3691,  # 学生数据行为
-    'C13': 0.2653,  # 管理者数据行为
+    'C11': 0.5091,  # 教师数据行为
+    'C12': 0.4909,  # 学生数据行为
 
     # C2 数据应用成效
     'C21': 0.4058,  # 数据应用特色成果

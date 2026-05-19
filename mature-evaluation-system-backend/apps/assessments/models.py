@@ -64,11 +64,56 @@ class Assessment(models.Model):
 class InstitutionAssessment(models.Model):
     """数据制度评估模型"""
     
+    LEADERSHIP_GROUP_TYPE_CHOICES = [
+        ('standard', '已设置规范管理小组'),
+        ('basic', '已设置基础管理小组'),
+        ('none', '未设置相关小组'),
+    ]
+
+    MANAGEMENT_DOC_STATUS_CHOICES = [
+        ('clear_required', '已在相关制度或规范文件中作出明确要求'),
+        ('follow_policy', '未作明确要求，但遵循国家或区域相关文件执行'),
+        ('self_awareness', '未作明确要求，主要依靠师生自主意识'),
+    ]
+
+    PRACTICE_DOC_STATUS_CHOICES = [
+        ('published', '已发布指南、操作说明或工作手册'),
+        ('internal_training', '未发布，但有内部培训进行指导'),
+        ('self_practice', '未发布，主要依靠师生自主实践'),
+    ]
+
     assessment = models.OneToOneField(
         Assessment,
         on_delete=models.CASCADE,
         related_name='institution',
         verbose_name='评估记录'
+    )
+
+    # 1. 数据组织机构
+    leadership_group_type = models.CharField(
+        '数据领导/工作小组类型',
+        max_length=30,
+        choices=LEADERSHIP_GROUP_TYPE_CHOICES,
+        blank=True,
+        default=''
+    )
+
+    # 3. 数据管理制度类文件
+    management_doc_status = models.CharField(
+        '数据管理制度要求情况',
+        max_length=30,
+        choices=MANAGEMENT_DOC_STATUS_CHOICES,
+        blank=True,
+        default=''
+    )
+
+    # 数据实践指导类文件
+    practice_doc_status = models.CharField(
+        '数据实践指导文件发布情况',
+        max_length=30,
+        choices=PRACTICE_DOC_STATUS_CHOICES,
+        blank=True,
+        default=''
     )
     
     # 1. 数据组织机构
@@ -117,13 +162,79 @@ class InstitutionAssessment(models.Model):
 class BehaviorAssessment(models.Model):
     """数据行为评估模型"""
     
+    STUDENT_DEVICE_PROVISION_CHOICES = [
+        ('none', '未配备数字化学习设备'),
+        ('computer_room', '仅建有计算机机房，供班级轮流上课使用'),
+        ('computer_room_and_terminal', '建有计算机机房，又为学生配备其他数字终端'),
+    ]
+
+    STUDENT_ACCOUNT_STATUS_CHOICES = [
+        ('none', '未为学生开通账号'),
+        ('partial', '部分学生开通账号'),
+        ('all', '全校学生均开通账号'),
+    ]
+
     assessment = models.OneToOneField(
         Assessment,
         on_delete=models.CASCADE,
         related_name='behavior',
         verbose_name='评估记录'
     )
-    
+
+    # C11 教师数据行为
+    teacher_device_use_freq = models.IntegerField(
+        '教师每周使用数字化设备开展教学的人均频次',
+        null=True,
+        blank=True
+    )
+    teacher_platform_use_freq = models.IntegerField(
+        '教师每周使用数据相关平台的人均频次',
+        null=True,
+        blank=True
+    )
+    teacher_data_behavior_items = models.JSONField(
+        '教师常态化开展的数据行为选项',
+        default=list,
+        blank=True
+    )
+    teacher_data_behavior_other = models.TextField(
+        '教师数据行为其他补充',
+        blank=True,
+        default=''
+    )
+
+    # C12 学生数据行为
+    student_device_provision = models.CharField(
+        '学生数字化学习设备配备情况',
+        max_length=40,
+        choices=STUDENT_DEVICE_PROVISION_CHOICES,
+        blank=True,
+        default=''
+    )
+    student_account_status = models.CharField(
+        '学生平台账号开通情况',
+        max_length=20,
+        choices=STUDENT_ACCOUNT_STATUS_CHOICES,
+        blank=True,
+        default=''
+    )
+    student_data_behavior_items = models.JSONField(
+        '学生常态化实现的数据行为选项',
+        default=list,
+        blank=True
+    )
+    student_data_behavior_other = models.TextField(
+        '学生数据行为其他补充',
+        blank=True,
+        default=''
+    )
+
+    public_account_post_count = models.IntegerField(
+        '公众号发布数据应用相关经验分享或创新实践次数',
+        null=True,
+        blank=True
+    )
+
     # 1. 数据行为监测
     teacher_login_freq = models.IntegerField('教师人均登录平台频次', null=True, blank=True)
     student_login_freq = models.IntegerField('学生人均登录平台频次', null=True, blank=True)
@@ -178,6 +289,97 @@ class AssetAssessment(models.Model):
         related_name='asset',
         verbose_name='评估记录'
     )
+
+    DATA_STAT_METHOD_CHOICES = [
+        ('unable', '无法统计'),
+        ('estimated', '可部分估算'),
+        ('system_query', '可系统查询'),
+    ]
+
+    # 数据资产统一管理与统计能力
+    has_unified_data_management = models.BooleanField(
+        '是否对校内数据资产进行统一管理或统筹管理',
+        null=True,
+        blank=True
+    )
+    can_query_data_assets = models.BooleanField(
+        '是否能够通过平台或系统统计查询主要数据资源',
+        null=True,
+        blank=True
+    )
+
+    # 教育教学数据
+    teaching_data_stat_method = models.CharField(
+        '教育教学数据统计方式',
+        max_length=20,
+        choices=DATA_STAT_METHOD_CHOICES,
+        blank=True,
+        default=''
+    )
+    teaching_data_volume = models.DecimalField(
+        '教育教学数据总量(GB)',
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
+    # 师生管理数据
+    teacher_student_data_stat_method = models.CharField(
+        '师生管理数据统计方式',
+        max_length=20,
+        choices=DATA_STAT_METHOD_CHOICES,
+        blank=True,
+        default=''
+    )
+    teacher_student_data_volume = models.DecimalField(
+        '师生管理数据总量(GB)',
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
+    # 数字资源数据
+    digital_resource_data_stat_method = models.CharField(
+        '数字资源数据统计方式',
+        max_length=20,
+        choices=DATA_STAT_METHOD_CHOICES,
+        blank=True,
+        default=''
+    )
+    digital_resource_data_volume = models.DecimalField(
+        '数字资源数据总量(GB)',
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
+    # 校园管理与行政数据
+    campus_admin_data_stat_method = models.CharField(
+        '校园管理与行政数据统计方式',
+        max_length=20,
+        choices=DATA_STAT_METHOD_CHOICES,
+        blank=True,
+        default=''
+    )
+    campus_admin_data_volume = models.DecimalField(
+        '校园管理与行政数据总量(GB)',
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
+    # 其他类型数据
+    other_type_data_volume = models.DecimalField(
+        '其他类型数据总量(GB)',
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
     
     # 数据资产积累
     management_data_volume = models.DecimalField('数字管理数据总量(GB)', max_digits=10, decimal_places=2, null=True, blank=True)
@@ -226,6 +428,12 @@ class TechnologyAssessment(models.Model):
         ('medium', '40%-80%'),
         ('high', '高于80%'),
     ]
+
+    PLATFORM_BUILD_MODE_CHOICES = [
+        ('self_built', '完全自建平台'),
+        ('external', '完全接入外部平台'),
+        ('mixed', '接入外部和自建平台并行'),
+    ]
     
     assessment = models.OneToOneField(
         Assessment,
@@ -243,6 +451,13 @@ class TechnologyAssessment(models.Model):
     has_data_platform = models.BooleanField('是否建设数据治理平台', null=True, blank=True)
     
     # 2. 数据安全水平
+    platform_build_mode = models.CharField(
+        '平台建设管理模式',
+        max_length=20,
+        choices=PLATFORM_BUILD_MODE_CHOICES,
+        blank=True,
+        null=True
+    )
     security_certified_count = models.IntegerField('通过安保等级认定数量', null=True, blank=True)
     security_certified_ratio = models.CharField('通过安保等级认定比例', max_length=20, choices=SECURITY_RATIO_CHOICES, blank=True, null=True)
     has_security_incident = models.BooleanField('是否发生数据风险事件', null=True, blank=True)

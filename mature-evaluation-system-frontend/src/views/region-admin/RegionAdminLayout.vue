@@ -19,17 +19,27 @@
       >
         <el-menu-item index="/region-admin/overview">
           <el-icon><DataAnalysis /></el-icon>
-          <span>区域概览</span>
+          <span>区域评估概览</span>
         </el-menu-item>
 
           <el-menu-item index="/region-admin/schools">
             <el-icon><List /></el-icon>
-            <span>学校管理</span>
+            <span>学校账户申请</span>
+          </el-menu-item>
+
+          <el-menu-item index="/region-admin/school-count">
+            <el-icon><School /></el-icon>
+            <span>学校账户管理</span>
           </el-menu-item>
 
         <el-menu-item index="/region-admin/assessments">
           <el-icon><DataLine /></el-icon>
-          <span>区域评估</span>
+          <span>学校评估报告</span>
+        </el-menu-item>
+
+        <el-menu-item index="/region-admin/region-report">
+          <el-icon><Document /></el-icon>
+          <span>区域评估报告</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
@@ -63,9 +73,6 @@
       </el-main>
 
       <!-- 页脚 -->
-      <el-footer class="footer">
-        <span>© 2025 苏师YangTeam 版权所有</span>
-      </el-footer>
     </el-container>
   </div>
 </template>
@@ -83,6 +90,7 @@ import {
   List
 } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
+import { useRegionStore } from '@/stores/region'
 
 const router = useRouter()
 const route = useRoute()
@@ -91,14 +99,25 @@ const userStore = useUserStore()
 const userInfo = computed(() => userStore.userInfo)
 const activeMenu = computed(() => route.path)
 
-// 顶部标题：根据当前路由动态显示（简单可用版）
+
+const regionStore = useRegionStore()
+
 const pageTitle = computed(() => {
+  const r = regionStore.currentRegion
   const p = route.path
-  if (p.startsWith('/region-admin/overview')) return '区域概览'
-  if (p.startsWith('/region-admin/schools/create')) return '新增学校'
-  if (p.startsWith('/region-admin/schools')) return '学校管理'
-  if (p.startsWith('/region-admin/assessments/')) return '评估详情'
-  if (p.startsWith('/region-admin/assessments')) return '区域评估'
+
+  if (
+    p.startsWith('/region-admin/assessments') ||
+    p.startsWith('/region-admin/schools') ||
+    p.startsWith('/region-admin/overview') ||
+    p.startsWith('/region-admin/school-count')
+  ) {
+    if (r) {
+      return `${r.province || ''}${r.city || ''}${r.name || ''}文化成熟度评估`
+    }
+    return '区域评估管理平台'
+  }
+
   return '区域管理后台'
 })
 
@@ -230,5 +249,87 @@ const handleCommand = (command) => {
   color: #909399;
   font-size: 14px;
   border-top: 1px solid #e4e7ed;
+}
+
+/* 底部页脚 */
+/* ===== Footer（深色条，按截图）===== */
+.footer {
+  margin-top: auto;
+  width: 100%;
+}
+
+.footer-bar {
+  background: #2f3d4a; /* 深蓝灰色背景 */
+  padding: 8px 0;    /* 增加上下内边距，让比例更协调 */
+}
+
+.footer-inner {
+  /* 核心：必须与 header-content 的宽度和对齐逻辑完全一致 */
+  max-width: 99%;
+  margin: 0 auto;
+  padding: 0 20px;    /* 与 header 保持一致的左右内边距 */
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* 彻底删除之前的 margin-left: -200px */
+}
+
+.footer-logo .logo-img {
+  height: 80px;
+  width: auto;
+  display: block;
+}
+
+.footer-text {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;      /* 标准页脚字号 */
+  line-height: 1.8;
+  text-align: left;
+}
+
+.footer-text .line {
+  white-space: nowrap; /* 强制不换行，保持整齐 */
+}
+
+.footer-right {
+  /* 彻底删除之前的 margin-right: -200px */
+  display: flex;
+  align-items: center;
+}
+
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-qrcode {
+  width: 80px;
+  height: 80px;
+  border-radius: 4px;
+  background: #ffffff;
+  padding: 3px;
+}
+
+.qr-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+.contact-note {
+  margin-top: 18px;          /* 与邮箱拉开距离 */
+  font-size: 13px;           /* 比正文小 */
+  color: #9ca3af;            /* 浅灰色 */
+  font-style: italic;        /* 微斜体，学术/说明感 */
+  line-height: 1.6;
 }
 </style>

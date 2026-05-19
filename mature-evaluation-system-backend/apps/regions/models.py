@@ -58,3 +58,61 @@ class Region(models.Model):
 
     def __str__(self):
         return f'{self.city}-{self.name}'
+
+
+class RegionReportSuggestionCache(models.Model):
+    """
+    区域报告 AI 建议缓存
+    同一区域只保留一份最新建议。
+    当区域报告数据发生变化时，通过 data_hash 自动重新生成。
+    """
+
+    region_code = models.CharField(
+        max_length=64,
+        unique=True,
+        db_index=True,
+        verbose_name="区域编码"
+    )
+
+    region_name = models.CharField(
+        max_length=128,
+        blank=True,
+        default="",
+        verbose_name="区域名称"
+    )
+
+    data_hash = models.CharField(
+        max_length=64,
+        db_index=True,
+        verbose_name="数据指纹"
+    )
+
+    suggestions = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name="AI建议内容"
+    )
+
+    payload_snapshot = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name="生成时的数据快照"
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="创建时间"
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name="更新时间"
+    )
+
+    class Meta:
+        db_table = "region_report_suggestion_cache"
+        verbose_name = "区域报告AI建议缓存"
+        verbose_name_plural = "区域报告AI建议缓存"
+
+    def __str__(self):
+        return f"{self.region_name or self.region_code} - {self.data_hash}"

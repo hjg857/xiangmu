@@ -25,15 +25,7 @@ class SurveyScoring:
         'A34': {'name': '数据应用与创新', 'question_range': range(20, 26), 'max_score': 30},  # 题20-25（6题）
         'A35': {'name': '数据伦理与隐私', 'question_range': range(26, 29), 'max_score': 15},  # 题26-28（3题）
     }
-    
-    # 管理者问卷维度配置（A21-A25）
-    MANAGER_DIMENSIONS = {
-        'A21': {'name': '数据意识与思维', 'question_range': range(7, 15), 'max_score': 40},  # 题7-14（8题）
-        'A22': {'name': '数据知识与技能', 'question_range': range(15, 23), 'max_score': 40},  # 题15-22（8题）
-        'A23': {'name': '数据评价与交流', 'question_range': range(23, 26), 'max_score': 15},  # 题23-25（3题）
-        'A24': {'name': '数据应用与创新', 'question_range': range(26, 34), 'max_score': 40},  # 题26-33（8题）
-        'A25': {'name': '数据伦理与隐私', 'question_range': range(34, 38), 'max_score': 20},  # 题34-37（4题）
-    }
+
     
     @classmethod
     def get_dimensions_config(cls, survey_type):
@@ -42,8 +34,6 @@ class SurveyScoring:
             return cls.TEACHER_DIMENSIONS
         elif survey_type == 'student':
             return cls.STUDENT_DIMENSIONS
-        elif survey_type == 'manager':
-            return cls.MANAGER_DIMENSIONS
         else:
             raise ValueError(f"未知的问卷类型: {survey_type}")
     
@@ -138,63 +128,63 @@ class SurveyScoring:
             }
         
         return dimension_averages
-    
+
     @classmethod
     def calculate_assessment_literacy_score(cls, assessment):
         """
         计算评估的数据素养总分
-        综合教师、学生、管理者三份问卷的得分
+        新版仅综合教师问卷和学生问卷。
         """
-        from apps.assessments.models import Assessment
-        
-        # 获取三份问卷实例
-        teacher_instance = assessment.survey_instances.filter(template__survey_type='teacher').first()
-        student_instance = assessment.survey_instances.filter(template__survey_type='student').first()
-        manager_instance = assessment.survey_instances.filter(template__survey_type='manager').first()
-        
+        # 获取教师、学生问卷实例
+        teacher_instance = assessment.survey_instances.filter(
+            template__survey_type='teacher'
+        ).first()
+
+        student_instance = assessment.survey_instances.filter(
+            template__survey_type='student'
+        ).first()
+
         # 计算各问卷的平均得分
         teacher_scores = cls.calculate_instance_average_score(teacher_instance) if teacher_instance else None
         student_scores = cls.calculate_instance_average_score(student_instance) if student_instance else None
-        manager_scores = cls.calculate_instance_average_score(manager_instance) if manager_instance else None
-        
-        # 如果三份问卷都没有数据，返回None
-        if not any([teacher_scores, student_scores, manager_scores]):
+
+        # 如果两份问卷都没有数据，返回 None
+        if not any([teacher_scores, student_scores]):
             return None
-        
-        # 计算综合得分（可以根据需要调整权重）
-        # 这里采用简单平均：教师、学生、管理者各占1/3
+
         total_normalized_score = 0
         valid_survey_count = 0
-        
+
         if teacher_scores:
-            # 教师问卷的五个维度平均
-            teacher_avg = sum(dim['average_normalized_score'] for dim in teacher_scores.values()) / len(teacher_scores)
+            teacher_avg = sum(
+                dim['average_normalized_score']
+                for dim in teacher_scores.values()
+            ) / len(teacher_scores)
+
             total_normalized_score += teacher_avg
             valid_survey_count += 1
-        
+
         if student_scores:
-            # 学生问卷的五个维度平均
-            student_avg = sum(dim['average_normalized_score'] for dim in student_scores.values()) / len(student_scores)
+            student_avg = sum(
+                dim['average_normalized_score']
+                for dim in student_scores.values()
+            ) / len(student_scores)
+
             total_normalized_score += student_avg
             valid_survey_count += 1
-        
-        if manager_scores:
-            # 管理者问卷的五个维度平均
-            manager_avg = sum(dim['average_normalized_score'] for dim in manager_scores.values()) / len(manager_scores)
-            total_normalized_score += manager_avg
-            valid_survey_count += 1
-        
-        # 计算最终得分（0-1标准化得分）
-        final_normalized_score = total_normalized_score / valid_survey_count if valid_survey_count > 0 else 0
-        
-        # 转换为百分制（假设数据素养维度满分20分）
+
+        final_normalized_score = (
+            total_normalized_score / valid_survey_count
+            if valid_survey_count > 0
+            else 0
+        )
+
         literacy_score = Decimal(final_normalized_score) * Decimal(20)
-        
+
         return {
             'literacy_score': float(literacy_score),
             'normalized_score': final_normalized_score,
             'teacher_scores': teacher_scores,
             'student_scores': student_scores,
-            'manager_scores': manager_scores,
             'valid_survey_count': valid_survey_count
         }

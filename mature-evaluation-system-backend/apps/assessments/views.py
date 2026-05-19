@@ -2,12 +2,13 @@
 评估系统视图
 """
 from rest_framework import viewsets, status
+from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-
+from django.db.models import Count, Q
 from .models import Assessment, InstitutionAssessment, BehaviorAssessment, AssetAssessment, TechnologyAssessment
 from .serializers import (
     AssessmentSerializer, InstitutionAssessmentSerializer,
@@ -18,6 +19,8 @@ from apps.regions.utils.generators import gen_unique_school_username, gen_strong
 from django.db import transaction
 from apps.schools.models import School
 import logging
+from apps.surveys.models import SurveyInstance, SurveyResponse
+from .scoring_service import  ScoringService
 
 from ..accounts.models import User
 
@@ -39,12 +42,14 @@ class AssessmentViewSet(viewsets.ModelViewSet):
         获取评估详细数据：绕过自动权限检查，直接使用 get_queryset 结果
         """
         try:
-            # self.get_queryset() 会应用你之前写好的：if user.is_admin_user(): return Assessment.objects.all()
             assessment = self.get_queryset().get(pk=pk)
         except Assessment.DoesNotExist:
-            return Response({"detail": "未找到评估记录或您没有权限访问"}, status=403)
+            return Response(
+                {"detail": "未找到评估记录或您没有权限访问"},
+                status=403
+            )
 
-        # 聚合数据逻辑（保持不变）
+        # 聚合各模块数据
         institution, _ = InstitutionAssessment.objects.get_or_create(assessment=assessment)
         behavior, _ = BehaviorAssessment.objects.get_or_create(assessment=assessment)
         asset, _ = AssetAssessment.objects.get_or_create(assessment=assessment)
@@ -52,12 +57,83 @@ class AssessmentViewSet(viewsets.ModelViewSet):
 
         school = assessment.school
 
+        def to_float(value, default=0.0):
+            try:
+                if value is None:
+                    return default
+                return float(value)
+            except (TypeError, ValueError):
+                return default
+
+        # 一级维度得分：优先使用重新计算结果，失败时使用 Assessment 已保存结果
+        dimension_scores = {
+            'literacy': to_float(assessment.literacy_score),
+            'institution': to_float(assessment.institution_score),
+            'behavior': to_float(assessment.behavior_score),
+            'asset': to_float(assessment.asset_score),
+            'technology': to_float(assessment.technology_score),
+        }
+
+        secondary_scores = {}
+        observation_scores = {}
+
+        # 重新计算报告展示所需的二级指标和观测点得分
+        try:
+            scoring_service = ScoringService(assessment)
+
+            literacy_score = scoring_service.calculate_literacy_score()
+            institution_score = scoring_service.calculate_institution_score()
+            behavior_score = scoring_service.calculate_behavior_score()
+            asset_score = scoring_service.calculate_asset_score()
+            technology_score = scoring_service.calculate_technology_score()
+
+            dimension_scores = {
+                'literacy': to_float(literacy_score, dimension_scores['literacy']),
+                'institution': to_float(institution_score, dimension_scores['institution']),
+                'behavior': to_float(behavior_score, dimension_scores['behavior']),
+                'asset': to_float(asset_score, dimension_scores['asset']),
+                'technology': to_float(technology_score, dimension_scores['technology']),
+            }
+
+            secondary_scores = scoring_service.secondary_scores or {}
+            observation_scores = scoring_service.observation_scores or {}
+
+        except Exception as e:
+            # 不让计分异常影响报告基础数据返回
+            logger.error(f"报告 data 接口重新计算指标得分失败：{str(e)}", exc_info=True)
+
+        # 统计教师、学生问卷参评人数
+        participant_counts = {
+            'teacher': SurveyResponse.objects.filter(
+                instance__assessment=assessment,
+                instance__template__survey_type='teacher'
+            ).count(),
+            'student': SurveyResponse.objects.filter(
+                instance__assessment=assessment,
+                instance__template__survey_type='student'
+            ).count(),
+        }
+
         return Response({
+            # 后端生成的 AI 建议
+            'suggestions': assessment.ai_suggestions or {},
+
+            # 报告页需要的完整得分
+            'dimension_scores': dimension_scores,
+            'secondary_scores': secondary_scores,
+            'observation_scores': observation_scores,
+
+            # 问卷参评人数
+            'participant_counts': participant_counts,
+
+            # 模块基础数据
             'assessment': AssessmentSerializer(assessment).data,
             'institution': InstitutionAssessmentSerializer(institution).data,
             'behavior': BehaviorAssessmentSerializer(behavior).data,
             'asset': AssetAssessmentSerializer(asset).data,
             'technology': TechnologyAssessmentSerializer(technology).data,
+
+            # 学校基础信息
             'school_name': school.name,
             'school_type': school.school_type,
             'province': school.province,
@@ -66,6 +142,8 @@ class AssessmentViewSet(viewsets.ModelViewSet):
             'founding_year': school.founding_year,
             'teacher_count': school.teacher_count,
             'student_count': school.student_count,
+
+            # 兼容旧前端 scores 读取
             'scores': {
                 'total_score': str(assessment.total_score),
                 'maturity_level': assessment.maturity_level,
@@ -458,3 +536,130 @@ class AssessmentViewSet(viewsets.ModelViewSet):
             },
             'completed_at': assessment.completed_at
         })
+
+class AdminDashboardStatsView(APIView):
+    """超级管理员概览统计接口"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not request.user.is_admin_user():
+            return Response({'error': '权限不足'}, status=403)
+
+        # 1. 顶部 KPI 统计
+        kpi = {
+            "provinces": School.objects.values('province').distinct().count(),
+            "regions": School.objects.values('province', 'city', 'district').distinct().count(),
+            "total_schools": School.objects.count(),
+            "completed": Assessment.objects.filter(status='completed').count()
+        }
+
+        # 2. 中间表格数据：按省份和区县聚合统计学校数量
+        # 逻辑：Group By province, district
+        distribution = School.objects.values('province', 'district').annotate(
+            school_count=Count('id')
+        ).order_by('province')
+
+        return Response({
+            "success": True,
+            "data": {
+                "kpi": kpi,
+                "distribution": distribution
+            }
+        })
+
+class AdminAssessmentListView(APIView):
+    """管理员专用评估列表（支持区域三级筛选）"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not request.user.is_admin_user():
+            return Response({'error': '权限不足'}, status=403)
+
+        queryset = Assessment.objects.select_related('school').all().order_by('-created_at')
+
+        # --- 过滤逻辑 ---
+        school_name = request.query_params.get('school_name')
+        province = request.query_params.get('province')
+        city = request.query_params.get('city')
+        district = request.query_params.get('district')
+        status = request.query_params.get('status')
+        school_type = request.query_params.get('school_type')
+
+        if school_name:
+            queryset = queryset.filter(school__name__icontains=school_name)
+        if province:
+            queryset = queryset.filter(school__province=province)
+        if city:
+            queryset = queryset.filter(school__city=city)
+        if district:
+            queryset = queryset.filter(school__district=district)
+        if status:
+            queryset = queryset.filter(status=status)
+        if school_type:
+            queryset = queryset.filter(school__school_type=school_type)
+
+        # --- 分页处理 ---
+        from django.core.paginator import Paginator
+        page_num = request.query_params.get('page', 1)
+        page_size = request.query_params.get('page_size', 20)
+        paginator = Paginator(queryset, page_size)
+        page_obj = paginator.get_page(page_num)
+
+        # 序列化
+        data = []
+        for item in page_obj:
+            data.append({
+                "id": item.id,
+                "school_name": item.school.name,
+                "school_type_display": item.school.get_school_type_display(),
+                "status": item.status,
+                "status_display": item.get_status_display(),
+                "total_score": float(item.total_score) if item.total_score else 0,
+                "maturity_level_display": item.get_maturity_level_display(),
+                "created_at": item.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            })
+
+        return Response({
+            "success": True,
+            "count": paginator.count,
+            "results": data
+        })
+
+
+class AdminProvinceSummaryView(APIView):
+    """超级管理员专用：按省份和“市区”聚合统计"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not request.user.is_admin_user():
+            return Response({'success': False, 'message': '权限不足'}, status=403)
+
+        # 获取所有省份
+        provinces = School.objects.values_list('province', flat=True).distinct()
+        result_data = []
+
+        for p_name in provinces:
+            if not p_name: continue
+
+            # 🌟 核心修改：按 city 分组，统计该城市下的学校总数
+            city_list = School.objects.filter(province=p_name).values('city').annotate(
+                count=Count('id')
+            ).order_by('city')
+
+            cities = []
+            total_schools_in_province = 0
+            for c in city_list:
+                city_name = c['city'] or "未知城市"
+                cities.append({
+                    "name": city_name,
+                    "school_count": c['count']
+                })
+                total_schools_in_province += c['count']
+
+            result_data.append({
+                "name": p_name,
+                "total_schools": total_schools_in_province,
+                "cities": cities  # 建议将 Key 名改为 cities 语义更准
+            })
+
+        return Response({"success": True, "data": result_data})

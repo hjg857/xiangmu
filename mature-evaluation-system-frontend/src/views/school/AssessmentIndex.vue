@@ -143,117 +143,8 @@
           />
           
           <p class="module-description">
-            为全面评估您所在学校“数据素养”发展水平，请您将以下问卷链接分享给学校更多教师、学生、管理者填写，问卷有限填写期限为48小时
-          </p>
-
-                    <!-- 管理者问卷 -->
-
-
-          <div class="survey-card">
-            <div class="survey-header">
-            <div class="title-line">
-              <h3 class="survey-title">管理者调查问卷</h3>
-              <el-popover
-                        placement="top-start"
-                        title="温馨提示"
-                        :width="350"
-                        trigger="hover"
-                        popper-class="custom-hint-popper"
-                      >
-                        <template #reference>
-                          <span class="hint-tag">填写提示</span>
-                        </template>
-      
-                        <!-- 弹出框的具体内容 -->
-                        <div class="hint-body">
-                          <p class="hint-text">
-我们将依据每位管理者的作答结果生成个人得分，通过整合个人得分，计算出学校管理者数据素养的平均水平。
-请您将此问卷链接或二维码转发给学校更多管理者填写，尽可能覆盖不同管理岗位、不同管理年限的管理者。参与测评的人数越多，越能客观反映学校真实水平。
-                          </p>
-                          <p class="hint-example">
-                            <em></em>
-                          </p>
-                        </div>
-                      </el-popover>
-              </div>
-              <p class="survey-desc">调查管理者的数据素养水平、数据资产意识及其对学校数据应用效果的主观评价。</p>
-            </div>
-            
-            <div v-if="managerInstance" class="survey-content">
-              <div class="survey-stats">
-                <div class="stat-item">
-                  <span class="stat-label">已收集：</span>
-                  <el-tag type="success">{{ managerInstance.collected_count }}</el-tag>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">截止日期：</span>
-                  <el-tag type="warning">{{ formatExpiredTime(managerInstance.expired_at) }}</el-tag>
-                </div>
-                <div v-if="isReadonly" class="stat-item">
-                  <el-tag type="info">已停止收集</el-tag>
-                </div>
-              </div>
-              
-              <div class="share-link-section" v-if="!isReadonly">
-                <div class="share-area">
-                  <div class="share-left">
-                  <div class="input-group-custom">
-                    <el-input
-                      type="textarea"
-                      :rows="2"
-                      readonly
-                      resize="none"
-                      :model-value="`${schoolName}《管理者数据素养调查问卷》\n问卷链接：${managerShareUrl}`"
-                      class="share-textarea-custom"
-                    />
-                    <el-button 
-                      type="primary" 
-                      class="share-append-btn"
-                      @click="copyLink(`${schoolName}《管理者数据素养调查问卷》\n问卷链接：${managerShareUrl}`)"
-                    >
-                      <el-icon style="margin-right: 4px;"><DocumentCopy /></el-icon>
-                      复制
-                    </el-button>
-                  </div>
-                  </div>
-
-                  <div class="share-right">
-                    <div class="qr-wrapper">
-                      <!-- 二维码区域 -->
-                      <div class="qr-box">
-                        <img
-                          v-if="managerQrUrl"
-                          :src="managerQrUrl"
-                          class="qr-img"
-                          alt="管理者问卷二维码"
-                        />
-                        <div v-else class="qr-placeholder">二维码生成中...</div>
-
-                        <!-- 中间学校名覆盖 -->
-                        <div class="qr-center">
-                          <span class="school-name">{{ schoolName }}</span>
-                        </div>
-                      </div>
-
-                      <!-- 二维码下方提示文字 -->
-                      <div class="qr-tip">
-                        《管理者数据素养及数据资产意识调查问卷》<br />
-                        请在48小时内完成问卷填写！
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-            
-            <div v-else class="survey-empty">
-              <p>{{ isReadonly ? '未生成问卷链接' : '尚未生成问卷链接' }}</p>
-              <el-button v-if="!isReadonly" type="primary" @click="createInstanceDirect('manager')" :loading="creating">
-                生成问卷链接
-              </el-button>
-            </div>
-          </div>
+            为全面评估您所在学校“数据素养”发展水平，请您将以下问卷链接分享给学校更多教师、学生填写，问卷有限填写期限为72小时
+          </p> 
 
           <!-- 教师问卷 -->
 
@@ -286,7 +177,7 @@
                         </div>
                       </el-popover>
               </div>
-              <p class="survey-desc">调查教师的数据素养水平及其对学校数据应用效果的主观评价。</p>
+              <p class="survey-desc">调查教师的数据素养水平、数据资产意识以及数据应用效果的主观评价。</p>
             </div>
             
             <div v-if="teacherInstance" class="survey-content">
@@ -313,13 +204,13 @@
                         :rows="2"
                         readonly
                         resize="none"
-                        :model-value="`${schoolName}《教师数据素养调查问卷》\n问卷链接：${teacherShareUrl}`"
+                        :model-value="`${schoolName}《教师调查问卷》\n问卷链接：${teacherShareUrl}`"
                         class="share-textarea-custom"
                       />
                       <el-button 
                         type="primary" 
                         class="share-append-btn"
-                        @click="copyLink(`${schoolName}《教师数据素养调查问卷》\n问卷链接：${teacherShareUrl}`)"
+                        @click="copyLink(`${schoolName}《教师调查问卷》\n问卷链接：${teacherShareUrl}`)"
                       >
                         <el-icon style="margin-right: 4px;"><DocumentCopy /></el-icon>
                         复制
@@ -344,8 +235,8 @@
 
                       <!-- 二维码下方提示文字 -->
                       <div class="qr-tip">
-                        《教师数据素养及数据应用效果调查问卷》<br />
-                        请在48小时内完成问卷填写！
+                        《教师调查问卷》<br />
+                        请在72小时内完成问卷填写！
                       </div>
                     </div>
                   </div>
@@ -393,7 +284,7 @@
                         </div>
                       </el-popover>
               </div>
-              <p class="survey-desc">调查学生的数据素养水平及其对学校数据应用效果的主观评价。</p>
+              <p class="survey-desc">调查学生的数据素养水平。</p>
             </div>
             
             <div v-if="studentInstance" class="survey-content">
@@ -420,13 +311,13 @@
                         :rows="2"
                         readonly
                         resize="none"
-                        :model-value="`${schoolName}《学生数据素养调查问卷》\n问卷链接：${studentShareUrl}`"
+                        :model-value="`${schoolName}《学生调查问卷》\n问卷链接：${studentShareUrl}`"
                         class="share-textarea-custom"
                       />
                       <el-button 
                         type="primary" 
                         class="share-append-btn"
-                        @click="copyLink(`${schoolName}《学生数据素养调查问卷》\n问卷链接：${studentShareUrl}`)"
+                        @click="copyLink(`${schoolName}《学生调查问卷》\n问卷链接：${studentShareUrl}`)"
                       >
                         <el-icon style="margin-right: 4px;"><DocumentCopy /></el-icon>
                         复制
@@ -454,8 +345,8 @@
 
                       <!-- 二维码下方提示文字 -->
                       <div class="qr-tip">
-                        《学生数据素养及数据应用效果调查问卷》<br />
-                        请在48小时内完成问卷填写！
+                        《学生调查问卷》<br />
+                        请在72小时内完成问卷填写！
                       </div>
                     </div>
                   </div>
@@ -642,10 +533,17 @@ const REQUIRED_FIELDS = {
   institution: [],
 
   behavior: [
-    'teacher_login_freq',
-    'student_login_freq',
-    'manager_login_freq',
-    'visit_count',
+    // C11 教师数据行为
+    'teacher_device_use_freq',
+    'teacher_platform_use_freq',
+    'teacher_data_behavior_items',
+
+    // C12 学生数据行为
+    'student_device_provision',
+    'student_account_status',
+    'student_data_behavior_items',
+
+    // C21 数据应用特色成果
     'published_paper_count',
     'published_book_count',
     'case_national_count',
@@ -654,19 +552,20 @@ const REQUIRED_FIELDS = {
     'award_national_count',
     'award_provincial_count',
     'award_city_count',
+
+    // C22 数据应用社会影响
     'media_national_count',
     'media_provincial_count',
     'media_city_count',
     'conference_national_count',
     'conference_provincial_count',
-    'conference_city_count'
+    'conference_city_count',
+    'public_account_post_count',
+    'visit_count'
   ],
 
   asset: [
-    'management_data_volume',
-    'resource_data_volume',
-    'service_data_volume',
-    'other_data_volume'
+    'has_unified_data_management',
   ],
 
   technology: [
@@ -674,30 +573,48 @@ const REQUIRED_FIELDS = {
     'student_device_ratio',
     'teacher_device_ratio',
     'has_data_platform',
-    'security_certified_count',
-    'security_certified_ratio',
+    'platform_build_mode',
     'has_security_incident'
-  ]
+]
 }
 
 const calcTechnologyDone = (data) => {
-  if (!data) return false;
+  if (!data) return false
 
-  // 1. 检查基础必填项（即上面列表里的那些）
-  const baseFields = REQUIRED_FIELDS.technology;
-  const baseOk = baseFields.every(f => isFilled(data[f]));
-  if (!baseOk) return false;
+  // 1. 是否设有独立数据中心必须填写
+  if (!isFilled(data.has_independent_data_center)) return false
 
-  // 2. 检查二选一逻辑
+  // 2. 如果选择“已设立独立数据中心”，必须填写B级要求达成情况
   if (data.has_independent_data_center === true) {
-    // 如果有机房，必须填标准符合度
-    return isFilled(data.data_center_standard);
-  } else if (data.has_independent_data_center === false) {
-    // 如果没机房，必须填云服务满足情况
-    return isFilled(data.cloud_dedicated_service);
+    if (!isFilled(data.data_center_standard)) return false
   }
 
-  return false;
+  // 3. 生机比、师机比必须填写
+  if (!isFilled(data.student_device_ratio)) return false
+  if (!isFilled(data.teacher_device_ratio)) return false
+
+  // 4. 数据系统平台必须填写
+  if (!isFilled(data.has_data_platform)) return false
+
+  // 5. 平台建设管理模式必须填写
+  if (!isFilled(data.platform_build_mode)) return false
+
+  // 6. 如果是完全自建平台或外部+自建并行，需要填写认证数量和认证比例
+  if (
+    data.platform_build_mode === 'self_built' ||
+    data.platform_build_mode === 'mixed'
+  ) {
+    if (!isFilled(data.security_certified_count)) return false
+    if (!isFilled(data.security_certified_ratio)) return false
+  }
+
+  // 7. 如果是完全接入外部平台，不要求填写认证数量和比例
+  // 后端会按 Excel 规则直接赋分
+
+  // 8. 数据风险事件必须填写
+  if (!isFilled(data.has_security_incident)) return false
+
+  return true
 }
 
 // ====== 拉取各模块数据（假设后端已有这些 GET 接口）======
@@ -731,75 +648,150 @@ const calcModuleDoneByFields = (data, fields) => {
   return fields.every((f) => isFilled(data[f]))
 }
 
+const calcAssetDone = (data) => {
+  if (!data) return false
+
+  // 1. 必须先回答：是否对校内数据资产进行统一管理或统筹管理
+  if (!isFilled(data.has_unified_data_management)) return false
+
+  // 2. 如果选择“否”，后续题目不需要填写，资产模块可视为完成
+  if (data.has_unified_data_management === false) {
+    return true
+  }
+
+  // 3. 如果选择“是”，必须继续回答是否能够统计查询
+  if (!isFilled(data.can_query_data_assets)) return false
+
+  // 4. 如果不能统计查询，后续数据量不需要填写，资产模块可视为完成
+  if (data.can_query_data_assets === false) {
+    return true
+  }
+
+  // 5. 如果可以统计查询，则需要填写四类主要数据的统计方式
+  const statFields = [
+    'teaching_data_stat_method',
+    'teacher_student_data_stat_method',
+    'digital_resource_data_stat_method',
+    'campus_admin_data_stat_method'
+  ]
+
+  for (const field of statFields) {
+    if (!isFilled(data[field])) return false
+  }
+
+  // 6. 如果某类数据选择“可部分估算”或“可系统查询”，则必须填写对应数据量
+  const volumeRules = [
+    ['teaching_data_stat_method', 'teaching_data_volume'],
+    ['teacher_student_data_stat_method', 'teacher_student_data_volume'],
+    ['digital_resource_data_stat_method', 'digital_resource_data_volume'],
+    ['campus_admin_data_stat_method', 'campus_admin_data_volume']
+  ]
+
+  for (const [methodField, volumeField] of volumeRules) {
+    const method = data[methodField]
+
+    if (method === 'estimated' || method === 'system_query') {
+      if (!isFilled(data[volumeField])) return false
+    }
+  }
+
+  // 7. 其他类型数据是选填，不参与完成判断
+  return true
+}
+
+const calcBehaviorDone = (data) => {
+  if (!data) return false
+
+  // 1. 基础必填字段
+  const baseOk = calcModuleDoneByFields(data, REQUIRED_FIELDS.behavior)
+  if (!baseOk) return false
+
+  // 2. 教师数据行为：如果选择“其他”，需要填写补充说明
+  const teacherItems = Array.isArray(data.teacher_data_behavior_items)
+    ? data.teacher_data_behavior_items
+    : []
+
+  if (teacherItems.includes('other') && !isFilled(data.teacher_data_behavior_other)) {
+    return false
+  }
+
+  // 3. 学生数据行为：如果选择“其他”，需要填写补充说明
+  const studentItems = Array.isArray(data.student_data_behavior_items)
+    ? data.student_data_behavior_items
+    : []
+
+  if (studentItems.includes('other') && !isFilled(data.student_data_behavior_other)) {
+    return false
+  }
+
+  return true
+}
+
 // institution：条件必填判定
 // institution：条件必填判定
 const calcInstitutionDone = (data) => {
   if (!data) return false;
 
-  // --- 1. 绝对必填项（这些开关必须有值，不能是 null/undefined） ---
-  const absoluteSwitches = [
-    'has_leadership_group',     // 是否成立领导小组
-    'has_data_staff',           // 是否配备数据管理人员
-    'has_training',             // 是否参与培训
-    'has_management_doc',       // 是否出台管理文件
-    'has_practice_doc'          // 是否出台实践指导文件
-  ];
+  // --- 1. B11 数据领导/工作小组：新版三选一 ---
+  if (!isFilled(data.leadership_group_type)) return false;
 
-  // 如果任何一个大开关还没选，直接返回不通过
-  if (!absoluteSwitches.every(f => isFilled(data[f]))) return false;
+  // B12 数据组织运行情况：会议/研讨次数必须填写，0 次也算有效填写
+  if (!isFilled(data.meeting_activity_count)) return false;
 
-  // --- 2. 条件必填逻辑（如果选“是”，则子项必须填；如果选“否”，则跳过） ---
+  // --- 2. B21 数据专职/兼职管理人员 ---
+  if (!isFilled(data.has_data_staff)) return false;
 
-  // A. 领导小组
-  if (data.has_leadership_group === true) {
-    if (!isFilled(data.meeting_activity_count)) return false;
-  }
-
-  // B. 数据人员
   if (data.has_data_staff === true) {
-    // 如果有人员，则 专职数、兼职数、职责说明 必须填
     if (!isFilled(data.fulltime_staff_count)) return false;
     if (!isFilled(data.parttime_staff_count)) return false;
     if (!isFilled(data.has_clear_responsibilities)) return false;
   }
 
-  // C. 数据培训
+  // --- 3. B22 数据人员进修与培训 ---
+  if (!isFilled(data.has_training)) return false;
+
   if (data.has_training === true) {
-    // 如果有培训，则 培训次数、证书数量（即使是0也算填了）必须有值
     if (!isFilled(data.training_count)) return false;
     if (!isFilled(data.national_cert_count)) return false;
     if (!isFilled(data.provincial_cert_count)) return false;
     if (!isFilled(data.city_cert_count)) return false;
   }
 
-  // D. 管理文件
-  if (data.has_management_doc === true) {
-    // 如果有文件，则 数量必须填，且 必须上传了文件
+  // --- 4. B31 数据管理制度类文件：新版三选一 ---
+  if (!isFilled(data.management_doc_status)) return false;
+
+  if (data.management_doc_status === 'clear_required') {
     const countOk = isFilled(data.management_doc_count);
     const filesOk = Array.isArray(data.management_doc_files) && data.management_doc_files.length > 0;
+
     if (!countOk || !filesOk) return false;
   }
 
-  // E. 实践指导文件
-  if (data.has_practice_doc === true) {
+  // 选择 follow_policy 或 self_awareness 时，不需要填写文件份数和上传文件
+
+  // --- 5. B32 数据实践指导类文件：新版三选一 ---
+  if (!isFilled(data.practice_doc_status)) return false;
+
+  if (data.practice_doc_status === 'published') {
     const countOk = isFilled(data.practice_doc_count);
     const filesOk = Array.isArray(data.practice_doc_files) && data.practice_doc_files.length > 0;
+
     if (!countOk || !filesOk) return false;
   }
 
-  // 如果能走到这里，说明：要么开关选了“否”，要么选了“是”且子项已填。
+  // 选择 internal_training 或 self_practice 时，不需要填写文件份数和上传文件
+
   return true;
-}
+};
 
 // ====== 数据素养：按你规则 collected_count>0 才算完成 ======
 const calcLiteracyDone = () => {
   // 逻辑：只要实例对象不为空，说明已经点击过“生成链接”按钮
   const teacherExists = !!teacherInstance.value
   const studentExists = !!studentInstance.value
-  const managerExists = !!managerInstance.value
 
   // 模块是否完成：三份问卷的链接都已生成
-  return teacherExists && studentExists && managerExists
+  return teacherExists && studentExists 
 }
 
 // ====== 统一刷新各模块完成状态 ======
@@ -816,9 +808,17 @@ const refreshModuleDone = async () => {
   ])
 
   moduleDone.institution = calcInstitutionDone(institution)
-  moduleDone.behavior = calcModuleDoneByFields(behavior, REQUIRED_FIELDS.behavior)
-  moduleDone.asset = calcModuleDoneByFields(asset, REQUIRED_FIELDS.asset)
+  moduleDone.behavior = calcBehaviorDone(behavior)
+  moduleDone.asset = calcAssetDone(asset)
   moduleDone.technology = calcTechnologyDone(technology)
+}
+const isAssessmentExpired = (assessmentData) => {
+  if (!assessmentData?.created_at) return false
+
+  const startTime = new Date(assessmentData.created_at).getTime()
+  const expireTime = startTime + 72 * 60 * 60 * 1000
+
+  return Date.now() > expireTime
 }
 
 // 只读模式（非草稿状态都是只读）
@@ -831,7 +831,6 @@ const viewingProgress = ref(false)
 // 问卷实例数据
 const teacherInstance = ref(null)
 const studentInstance = ref(null)
-const managerInstance = ref(null)
 
 // 创建状态
 const creating = ref(false)
@@ -851,15 +850,10 @@ const studentShareUrl = computed(() => {
   return `${window.location.origin}${studentInstance.value.share_url}`
 })
 
-const managerShareUrl = computed(() => {
-  if (!managerInstance.value) return ''
-  return `${window.location.origin}${managerInstance.value.share_url}`
-})
 
 /** ========== 二维码（dataURL） ========== */
 const teacherQrUrl = ref('')
 const studentQrUrl = ref('')
-const managerQrUrl = ref('')
 
 const generateQr = async (url, title) => {
   if (!url) return ''
@@ -932,7 +926,7 @@ const generateQr = async (url, title) => {
         ctx.font = `bold 44px "Microsoft YaHei", sans-serif`
         // 动态计算 Y 坐标，确保在标题下方合适位置
         const reminderY = textStartY + (titleLines.length * 60) + 30
-        ctx.fillText('请在48小时内完成问卷填写！', w / 2, reminderY)
+        ctx.fillText('请在72小时内完成问卷填写！', w / 2, reminderY)
 
         resolve(canvas.toDataURL('image/png', 1.0))
       }
@@ -961,16 +955,13 @@ const splitTextIntoLines = (ctx, text, maxWidth) => {
 }
 
 watch(teacherShareUrl, async (url) => {
-  if (url) teacherQrUrl.value = await generateQr(url, '教师数据素养及数据应用效果调查问卷')
+  if (url) teacherQrUrl.value = await generateQr(url, '教师调查问卷')
 }, { immediate: true })
 
 watch(studentShareUrl, async (url) => {
-  if (url) studentQrUrl.value = await generateQr(url, '学生数据素养及数据应用效果调查问卷')
+  if (url) studentQrUrl.value = await generateQr(url, '学生调查问卷')
 }, { immediate: true })
 
-watch(managerShareUrl, async (url) => {
-  if (url) managerQrUrl.value = await generateQr(url, '管理者数据素养及数据资产意识调查问卷')
-}, { immediate: true })
 
 onMounted(async () => {
   const storedUser = localStorage.getItem('user')
@@ -1094,15 +1085,12 @@ const loadSurveys = async () => {
 
     teacherInstance.value = null
     studentInstance.value = null
-    managerInstance.value = null
 
     data.forEach(instance => {
       if (instance.template_info.survey_type === 'teacher') {
         teacherInstance.value = instance
       } else if (instance.template_info.survey_type === 'student') {
         studentInstance.value = instance
-      } else if (instance.template_info.survey_type === 'manager') {
-        managerInstance.value = instance
       }
     })
     await refreshModuleDone()
@@ -1236,21 +1224,19 @@ const handleSubmitAssessment = async () => {
 
   const teacherReady = isSurveyReady(teacherInstance.value);
   const studentReady = isSurveyReady(studentInstance.value);
-  const managerReady = isSurveyReady(managerInstance.value);
 
   // 如果有任何一个问卷既没数据也没到期，则拦截
-  if (!teacherReady || !studentReady || !managerReady) {
+  if (!teacherReady || !studentReady ) {
     let unreadyList = [];
     if (!teacherReady) unreadyList.push('教师问卷');
     if (!studentReady) unreadyList.push('学生问卷');
-    if (!managerReady) unreadyList.push('管理者问卷');
 
     ElMessageBox.alert(
       `<div style="line-height: 1.6;">
         以下问卷<b>既无回收数据也未到截止时间</b>：<br/>
         <b style="color: #f56c6c">${unreadyList.join('、')}</b>。<br/><br/>
         系统要求每类问卷至少有 <b>1 份</b>填答记录才能进行有效评估。<br/>
-        如果您无法获取填答数据，请等待<b>问卷过期（生成链接48小时后）</b>再尝试提交。<br/><br/>
+        如果您无法获取填答数据，请等待<b>问卷过期（生成链接72小时后）</b>再尝试提交。<br/><br/>
         <small style="color: #909399;">若已填写，请点击页面上方“刷新”按钮更新数据状态。</small>
       </div>`,
       '无法提交：数据不足且未过期',
@@ -1834,12 +1820,23 @@ const handleViewProgress = () => {
 }
 
 .share-right {
-  width: 140px;
+  width: 170px; /* 宽度给够 */
   flex-shrink: 0;
   display: flex;
   justify-content: flex-end;
   align-items: flex-start;
-  margin-top: -120px;
+
+  /* 原来是 -200px，会导致二维码超出调查问卷框 */
+  margin-top: -100px;
+}
+
+.qr-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  /* 不再额外上移 */
+  margin-top: 0;
 }
 
 .qr-wrapper {
@@ -1876,11 +1873,6 @@ const handleViewProgress = () => {
 /* 彻底隐藏网页上的原有提示文字 */
 .qr-tip {
   display: none !important;
-}
-
-.share-right {
-  width: 170px; /* 宽度给够 */
-  margin-top: -200px; /* 根据实际位置上下微调 */
 }
 
 

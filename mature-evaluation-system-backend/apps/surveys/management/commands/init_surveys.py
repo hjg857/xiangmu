@@ -6,7 +6,7 @@ from apps.surveys.models import SurveyTemplate, SurveyQuestion
 
 
 class Command(BaseCommand):
-    help = '初始化三份问卷数据（教师、学生、管理者）'
+    help = '初始化三份问卷数据（教师、学生）'
 
     def handle(self, *args, **options):
         self.stdout.write('开始初始化问卷数据...')
@@ -21,9 +21,6 @@ class Command(BaseCommand):
         # 创建学生问卷
         self.create_student_survey()
         
-        # 创建管理者问卷
-        self.create_manager_survey()
-        
         self.stdout.write(self.style.SUCCESS('问卷数据初始化完成！'))
 
     def create_teacher_survey(self):
@@ -32,11 +29,11 @@ class Command(BaseCommand):
         
         template = SurveyTemplate.objects.create(
             survey_type='teacher',
-            title='中小学校教师数据素养及数据应用效果调查问卷',
+            title='中小学校教师数据素养、数据资产意识及数据应用效果调查问卷',
             description='''尊敬的老师：
-您好！为深入了解您所在学校教师数据素养的整体发展现状，以及各位教师对学校数据应用成效的主观评价，特设计《中小学校教师数据素养及数据应用效果调查问卷》，诚邀您根据实际情况进行填写。
-此次调查严格遵循专业伦理与规范要求，确保您的个人隐私得到充分保护。您的回答无对错之分，请放心填写。
-衷心感谢您的支持与参与！''',
+            您好！为深入了解您所在学校教师数据素养的整体发展现状，以及各位教师对学校数据应用成效的主观评价，特设计《中小学校教师数据素养、数据资产意识及数据应用效果调查问卷》，诚邀您根据实际情况进行填写。
+            此次调查严格遵循专业伦理与规范要求，确保您的个人隐私得到充分保护。您的回答无对错之分，请放心填写。
+            衷心感谢您的支持与参与！''',
             is_active=True
         )
         
@@ -195,9 +192,72 @@ class Command(BaseCommand):
                 is_required=True
             )
             order += 1
-        
+
+        # 第三部分：数据资产意识评价量表
+        # 一、数据资产价值意识（D11，4题，20分）
+        asset_value_questions = [
+            '我认为学校数据是重要的战略资源。',
+            '我认为数据资产能够支持学校的教学、管理和决策。',
+            '我认为学校应加强数据资产的评估与价值挖掘，以提升数据利用效率和效能。',
+            '我认为学校应将数据资产纳入长期发展规划，以提升教育质量和管理水平。'
+        ]
+
+        for q_text in asset_value_questions:
+            SurveyQuestion.objects.create(
+                template=template,
+                question_text=q_text,
+                question_type='scale',
+                options=scale_options,
+                score_rule=score_rule,
+                order=order,
+                is_required=True
+            )
+            order += 1
+
+        # 二、数据资产应用意识（D12，4题，20分）
+        asset_application_questions = [
+            '我会主动探索数据资产在提升学校教学质量和管理效果的应用。',
+            '我会引导教师和学生重视数据资产的应用。',
+            '我会合理规划数据资产的使用，确保数据服务于学校的长期发展目标。',
+            '我会利用数据资产来支持学校的创新实践和改革探索。'
+        ]
+
+        for q_text in asset_application_questions:
+            SurveyQuestion.objects.create(
+                template=template,
+                question_text=q_text,
+                question_type='scale',
+                options=scale_options,
+                score_rule=score_rule,
+                order=order,
+                is_required=True
+            )
+            order += 1
+
+        # 三、数据资产治理意识（D13，6题，30分）
+        asset_governance_questions = [
+            '我认为数据清洗和整理有助于提高数据的准确性、完整性和一致性。',
+            '我认为应定期检查和维护学校数据。',
+            '我认为对数据进行识别与分类有助于提升数据的可用性和可解释性。',
+            '我认为数据应用过程中应注重权限设置与管理。',
+            '我认为识别和防范数据应用风险，有助于提升数据使用的安全性和可控性。',
+            '我认为学校应形成数据制度文件，以规范数据的采集、存储和使用等全过程。'
+        ]
+
+        for q_text in asset_governance_questions:
+            SurveyQuestion.objects.create(
+                template=template,
+                question_text=q_text,
+                question_type='scale',
+                options=scale_options,
+                score_rule=score_rule,
+                order=order,
+                is_required=True
+            )
+            order += 1
+
         # 第三部分：数据应用效果主观评价量表
-        part3_questions = [
+        part4_questions = [
             '我认为学校当前具备较完善的数据应用支持（如平台工具、指导培训或技术帮助等），能够支撑日常教学和学习活动。',
             '我认为学校在教学中应用数据的方式具有针对性，能够有效回应教学中的具体问题。',
             '我认为学校提供的数据报告或分析结果具备较强的专业性，能为教学提供明确的解释与参考。',
@@ -206,7 +266,7 @@ class Command(BaseCommand):
             '我对学校整体的数据应用情况感到满意。'
         ]
         
-        for q_text in part3_questions:
+        for q_text in part4_questions:
             SurveyQuestion.objects.create(
                 template=template,
                 question_text=q_text,
@@ -269,12 +329,12 @@ class Command(BaseCommand):
         # 一、数据意识与思维（A31，7题，35分）
         dimension1_questions = [
             '我能够注意到学习过程中产生的各类数据（如成绩、学习时间、错题等）。',
-            '我具有主动使用数据来发现问题、改进学习方法和提高学习效率的意识。',
+            '我能通过数据发现问题并改进学习方法。',
             '我能够以严谨认真的态度对待和使用教育数据。',
             '我能够尝试将学习活动（如背单词、写作业等）转化为数据来记录和分析。',
             '我能够将学习数据与学习现象（如成绩波动等）联系起来，并发现原因或优化方法。',
             '我能够从不同角度理解和分析学习数据，发现其中潜藏的信息。',
-            '我遇到异常或不合理的数据时，能提出质疑并进一步思考其背后原因。'
+            '如果遇到不合理的数据，我会提出疑问并思考背后的原因。'
         ]
         
         order = 4
@@ -373,26 +433,6 @@ class Command(BaseCommand):
             order += 1
         
         # 第三部分：数据应用效果评价量表
-        part3_questions = [
-            '我认为学校提供了充分的数据工具与指导（如数据平台、培训讲解等），以支持我的学习。',
-            '我认为学校在平台上呈现的数据（如作业成绩、测验结果等）能够真实反映我的学习情况，并帮助我改进学习行为。',
-            '我认为学校提供的学习分析报告或反馈内容清晰明确，能够帮助我了解自身的优势与不足。',
-            '我发现教师会根据测验、作业等数据，及时调整教学方法或内容，使我的学习更加高效。',
-            '我认为学校在收集和使用数据时操作规范，不影响我正常学习，也能有效保护我的隐私。',
-            '我对学校整体的数据应用情况感到满意。'
-        ]
-        
-        for q_text in part3_questions:
-            SurveyQuestion.objects.create(
-                template=template,
-                question_text=q_text,
-                question_type='scale',
-                options=scale_options,
-                score_rule=score_rule,
-                order=order,
-                is_required=True
-            )
-            order += 1
         
         self.stdout.write(self.style.SUCCESS(f'  学生问卷创建完成，共 {order-1} 题'))
 

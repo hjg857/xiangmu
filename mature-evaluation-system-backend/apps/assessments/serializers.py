@@ -58,18 +58,43 @@ class InstitutionAssessmentSerializer(serializers.ModelSerializer):
         model = InstitutionAssessment
         fields = [
             'id', 'assessment',
+
             # 数据组织机构
-            'has_leadership_group', 'meeting_activity_count',
+            'has_leadership_group',
+            'leadership_group_type',
+            'meeting_activity_count',
+
             # 数据人员配备
-            'has_data_staff', 'fulltime_staff_count', 'parttime_staff_count', 'has_clear_responsibilities',
+            'has_data_staff',
+            'fulltime_staff_count',
+            'parttime_staff_count',
+            'has_clear_responsibilities',
+
             # 数据培训
-            'has_training', 'training_count', 'national_cert_count', 'provincial_cert_count', 'city_cert_count',
+            'has_training',
+            'training_count',
+            'national_cert_count',
+            'provincial_cert_count',
+            'city_cert_count',
+
             # 数据管理文件
-            'has_management_doc', 'management_doc_count', 'management_doc_files', 'management_doc_analysis',
+            'has_management_doc',
+            'management_doc_status',
+            'management_doc_count',
+            'management_doc_files',
+            'management_doc_analysis',
+
             # 数据实践指导文件
-            'has_practice_doc', 'practice_doc_count', 'practice_doc_files', 'practice_doc_analysis',
+            'has_practice_doc',
+            'practice_doc_status',
+            'practice_doc_count',
+            'practice_doc_files',
+            'practice_doc_analysis',
+
             # 其他
-            'auto_crawled_data', 'created_at', 'updated_at'
+            'auto_crawled_data',
+            'created_at',
+            'updated_at'
         ]
         read_only_fields = ['assessment', 'auto_crawled_data', 'management_doc_analysis', 'practice_doc_analysis', 'created_at', 'updated_at']
 
@@ -81,14 +106,23 @@ class BehaviorAssessmentSerializer(serializers.ModelSerializer):
         model = BehaviorAssessment
         fields = [
             'id', 'assessment',
+
             # 数据行为监测
-            'teacher_login_freq', 'student_login_freq', 'manager_login_freq', 'visit_count',
+            'teacher_login_freq', 'student_login_freq', 'manager_login_freq',
+            'teacher_device_use_freq', 'teacher_platform_use_freq',
+            'teacher_data_behavior_items', 'teacher_data_behavior_other',
+            'student_device_provision', 'student_account_status',
+            'student_data_behavior_items', 'student_data_behavior_other',
+            'visit_count',
+
             # 数据应用成效
             'published_paper_count', 'published_book_count',
             'case_national_count', 'case_provincial_count', 'case_city_count',
             'award_national_count', 'award_provincial_count', 'award_city_count',
             'media_national_count', 'media_provincial_count', 'media_city_count',
             'conference_national_count', 'conference_provincial_count', 'conference_city_count',
+            'public_account_post_count',
+
             # 其他
             'auto_crawled_data', 'created_at', 'updated_at'
         ]

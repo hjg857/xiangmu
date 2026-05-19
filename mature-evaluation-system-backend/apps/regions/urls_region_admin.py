@@ -15,6 +15,7 @@ from .views_region_admin import (
     RegionAdminSchoolImportView,
     RegionAdminSchoolTemplateView,
 )
+from .views import RegionReportAISuggestionsView
 
 urlpatterns = [
     path("overview/", RegionAdminOverviewView.as_view(), name="region_admin_overview"),
@@ -31,5 +32,5 @@ urlpatterns = [
     path("applications/<int:application_id>/", RegionAdminApplicationDeleteView.as_view()),
     path("schools/template/", RegionAdminSchoolTemplateView.as_view()),
     path("schools/import/", RegionAdminSchoolImportView.as_view(), name="region_admin_school_import"),
-
+    path("region-report/ai-suggestions/", RegionReportAISuggestionsView.as_view(), name="region-report-ai-suggestions"),
 ]
