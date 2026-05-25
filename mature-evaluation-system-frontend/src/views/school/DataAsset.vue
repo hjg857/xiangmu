@@ -16,7 +16,7 @@
 
       <el-alert
         v-if="isReadonly"
-        title="评价已完成，当前为只读模式，无法修改数据"
+        :title="readonlyTip"
         type="warning"
         :closable="false"
         style="margin-bottom: 20px"
@@ -92,10 +92,15 @@
         </div>
 
         <template v-if="formData.has_unified_data_management === true && formData.can_query_data_assets === true">
-          <div class="form-section-label">
-            数据资产统计：教育教学、师生管理、数字资源、校园管理与行政以及其他类型数据总量：
-          </div>
-
+          <span>数据资产统计：教育教学、师生管理、数字资源、校园管理与行政以及其他类型数据总量：</span>
+          <el-popover placement="top-start" :width="300" trigger="hover" popper-class="custom-hint-popper">
+                <template #reference>
+                  <span class="hint-tag">填写说明</span>
+                </template>
+                <div class="hint-body">
+                  <p class="hint-text">说明：数据资产包括教育教学数据（学生学习数据、教师教学数据）、师生管理数据（基本信息数据、心理生理健康数据等）、数字资源数据（电子教材与教案、学科资料库等）、校园管理与行政数据（财务数据、安全管理数据等）等。</p>
+                </div>
+              </el-popover>
           <div class="data-volume-section">
             <!-- 教育教学数据 -->
             <div class="data-volume-block">
@@ -113,7 +118,7 @@
               >
                 <span class="volume-label">数据总量</span>
                 <el-input-number v-model="formData.teaching_data_volume" :min="0" :controls="false" />
-                <span>GB</span>
+                <span style="font-size: 14px;">GB</span>
               </div>
 
               <div class="volume-hint">
@@ -138,7 +143,7 @@
               >
                 <span class="volume-label">数据总量</span>
                 <el-input-number v-model="formData.teacher_student_data_volume" :min="0" :controls="false" />
-                <span>GB</span>
+                <span style="font-size: 14px;">GB</span>
               </div>
 
               <div class="volume-hint">
@@ -163,7 +168,7 @@
               >
                 <span class="volume-label">数据总量</span>
                 <el-input-number v-model="formData.digital_resource_data_volume" :min="0" :controls="false" />
-                <span>GB</span>
+                <span style="font-size: 14px;">GB</span>
               </div>
 
               <div class="volume-hint">
@@ -188,7 +193,7 @@
               >
                 <span class="volume-label">数据总量</span>
                 <el-input-number v-model="formData.campus_admin_data_volume" :min="0" :controls="false" />
-                <span>GB</span>
+                <span style="font-size: 14px;">GB</span>
               </div>
 
               <div class="volume-hint">
@@ -204,7 +209,7 @@
               <div class="data-volume-item">
                 <span class="volume-label">数据总量</span>
                 <el-input-number v-model="formData.other_type_data_volume" :min="0" :controls="false" />
-                <span>GB</span>
+                <span style="font-size: 14px;">GB</span>
               </div>
 
               <div class="volume-hint">
@@ -212,10 +217,6 @@
                 统计方式示例：可将学校未分类数据量进行汇总，得到其他类型数据总量；具体统计方式可根据学校实际情况进行调整。
               </div>
             </div>
-          </div>
-
-          <div class="form-tip">
-            说明：数据资产包括教育教学数据、师生管理数据、数字资源数据、校园管理与行政数据等。若某类数据选择“无法统计”，该类数据量按 0 处理，但不影响其他类别继续填写。
           </div>
         </template>
       </div>
@@ -270,6 +271,7 @@ const loading = ref(true)
 const saving = ref(false)
 const formRef = ref(null)
 const isReadonly = ref(false)  // 只读模式
+const assessmentInfo = ref(null)
 
 // 表单数据
 const formData = ref({
@@ -304,33 +306,72 @@ const formData = ref({
 })
 
 const isAssessmentExpired = (assessmentData) => {
-  if (!assessmentData?.created_at) return false
+  const startTime = assessmentData?.started_at || assessmentData?.created_at
 
-  const startTime = new Date(assessmentData.created_at).getTime()
-  const expireTime = startTime + 72 * 60 * 60 * 1000
+  if (!startTime) return false
 
-  return Date.now() > expireTime
+  const start = new Date(startTime).getTime()
+
+  if (!Number.isFinite(start)) return false
+
+  const expire = start + 72 * 60 * 60 * 1000
+
+  return Date.now() > expire
 }
+
+const isAssessmentReadonly = (assessmentData) => {
+  if (!assessmentData) return false
+
+  // 只有整份评估最终提交完成，或超过72小时，才进入只读
+  return assessmentData.status === 'completed' || isAssessmentExpired(assessmentData)
+}
+
+const readonlyTip = computed(() => {
+  if (assessmentInfo.value?.status === 'completed') {
+    return '评价已完成，当前为只读模式，无法修改数据'
+  }
+
+  if (isAssessmentExpired(assessmentInfo.value)) {
+    return '本次评估已超过72小时填报期限，当前为只读模式，无法修改数据'
+  }
+
+  return ''
+})
 
 // 加载数据
 const loadData = async () => {
   loading.value = true
+
   try {
+    const token = localStorage.getItem('access_token')
+
     // 先获取评估状态
     const assessmentResponse = await fetch(`/api/assessments/${assessmentId.value}/`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        'Authorization': `Bearer ${token}`
       }
     })
+
+    if (!assessmentResponse.ok) {
+      throw new Error('评估信息加载失败')
+    }
+
     const assessmentData = await assessmentResponse.json()
-    isReadonly.value = assessmentData.status !== 'draft' || isAssessmentExpired(assessmentData)
-    
+
+    assessmentInfo.value = assessmentData
+    isReadonly.value = isAssessmentReadonly(assessmentData)
+
     // 获取数据资产数据
     const response = await fetch(`/api/assessments/${assessmentId.value}/asset/`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        'Authorization': `Bearer ${token}`
       }
     })
+
+    if (!response.ok) {
+      throw new Error('数据资产信息加载失败')
+    }
+
     const data = await response.json()
     Object.assign(formData.value, data)
 
@@ -349,6 +390,7 @@ const loadData = async () => {
     })
   } catch (error) {
     console.error('加载数据失败:', error)
+    ElMessage.error(error.message || '加载数据失败')
   } finally {
     loading.value = false
   }
@@ -482,12 +524,6 @@ onBeforeUnmount(() => {
   margin-bottom: 10px;
 }
 
-.volume-label {
-  font-weight: 500;
-  color: #606266;
-  min-width: 150px;
-}
-
 .volume-hint {
   font-size: 12px;
   color: #909399;
@@ -499,7 +535,7 @@ onBeforeUnmount(() => {
 }
 
 :deep(.el-form-item) {
-  margin-bottom: 22px;
+  margin-bottom: 34x;
 }
 
 :deep(.el-form-item__label) {
@@ -646,7 +682,7 @@ onBeforeUnmount(() => {
 }
 
 .volume-label {
-  font-weight: 500;
+  font-size: 14px;
   color: #606266;
   min-width: 80px;
 }
@@ -654,8 +690,9 @@ onBeforeUnmount(() => {
 .volume-hint,
 .form-tip {
   width: 100%;
-  margin-top: 10px;
-  padding: 10px 14px;
+  margin-top: 14px;
+  margin-bottom: 22px;
+  padding: 12px 16px;
   background-color: #f5f7fa;
   border-radius: 4px;
   font-size: 13px;
@@ -667,6 +704,50 @@ onBeforeUnmount(() => {
 :deep(.el-form-item__content) {
   flex-wrap: wrap;
   align-items: flex-start;
+}
+
+/* 填写提示小标签样式 */
+.hint-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 10px;
+  font-size: 12px;
+  color: #409eff;
+  background-color: #ecf5ff;
+  border: 1px solid #cfe5ff;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap; /* 强制标签不换行 */
+  transition: all 0.2s;
+  line-height: 1.2;
+}
+
+.hint-tag:hover {
+  background-color: #409eff;
+  color: #ffffff;
+}
+
+/* 弹出框内容样式 */
+.hint-body {
+  padding: 8px 4px;
+}
+
+.hint-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #303133;
+  margin-bottom: 10px;
+}
+
+.hint-example {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #909399;
+}
+
+.hint-example em {
+  font-style: italic;
 }
 
 </style>

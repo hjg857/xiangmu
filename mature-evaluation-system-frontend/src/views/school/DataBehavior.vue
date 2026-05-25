@@ -16,7 +16,7 @@
 
       <el-alert
         v-if="isReadonly"
-        title="评价已完成，当前为只读模式，无法修改数据"
+        :title="readonlyTip"
         type="warning"
         :closable="false"
         style="margin-bottom: 20px"
@@ -53,7 +53,7 @@
             <span>学校教师每周使用多媒体一体机、智能黑板、希沃白板等数字化设备开展教学的人均频次？</span>
             <el-popover placement="top-start" :width="380" trigger="hover" popper-class="custom-hint-popper">
               <template #reference>
-                <span class="hint-tag">填写提示</span>
+                <span class="hint-tag">填写说明</span>
               </template>
               <div class="hint-body">
                 <p class="hint-text">
@@ -84,7 +84,7 @@
             <span>学校教师每周使用数据相关平台获取教学资源、分析学情、管理学生等的人均频次？</span>
             <el-popover placement="top-start" :width="420" trigger="hover" popper-class="custom-hint-popper">
               <template #reference>
-                <span class="hint-tag">填写提示</span>
+                <span class="hint-tag">填写说明</span>
               </template>
               <div class="hint-body">
                 <p class="hint-text">
@@ -115,7 +115,7 @@
             <span>学校教师日常教学中已常态化开展的数据行为有哪些？</span>
             <el-popover placement="top-start" :width="420" trigger="hover" popper-class="custom-hint-popper">
               <template #reference>
-                <span class="hint-tag">填写提示</span>
+                <span class="hint-tag">填写说明</span>
               </template>
               <div class="hint-body">
                 <p class="hint-text">
@@ -188,11 +188,11 @@
           <span>学校是否为学生提供数字化设备用于学习（如多媒体一体机、电脑、平板等）？</span>
           <el-popover placement="top-start" :width="420" trigger="hover" popper-class="custom-hint-popper">
             <template #reference>
-              <span class="hint-tag">填写提示</span>
+              <span class="hint-tag">填写说明</span>
             </template>
             <div class="hint-body">
               <p class="hint-text">
-                数字化学习设备包括多媒体一体机、学生机房计算机、学生平板、移动学习终端等，可根据学校实际配备情况选择。
+                数字化学习设备包括多媒体一体机、学生机房计算机、学生平板、移动学习终端等。
               </p>
             </div>
           </el-popover>
@@ -212,11 +212,11 @@
           <span>学校是否为学生开通个人账号，可登录数据相关平台，开展线上学习、习题作答、学业数据查询等活动？</span>
           <el-popover placement="top-start" :width="450" trigger="hover" popper-class="custom-hint-popper">
             <template #reference>
-              <span class="hint-tag">填写提示</span>
+              <span class="hint-tag">填写说明</span>
             </template>
             <div class="hint-body">
               <p class="hint-text">
-                若学生无法独立开通个人账号，但可由家长协助注册、绑定，并正常使用相关平台开展学习与学业查询，也可视为已配备账号。
+                说明：若学生无法独立开通个人账号，由家长协助注册、绑定并可正常使用相关平台开展学习与学业查询，同样视为已配备账号，纳入计分范围。
               </p>
             </div>
           </el-popover>
@@ -240,14 +240,11 @@
           <span>学生日常学习生活中已常态化实现的数据行为有哪些？</span>
           <el-popover placement="top-start" :width="420" trigger="hover" popper-class="custom-hint-popper">
             <template #reference>
-              <span class="hint-tag">填写提示</span>
+              <span class="hint-tag">填写说明</span>
             </template>
             <div class="hint-body">
               <p class="hint-text">
-                请根据学生在日常学习生活中已经常态化开展的数据行为进行勾选，可多选。
-              </p>
-              <p class="hint-example">
-                <em>系统将根据勾选数量进行计分。若选择“其他”，请在下方补充说明。</em>
+                说明：上述数据相关平台包括国家智慧教育平台、地方（省、市、区县级）智慧教育平台、教学平台、教务系统、校园一卡通等各类服务平台。
               </p>
             </div>
           </el-popover>
@@ -306,11 +303,11 @@
               <span>2023年至2025年，学校公开发表的与数据赋能教学、管理、评价和教研等相关的成果（如论文、著作等）？</span>
               <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
-                  <span class="hint-tag">填写提示</span>
+                  <span class="hint-tag">填写说明</span>
                 </template>
                 <div class="hint-body">
                   <p class="hint-text">学校以单位名义公开发表 / 出版的、主题围绕数据应用相关的论文和著作数量。</p>
-                  <p class="hint-example"><em>示例：学校 2022 年发表《中小学教育数据应用实践》论文 2 篇，2024 年出版《校园数据治理》著作 1 部，则已发表论文填写「2」，已出版著作填写「1」。</em></p>
+                  <p class="hint-example"><em>示例：学校2023年至2025年发表《中小学教育数据应用实践》论文 2 篇，2024 年出版《校园数据治理》著作 1 部，则已发表论文填写「2」，已出版著作填写「1」。</em></p>
                 </div>
               </el-popover>
             </div>
@@ -332,7 +329,7 @@
               <span>2023年至2025年，学校利用数据赋能教育教学和校园管理的典型做法或优秀实践入选各级优秀或典型案例、课例的情况？</span>
               <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
-                  <span class="hint-tag">填写提示</span>
+                  <span class="hint-tag">填写说明</span>
                 </template>
                 <div class="hint-body">
                   <p class="hint-text">学校数据应用相关成果入选对应级别教育信息化 / 数字化转型优秀或典型案例的数量。</p>
@@ -361,7 +358,7 @@
               <span>2023年至2025年，学校利用数据赋能教育教学和校园管理的典型做法或优秀实践受到市级及以上荣誉奖励的情况？</span>
               <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
-                  <span class="hint-tag">填写提示</span>
+                  <span class="hint-tag">填写说明</span>
                 </template>
                 <div class="hint-body">
                   <p class="hint-text">学校数据应用相关成果获得对应级别官方颁发的荣誉奖励数量。</p>
@@ -393,7 +390,7 @@
               <span>2023年至2025年，学校利用数据赋能教育教学和校园管理的典型做法或优秀实践被官方媒体宣传报道的情况？</span>
               <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
-                  <span class="hint-tag">填写提示</span>
+                  <span class="hint-tag">填写说明</span>
                 </template>
                 <div class="hint-body">
                   <p class="hint-text">学校数据应用相关成果被对应级别官方媒体（电视台、党报、政府官网等）宣传报道的次数。</p>
@@ -422,11 +419,11 @@
               <span>2023年至2025年，学校在教育信息化/数字化转型/智慧校园建设会议、活动上作交流发言或经验分享的情况？</span>
               <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
-                  <span class="hint-tag">填写提示</span>
+                  <span class="hint-tag">填写说明</span>
                 </template>
                 <div class="hint-body">
                   <p class="hint-text">学校代表在对应级别教育信息化/数字化转型会议、活动中就数据应用相关主题交流发言或分享经验的次数。</p>
-                  <p class="hint-example"><em>示例：学校 2022 年在国家级数字化转型论坛发言 1 次、2023 年在省级教育信息化会议分享经验 2 次、2024 年在市级交流活动发言 1 次，则国家级填写「1」，省级填写「2」，市级及以下填写「1」。</em></p>
+                  <p class="hint-example"><em>示例：学校2023年至2025年在国家级数字化转型论坛发言 1 次、2023 年在省级教育信息化会议分享经验 2 次、2024 年在市级交流活动发言 1 次，则国家级填写「1」，省级填写「2」，市级及以下填写「1」。</em></p>
                 </div>
               </el-popover>
             </div>
@@ -451,7 +448,7 @@
               <span>2023年至2025年，学校通过公众号发布与数据应用相关的教育教学和校园管理的经验分享或创新实践的情况？</span>
               <el-popover placement="top-start" :width="380" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
-                  <span class="hint-tag">填写提示</span>
+                  <span class="hint-tag">填写说明</span>
                 </template>
                 <div class="hint-body">
                   <p class="hint-text">
@@ -483,11 +480,11 @@
               <span>2023年至2025年，其他学校到本校参观学习数据赋能教育教学和校园管理经验的情况？</span>
               <el-popover placement="top-start" :width="300" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
-                  <span class="hint-tag">填写提示</span>
+                  <span class="hint-tag">填写说明</span>
                 </template>
                 <div class="hint-body">
                   <p class="hint-text">请填写2023年至2025年期间，其他学校到本校参观学习数据赋能教育教学、校园管理或智慧校园建设经验的总次数。单次多所学校来访可计为1次。</p>
-                  <p class="hint-example"><em>示例：2021 年有 3 所学校分批来访学习（计 3 次），2023 年有 1 批 5 所学校集体来访（计 1 次），则其他学校参观学习填写「4」。</em></p>
+                  <p class="hint-example"><em>示例：2023年至2025年有3所学校分批来访学习（计3次），2023 有1批5所学校集体来访（计1次），则其他学校参观学习填写「4」。</em></p>
                 </div>
               </el-popover>
             </div>
@@ -563,6 +560,7 @@ const loading = ref(true)
 const saving = ref(false)
 const formRef = ref(null)
 const isReadonly = ref(false)  // 只读模式
+const assessmentInfo = ref(null)
 
 // 表单数据
 const formData = ref({
@@ -602,33 +600,72 @@ const formData = ref({
 })
 
 const isAssessmentExpired = (assessmentData) => {
-  if (!assessmentData?.created_at) return false
+  const startTime = assessmentData?.started_at || assessmentData?.created_at
 
-  const startTime = new Date(assessmentData.created_at).getTime()
-  const expireTime = startTime + 72 * 60 * 60 * 1000
+  if (!startTime) return false
 
-  return Date.now() > expireTime
+  const start = new Date(startTime).getTime()
+
+  if (!Number.isFinite(start)) return false
+
+  const expire = start + 72 * 60 * 60 * 1000
+
+  return Date.now() > expire
 }
+
+const isAssessmentReadonly = (assessmentData) => {
+  if (!assessmentData) return false
+
+  // 只有整份评估最终提交完成，或超过72小时，才进入只读
+  return assessmentData.status === 'completed' || isAssessmentExpired(assessmentData)
+}
+
+const readonlyTip = computed(() => {
+  if (assessmentInfo.value?.status === 'completed') {
+    return '评价已完成，当前为只读模式，无法修改数据'
+  }
+
+  if (isAssessmentExpired(assessmentInfo.value)) {
+    return '本次评估已超过72小时填报期限，当前为只读模式，无法修改数据'
+  }
+
+  return ''
+})
 
 // 加载数据
 const loadData = async () => {
   loading.value = true
+
   try {
+    const token = localStorage.getItem('access_token')
+
     // 先获取评估状态
     const assessmentResponse = await fetch(`/api/assessments/${assessmentId.value}/`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        'Authorization': `Bearer ${token}`
       }
     })
+
+    if (!assessmentResponse.ok) {
+      throw new Error('评估信息加载失败')
+    }
+
     const assessmentData = await assessmentResponse.json()
-    isReadonly.value = assessmentData.status !== 'draft' || isAssessmentExpired(assessmentData)
-    
+
+    assessmentInfo.value = assessmentData
+    isReadonly.value = isAssessmentReadonly(assessmentData)
+
     // 获取数据行为数据
     const response = await fetch(`/api/assessments/${assessmentId.value}/behavior/`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        'Authorization': `Bearer ${token}`
       }
     })
+
+    if (!response.ok) {
+      throw new Error('数据行为信息加载失败')
+    }
+
     const data = await response.json()
     Object.assign(formData.value, data)
 
@@ -658,6 +695,7 @@ const loadData = async () => {
     }
   } catch (error) {
     console.error('加载数据失败:', error)
+    ElMessage.error(error.message || '加载数据失败')
   } finally {
     loading.value = false
   }
@@ -767,7 +805,7 @@ onBeforeUnmount(() => {
 }
 
 :deep(.el-form-item) {
-  margin-bottom: 22px;
+  margin-bottom: 34px;
 }
 
 :deep(.el-form-item__label) {
@@ -947,8 +985,9 @@ onBeforeUnmount(() => {
 
 .form-tip {
   width: 100%;
-  margin-top: 10px;
-  padding: 10px 14px;
+  margin-top: 14px;
+  margin-bottom: 22px;
+  padding: 12px 16px;
   background-color: #f5f7fa;
   border-radius: 4px;
   font-size: 13px;

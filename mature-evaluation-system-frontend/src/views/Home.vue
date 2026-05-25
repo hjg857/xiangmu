@@ -114,6 +114,71 @@ const userInfo = ref({
 const schoolName = ref('')
 const currentAssessment = ref(null)
 
+const getAssessmentTime = (item) => {
+  return new Date(
+    item?.started_at ||
+    item?.created_at ||
+    item?.times?.started_at ||
+    item?.times?.created_at ||
+    0
+  ).getTime()
+}
+
+const pickCurrentAssessment = (list = []) => {
+  if (!Array.isArray(list) || !list.length) return null
+
+  // 优先找未完成的 draft 评估
+  const draftList = list
+    .filter(item => item.status === 'draft')
+    .sort((a, b) => getAssessmentTime(b) - getAssessmentTime(a))
+
+  if (draftList.length) {
+    return draftList[0]
+  }
+
+  // 没有 draft 时，再取最新一条
+  return [...list].sort((a, b) => getAssessmentTime(b) - getAssessmentTime(a))[0]
+}
+
+const hasCompletedBasicInfo = (assessment = null) => {
+  const school =
+    assessment?.school ||
+    assessment?.school_info ||
+    userInfo.value?.school ||
+    userInfo.value ||
+    {}
+
+  const foundingYear = school.founding_year
+  const teacherCount = school.teacher_count
+  const studentCount = school.student_count
+
+  return (
+    foundingYear !== null &&
+    foundingYear !== undefined &&
+    foundingYear !== '' &&
+    teacherCount !== null &&
+    teacherCount !== undefined &&
+    teacherCount !== '' &&
+    Number(teacherCount) > 0 &&
+    studentCount !== null &&
+    studentCount !== undefined &&
+    studentCount !== '' &&
+    Number(studentCount) > 0
+  )
+}
+
+const goToAssessmentEntry = (assessment = null) => {
+  // 只要已经存在评估记录，就直接进入评估流程页
+  // 不再从首页反复进入基础信息采集页
+  if (assessment?.id) {
+    router.push('/school/assessment')
+    return
+  }
+
+  // 没有评估记录时才进入基础信息采集页
+  router.push('/school/basic-info')
+}
+
 onMounted(async () => {
   // 获取用户信息
   const storedUser = localStorage.getItem('user')
@@ -126,45 +191,48 @@ onMounted(async () => {
   // 获取评估状态
   try {
     const assessments = await getAssessments()
-    if (assessments && assessments.length > 0) {
-      currentAssessment.value = assessments[0]
-    }
+    currentAssessment.value = pickCurrentAssessment(assessments)
   } catch (error) {
     console.error('获取评估状态失败:', error)
   }
 })
 
 // 开始评估
+// 开始评估
 const handleStartAssessment = async () => {
-  // 情况 A：没有任何记录，或者最近的一份已经完成了
-  // 我们需要开启一轮新的评估
+  // 情况 A：没有评估记录，或者最近一份已经完成，开启新一轮评估
   if (!currentAssessment.value || currentAssessment.value.status === 'completed') {
     try {
-      loading.value = true // 如果你有加载状态的话
+      loading.value = true
+
       const res = await createAssessment()
-      
-      // 后端会返回新创建的评估对象（或者是之前没写完的草稿）
-      // 我们直接跳转到评估填写页面
+
+      // 兼容不同接口返回格式
+      const newAssessment = res?.data?.data || res?.data || res
+
+      currentAssessment.value = newAssessment
+
       ElMessage.success('已为您开启新一轮评估')
-      router.push('/school/basic-info')
+
+      // 基础信息完整则直接进入评估流程；不完整才进入基础信息采集
+      goToAssessmentEntry(newAssessment)
     } catch (error) {
       console.error('开启评估失败:', error)
       ElMessage.error(error.response?.data?.error || '无法开启新评估，请联系管理员')
     } finally {
       loading.value = false
     }
+
     return
   }
 
-  // 情况 B：当前有一份评估是“草稿”状态 (draft)
+  // 情况 B：当前有一份评估是 draft，继续填写
   if (currentAssessment.value.status === 'draft') {
-    // 直接进去接着填
-    router.push('/school/basic-info')
+    goToAssessmentEntry(currentAssessment.value)
     return
   }
 
-  // 情况 C：当前评估正在处理中 (collecting / analyzing)
-  // 这种状态下既不能改，也不能开新的（必须等这份出结果）
+  // 情况 C：当前评估正在处理中
   if (['collecting', 'analyzing'].includes(currentAssessment.value.status)) {
     ElMessageBox.alert(
       '您当前有一份评估正在计算中，请等待结果生成后再开启新一轮评估。',

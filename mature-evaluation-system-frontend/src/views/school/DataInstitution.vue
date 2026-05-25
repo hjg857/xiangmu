@@ -16,7 +16,7 @@
 
       <el-alert
         v-if="isReadonly"
-        title="评价已完成，当前为只读模式，无法修改数据"
+        :title="readonlyTip"
         type="warning"
         :closable="false"
         style="margin-bottom: 20px"
@@ -50,12 +50,14 @@
             <span>学校是否设置对数据进行收集、存储与管理或整体规划的领导小组或工作小组？</span>
             <el-popover placement="top-start" :width="460" trigger="hover" popper-class="custom-hint-popper">
               <template #reference>
-                <span class="hint-tag">填写提示</span>
+                <span class="hint-tag">填写说明</span>
               </template>
               <div class="hint-body">
                 <p class="hint-text">
-                  请根据学校数据工作小组的实际设置情况选择。规范管理小组强调专人分工、职责明确和全校数据工作的体系化管理；基础管理小组主要负责日常登记、整理和常规维护。
-                </p>
+                  规范管理型：专人分工负责全校数据的体系化管理，涵盖数据的收集、存储、分析、应用和整体规划，职责分工明确。</p>
+                <p class="hint-example"><em>例如：由信息技术教师、机房管理人员、行政内勤等兼任的人员组成小组，负责设备登记、教学数据记录、电脑及机房设备借阅登记等基础工作。虽然为小组形式，但没有专门的负责人统筹管理。</em></p>
+                <p class="hint-text">基础管理型：小组成员多为兼任人员，负责学校数据的日常登记、数据整理、常规维护等工作，但缺乏整体规划。</p>
+                <p class="hint-example"><em>例如：由校长担任总负责人，信息中心主任为分管负责人，其他行政部门、年级组指派专人组成小组，统筹全校各类教学、管理等数据的采集、归档、分析和规划。</em></p>
               </div>
             </el-popover>
           </div>
@@ -68,10 +70,12 @@
         </el-radio-group>
 
         <div class="form-tip">
-          规范管理型：专人分工负责全校数据的体系化管理，涵盖数据的收集、存储、分析、应用和整体规划，职责分工明确。
+          规范管理型：专人分工负责全校数据的体系化管理，涵盖数据的收集、存储、分析、应用和整体规划，职责分工明确。<br>
+          例如：由信息技术教师、机房管理人员、行政内勤等兼任的人员组成小组，负责设备登记、教学数据记录、电脑及机房设备借阅登记等基础工作。虽然为小组形式，但没有专门的负责人统筹管理。
         </div>
         <div class="form-tip">
-          基础管理型：小组成员多为兼任人员，负责学校数据的日常登记、数据整理、常规维护等工作，但缺乏整体规划。
+          基础管理型：小组成员多为兼任人员，负责学校数据的日常登记、数据整理、常规维护等工作，但缺乏整体规划。<br>
+          例如：由校长担任总负责人，信息中心主任为分管负责人，其他行政部门、年级组指派专人组成小组，统筹全校各类教学、管理等数据的采集、归档、分析和规划。
         </div>
       </el-form-item>
         <el-form-item prop="meeting_activity_count">
@@ -80,11 +84,10 @@
               <span>2023年到2025年，上述数据小组围绕学校数据收集、分析、应用等方面开展会议或研讨的次数？</span>
               <el-popover placement="top-start" :width="300" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
-                  <span class="hint-tag">填写提示</span>
+                  <span class="hint-tag">填写说明</span>
                 </template>
                 <div class="hint-body">
-                  <p class="hint-text">2023年到2025年期间，由学校组织的各类数据相关会议、培训、研讨、专项活动等的总次数。</p>
-                  <p class="hint-example"><em>示例：学校2022年开展1次数据安全专项会议、2023年开展2次数据应用研讨、2024年开展3次数据素养培训，则共计6次，填写「6」。</em></p>
+                  <p class="hint-text">数据工作会议或研讨：包括但不限于数据存储与管理规范化、智慧校园数据体系建设规划、学籍数据质量自查、跨部门数据协同与应用、设备台账与信息化资产登记规范化等会议或研讨。</p>
                 </div>
               </el-popover>
             </div>
@@ -103,13 +106,6 @@
           <div class="label-with-hint">
             <span>学校是否安排专人或兼职人员，负责校内数据工作？</span>
             <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
-              <template #reference>
-                <span class="hint-tag">填写提示</span>
-              </template>
-              <div class="hint-body">
-                <p class="hint-text">学校设有负责数据的收集、整理、维护、分析等日常数据管理工作的专人（全职或兼职）。</p>
-                <p class="hint-example"><em>示例:学校设有1名专职数据首席官，负责全校数据管理工作，则选择「已配备」；学校校长兼职统筹全校数据管理工作，也选择「已配备」；若学校无专人负责数据管理，仅由各部门教师零散处理，则选择「未配备」。</em></p>
-              </div>
             </el-popover>
           </div>
         </template>
@@ -148,13 +144,6 @@
           <div class="label-with-hint">
             <span>2023年至2025年，学校数据专职或兼职人员是否参加过数据管理、数据分析、数据安全、数据应用等方面的培训或进修？</span>
             <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
-              <template #reference>
-                <span class="hint-tag">填写提示</span>
-              </template>
-              <div class="hint-body">
-                <p class="hint-text">2023年到2025年期间 ，学校数据相关人员参加的与数据管理、数据分析、数据安全等主题相关的外部进修或校内培训。</p>
-                <p class="hint-example"><em>示例：数据管理员2023年参加了市级“数据分析”培训、2024年参加了校内“数据安全规范”培训，则选择「有参与」；若未参加任何相关进修、培训，则选择「未参与」。</em></p>
-              </div>
             </el-popover>
           </div>
         </template>
@@ -196,16 +185,8 @@
         <el-form-item prop="management_doc_status">
         <template #label>
           <div class="label-with-hint">
-            <span>学校是否在相关管理制度或规范文件中，对数据的采集、使用、存储与共享等环节作出明确规定？</span>
+            <span>学校是否在相关管理制度或规范文件中，对数据（如师生信息）的采集、使用、存储与共享等环节作出明确规定？</span>
             <el-popover placement="top-start" :width="460" trigger="hover" popper-class="custom-hint-popper">
-              <template #reference>
-                <span class="hint-tag">填写提示</span>
-              </template>
-              <div class="hint-body">
-                <p class="hint-text">
-                  这里主要考察学校是否通过制度、办法、细则等文件，对师生信息、教学数据、管理数据等的采集、使用、存储和共享作出明确要求。
-                </p>
-              </div>
             </el-popover>
           </div>
         </template>
@@ -218,7 +199,7 @@
       </el-form-item>
 
       <template v-if="formData.management_doc_status === 'clear_required'">
-        <el-form-item label="学校出台的与数据管理相关文件的份数？">
+        <el-form-item label="学校出台的与数据管理相关文件的份数（如管理、办法、细则）？">
           <div class="inline-inputs">
             <el-input-number v-model="formData.management_doc_count" :min="0" :controls="false" />
             <span>份</span>
@@ -254,16 +235,9 @@
         <el-form-item prop="practice_doc_status">
   <template #label>
     <div class="label-with-hint">
-      <span>学校是否发布指导师生使用数据的相关指南、操作说明或工作手册？</span>
+      <span>学校是否发布指导师生使用数据的相关指南、操作说明或工作手册（如一体机使用手册，利用平台分析学情、优化教学等的指南）？</span>
       <el-popover placement="top-start" :width="460" trigger="hover" popper-class="custom-hint-popper">
-        <template #reference>
-          <span class="hint-tag">填写提示</span>
-        </template>
-        <div class="hint-body">
-          <p class="hint-text">
-            相关材料可包括一体机使用手册、平台操作说明、学情分析指南、利用数据优化教学的操作手册等。
-          </p>
-        </div>
+        
       </el-popover>
     </div>
   </template>
@@ -276,7 +250,7 @@
 </el-form-item>
 
 <template v-if="formData.practice_doc_status === 'published'">
-  <el-form-item label="学校出台的与数据实践指导相关文件的份数？">
+  <el-form-item label="学校出台的与数据实践指导相关文件的份数（如规范、标准、指南）？">
     <div class="inline-inputs">
       <el-input-number v-model="formData.practice_doc_count" :min="0" :controls="false" />
       <span>份</span>
@@ -359,6 +333,7 @@ const loading = ref(true)
 const saving = ref(false)
 const formRef = ref(null)
 const isReadonly = ref(false)  // 只读模式
+const assessmentInfo = ref(null)
 
 // 表单数据
 const formData = ref({
@@ -437,33 +412,72 @@ const uploadHeaders = computed(() => {
 })
 
 const isAssessmentExpired = (assessmentData) => {
-  if (!assessmentData?.created_at) return false
+  const startTime = assessmentData?.started_at || assessmentData?.created_at
 
-  const startTime = new Date(assessmentData.created_at).getTime()
-  const expireTime = startTime + 72 * 60 * 60 * 1000
+  if (!startTime) return false
 
-  return Date.now() > expireTime
+  const start = new Date(startTime).getTime()
+
+  if (!Number.isFinite(start)) return false
+
+  const expire = start + 72 * 60 * 60 * 1000
+
+  return Date.now() > expire
 }
+
+const isAssessmentReadonly = (assessmentData) => {
+  if (!assessmentData) return false
+
+  // 只有整份评估最终提交完成，或超过72小时，才进入只读
+  return assessmentData.status === 'completed' || isAssessmentExpired(assessmentData)
+}
+
+const readonlyTip = computed(() => {
+  if (assessmentInfo.value?.status === 'completed') {
+    return '评价已完成，当前为只读模式，无法修改数据'
+  }
+
+  if (isAssessmentExpired(assessmentInfo.value)) {
+    return '本次评估已超过72小时填报期限，当前为只读模式，无法修改数据'
+  }
+
+  return ''
+})
 
 // 加载数据
 const loadData = async () => {
   loading.value = true
+
   try {
+    const token = localStorage.getItem('access_token')
+
     // 先获取评估状态
     const assessmentResponse = await fetch(`/api/assessments/${assessmentId.value}/`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        'Authorization': `Bearer ${token}`
       }
     })
+
+    if (!assessmentResponse.ok) {
+      throw new Error('评估信息加载失败')
+    }
+
     const assessmentData = await assessmentResponse.json()
-    isReadonly.value = assessmentData.status !== 'draft' || isAssessmentExpired(assessmentData)
-    
+
+    assessmentInfo.value = assessmentData
+    isReadonly.value = isAssessmentReadonly(assessmentData)
+
     // 获取数据制度数据
     const response = await fetch(`/api/assessments/${assessmentId.value}/institution/`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        'Authorization': `Bearer ${token}`
       }
     })
+
+    if (!response.ok) {
+      throw new Error('数据制度信息加载失败')
+    }
+
     const data = await response.json()
     Object.assign(formData.value, data)
 
@@ -489,6 +503,7 @@ const loadData = async () => {
     }
   } catch (error) {
     console.error('加载数据失败:', error)
+    ElMessage.error(error.message || '加载数据失败')
   } finally {
     loading.value = false
   }
@@ -497,11 +512,12 @@ const loadData = async () => {
 // 保存数据
 const handleSave = async () => {
   if (!formRef.value) return
-  
+
+  saving.value = true
+
   try {
     await formRef.value.validate()
-    
-    saving.value = true
+
     const response = await fetch(`/api/assessments/${assessmentId.value}/save_institution/`, {
       method: 'PUT',
       headers: {
@@ -510,15 +526,15 @@ const handleSave = async () => {
       },
       body: JSON.stringify(formData.value)
     })
-    
-    if (response.ok) {
-      ElMessage.success('保存成功')
-    } else {
+
+    if (!response.ok) {
       throw new Error('保存失败')
     }
+
+    ElMessage.success('保存成功')
   } catch (error) {
     console.error('保存失败:', error)
-    ElMessage.error('保存失败')
+    ElMessage.error(error.message || '保存失败')
   } finally {
     saving.value = false
   }
@@ -718,7 +734,7 @@ onBeforeUnmount(() => {
 }
 
 :deep(.el-form-item) {
-  margin-bottom: 22px;
+  margin-bottom: 34px;
 }
 
 :deep(.el-form-item__label) {
@@ -931,8 +947,9 @@ onBeforeUnmount(() => {
 
 .form-tip {
   width: 100%;
-  margin-top: 10px;
-  padding: 10px 14px;
+  margin-top: 14px;
+  margin-bottom: 22px;
+  padding: 12px 16px;
   background-color: #f5f7fa;
   border-radius: 4px;
   font-size: 13px;

@@ -16,7 +16,7 @@
 
       <el-alert
         v-if="isReadonly"
-        title="评价已完成，当前为只读模式，无法修改数据"
+        :title="readonlyTip"
         type="warning"
         :closable="false"
         style="margin-bottom: 20px"
@@ -46,7 +46,15 @@
         <el-form-item prop="has_independent_data_center">
           <template #label>
             <div class="label-with-hint">
-              <span>学校是否设有独立数据中心且指标达到B级要求？</span>
+              <span>学校是否设有独立数据中心？</span>
+              <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
+                <template #reference>
+                  <span class="hint-tag">填写说明</span>
+                </template>
+                <div class="hint-body">
+                  <p class="hint-text">说明：数据中心指专门用于承载学校各类业务数据的集中存储、服务器部署、网络运维与安全保障的专用物理机房或云端专属服务环境。</p>
+                </div>
+              </el-popover>
             </div>
           </template>
           <el-radio-group v-model="formData.has_independent_data_center" class="horizontal-radio">
@@ -61,7 +69,7 @@
               <span>已设立独立数据中心的情况下，数据中心指标达到B级要求的程度？</span>
               <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
-                  <span class="hint-tag">填写提示</span>
+                  <span class="hint-tag">填写说明</span>
                 </template>
                 <div class="hint-body">
                   <p class="hint-text">学校是否拥有独立数据中心（独立机房），且该数据中心的建设标准是否符合 GB50174-2017《数据中心设计规范》的对应要求，按实际情况选择对应选项。</p>
@@ -112,11 +120,10 @@
             <span>学校数字终端（如教学一体机、智能黑板、希沃白板）配备生机比（学生用机数量与在校生人数之比）？</span>
             <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
               <template #reference>
-                <span class="hint-tag">填写提示</span>
+                <span class="hint-tag">填写说明</span>
               </template>
               <div class="hint-body">
-                <p class="hint-text">生机比指 “学生人数：数字终端数量”，按实际计算结果选择对应区间选项（数字终端含电脑、平板等教学用智能终端）。</p>
-                <p class="hint-example"><em>示例：全校学生 1000 人、数字终端 200 台，生机比 = 5:1（＜6:1），则选择「生机比 < 6:1」。</em></p>
+                <p class="hint-text">说明：数字终端包括多媒体一体机、智能黑板、希沃交互终端、教师办公电脑、学生机房计算机、学生平板等各类教学与学习智能终端设备。</p>
               </div>
             </el-popover>
           </div>
@@ -135,11 +142,10 @@
             <span>学校数字终端（如教学一体机、智能黑板、希沃白板）配备师机比（专任教师用机数量与专任教师人数之比） ？</span>
             <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
               <template #reference>
-                <span class="hint-tag">填写提示</span>
+                <span class="hint-tag">填写说明</span>
               </template>
               <div class="hint-body">
-                <p class="hint-text">师机比指 “教师人数：数字终端数量”，按实际计算结果选择对应区间选项（数字终端含电脑、平板等教学用智能终端）。</p>
-                <p class="hint-example"><em>示例：全校教师 100 人、数字终端 80 台，师机比 = 1.25:1（1:1 ≤ 师机比 < 4:1），则选择「1:1 ≤ 师机比 < 4:1」。</em></p>
+                <p class="hint-text">说明：数字终端包括多媒体一体机、智能黑板、希沃交互终端、教师办公电脑、学生机房计算机、学生平板等各类教学与学习智能终端设备。</p>
               </div>
             </el-popover>
           </div>
@@ -161,11 +167,10 @@
               <span>学校是否建设数据治理平台，如云平台、专享云服务等，进行数据集中归集、统一管理、共享调用？</span>
               <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
                 <template #reference>
-                  <span class="hint-tag">填写提示</span>
+                  <span class="hint-tag">填写说明</span>
                 </template>
                 <div class="hint-body">
-                  <p class="hint-text">判断学校是否搭建了专门的数治理平台（含数据中台、数据交换中心、数据管理平台等。</p>
-                  <p class="hint-example"><em>示例：学校已建成校级数据中台，实现全校数据统一归集和交换，则选择「已建立」；学校未搭建任何数据治理类平台，仅零散存储数据，则选择「未建立」。</em></p>
+                  <p class="hint-text">说明：依托区级统一教育平台、校外租用专业教育云服务、学校自主搭建校级云管理平台，实现校内数据集中管控与业务共享，均视为已建设数据治理平台。</p>
                 </div>
               </el-popover>
             </div>
@@ -197,14 +202,6 @@
           <div class="label-with-hint">
             <span>学校各类业务管理与教学平台的建设管理模式属于：</span>
             <el-popover placement="top-start" :width="420" trigger="hover" popper-class="custom-hint-popper">
-              <template #reference>
-                <span class="hint-tag">填写提示</span>
-              </template>
-              <div class="hint-body">
-                <p class="hint-text">
-                  请根据学校各类业务管理与教学平台的实际建设方式选择。若完全接入外部平台，则后续安保认证数量和比例不再填写，系统将按照计分规则直接赋分。
-                </p>
-              </div>
             </el-popover>
           </div>
         </template>
@@ -222,13 +219,7 @@
               <div class="label-with-hint">
                 <span>学校自建的各类平台通过国家安保等级认证的数量？</span>
                 <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
-                  <template #reference>
-                    <span class="hint-tag">填写提示</span>
-                  </template>
-                  <div class="hint-body">
-                    <p class="hint-text">统计学校当前部署的所有信息化平台中，通过国家网络安全等级保护认证（等保认证）的平台数量。</p>
-                    <p class="hint-example"><em>示例：学校部署了教务管理平台、学生评价平台、校园安全平台共 3 个平台，其中教务管理平台和校园安全平台通过等保认证，则填写「2」；所有平台均未通过则填写「0」。</em></p>
-                  </div>
+
                 </el-popover>
               </div>
             </template>
@@ -245,17 +236,7 @@
               <div class="label-with-hint">
                 <span>学校部署的各类平台通过国家安保等级认定的比例</span>
                 <el-popover placement="top-start" :width="380" trigger="hover" popper-class="custom-hint-popper">
-                  <template #reference>
-                    <span class="hint-tag">填写提示</span>
-                  </template>
-                  <div class="hint-body">
-                    <p class="hint-text">
-                      请根据“通过国家安保等级认定的平台数量 ÷ 学校部署的所有平台总数”计算认定比例，并按区间选择对应选项。
-                    </p>
-                    <p class="hint-example">
-                      <em>示例：学校共部署 5 个平台，其中 3 个通过认定，则认定比例为 60%，选择“40%＜认定比例≤80%”。</em>
-                    </p>
-                  </div>
+                
                 </el-popover>
               </div>
             </template>
@@ -282,13 +263,7 @@
               <div class="label-with-hint">
                 <span>2023年到2025年，学校是否发生数据风险事件？</span>
                 <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
-                  <template #reference>
-                    <span class="hint-tag">填写提示</span>
-                  </template>
-                  <div class="hint-body">
-                    <p class="hint-text">2023年到2025年期间， 学校是否发生过数据泄露、数据篡改、数据丢失、数据被非法访问等数据安全风险事件。</p>
-                    <p class="hint-example"><em>示例：2023 年学校发生过学生信息泄露事件，则选择「有发生」；2020-2025年期间未发生任何数据安全问题，则选择「未发生」。</em></p>
-                  </div>
+                  
                 </el-popover>
               </div>
             </template>
@@ -362,6 +337,7 @@ const loading = ref(true)
 const saving = ref(false)
 const formRef = ref(null)
 const isReadonly = ref(false)  // 只读模式
+const assessmentInfo = ref(null)
 
 // 表单数据
 const formData = ref({
@@ -384,33 +360,72 @@ const formData = ref({
 })
 
 const isAssessmentExpired = (assessmentData) => {
-  if (!assessmentData?.created_at) return false
+  const startTime = assessmentData?.started_at || assessmentData?.created_at
 
-  const startTime = new Date(assessmentData.created_at).getTime()
-  const expireTime = startTime + 72 * 60 * 60 * 1000
+  if (!startTime) return false
 
-  return Date.now() > expireTime
+  const start = new Date(startTime).getTime()
+
+  if (!Number.isFinite(start)) return false
+
+  const expire = start + 72 * 60 * 60 * 1000
+
+  return Date.now() > expire
 }
+
+const isAssessmentReadonly = (assessmentData) => {
+  if (!assessmentData) return false
+
+  // 只有整份评估最终提交完成，或超过72小时，才只读
+  return assessmentData.status === 'completed' || isAssessmentExpired(assessmentData)
+}
+
+const readonlyTip = computed(() => {
+  if (assessmentInfo.value?.status === 'completed') {
+    return '评价已完成，当前为只读模式，无法修改数据'
+  }
+
+  if (isAssessmentExpired(assessmentInfo.value)) {
+    return '本次评估已超过72小时填报期限，当前为只读模式，无法修改数据'
+  }
+
+  return ''
+})
 
 // 加载数据
 const loadData = async () => {
   loading.value = true
+
   try {
+    const token = localStorage.getItem('access_token')
+
     // 先获取评估状态
     const assessmentResponse = await fetch(`/api/assessments/${assessmentId.value}/`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        'Authorization': `Bearer ${token}`
       }
     })
+
+    if (!assessmentResponse.ok) {
+      throw new Error('评估信息加载失败')
+    }
+
     const assessmentData = await assessmentResponse.json()
-    isReadonly.value = assessmentData.status !== 'draft' || isAssessmentExpired(assessmentData)
-    
+
+    assessmentInfo.value = assessmentData
+    isReadonly.value = isAssessmentReadonly(assessmentData)
+
     // 获取数据技术数据
     const response = await fetch(`/api/assessments/${assessmentId.value}/technology/`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        'Authorization': `Bearer ${token}`
       }
     })
+
+    if (!response.ok) {
+      throw new Error('数据技术信息加载失败')
+    }
+
     const data = await response.json()
     Object.assign(formData.value, data)
 
@@ -420,6 +435,7 @@ const loadData = async () => {
     }
   } catch (error) {
     console.error('加载数据失败:', error)
+    ElMessage.error(error.message || '加载数据失败')
   } finally {
     loading.value = false
   }
@@ -428,6 +444,7 @@ const loadData = async () => {
 // 保存数据
 const handleSave = async () => {
   saving.value = true
+
   try {
     const response = await fetch(`/api/assessments/${assessmentId.value}/save_technology/`, {
       method: 'PUT',
@@ -437,16 +454,22 @@ const handleSave = async () => {
       },
       body: JSON.stringify(formData.value)
     })
-    
-    if (response.ok) {
-      ElMessage.success('保存成功')
-    } else {
+
+    if (!response.ok) {
       throw new Error('保存失败')
     }
+
+    const savedData = await response.json().catch(() => null)
+
+    if (savedData && typeof savedData === 'object') {
+      Object.assign(formData.value, savedData)
+    }
+
+    ElMessage.success('保存成功')
   } catch (error) {
     console.log('保存数据:', formData.value)
     console.error('保存失败:', error)
-    ElMessage.error('保存失败')
+    ElMessage.error(error.message || '保存失败')
   } finally {
     saving.value = false
   }
@@ -582,7 +605,7 @@ watch(() => formData.value.platform_build_mode, (newVal) => {
 }
 
 :deep(.el-form-item) {
-  margin-bottom: 22px;
+  margin-bottom: 34px;
 }
 
 :deep(.el-form-item__label) {
@@ -782,8 +805,9 @@ watch(() => formData.value.platform_build_mode, (newVal) => {
 .volume-hint,
 .form-tip {
   width: 100%;
-  margin-top: 10px;
-  padding: 10px 14px;
+  margin-top: 14px;
+  margin-bottom: 22px;
+  padding: 12px 16px;
   background-color: #f5f7fa;
   border-radius: 4px;
   font-size: 13px;

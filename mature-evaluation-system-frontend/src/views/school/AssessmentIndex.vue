@@ -55,7 +55,7 @@
             <el-icon><Reading /></el-icon>
             <span>数据素养</span>
 
-            <!-- 绿色对号：完成才显示 -->
+            <!-- 完成标识：完成才显示 -->
             <el-icon v-if="moduleDone.literacy" class="done-check"><CircleCheckFilled /></el-icon>
           </el-menu-item>
 
@@ -476,15 +476,16 @@ const moduleDone = reactive({
 })
 
 const menuItemClass = (key) => {
-  const locked = isModuleLocked(key);
-  const done = moduleDone[key];
-  
+  const locked = isModuleLocked(key)
+  const done = moduleDone[key]
+  const current = activeModule.value === key
+
   return {
-    'menu-locked': locked,       // 锁定的灰色且带禁用手势
-    'menu-done': done,           // 已完成的正常显示（带绿勾）
-    'menu-active': !locked && !done // 当前正在做的
-  };
-};
+    'menu-locked': locked,
+    'menu-done': done,
+    'menu-current': current
+  }
+}
 /**
  * 判空工具：你这里“都填完”的核心
  * - null/undefined -> 未填
@@ -1556,19 +1557,6 @@ const handleViewProgress = () => {
   border: 1px dashed #dcdfe6; /* 虚线框包裹，提示这是分享区 */
 }
 
-/* 状态：进行中（当前正在填写的） */
-.menu-active {
-  opacity: 1;
-  border-left: 4px solid #409eff; /* 给当前可做的模块加个左侧蓝条提示 */
-  background-color: #f0f7ff;
-}
-
-/* 修正已完成状态：不再变灰，而是保持清晰，仅靠绿勾区分 */
-.menu-done {
-  opacity: 1;
-  filter: none;
-}
-
 .assessment-menu .el-menu-item {
   transition: all 0.2s ease;
   display: flex;
@@ -1820,41 +1808,30 @@ const handleViewProgress = () => {
 }
 
 .share-right {
-  width: 170px; /* 宽度给够 */
+  width: 240px;
   flex-shrink: 0;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: flex-start;
-
-  /* 原来是 -200px，会导致二维码超出调查问卷框 */
-  margin-top: -100px;
+  margin-top: -115px;
 }
 
 .qr-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  /* 不再额外上移 */
   margin-top: 0;
-}
-
-.qr-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 8px; /* 控制整体往上 */
 }
 
 .qr-box {
   position: relative;
-  width: 160px; /* 固定显示宽度 */
+  width: 220px;
   height: auto !important;
   background: #ffffff;
   border: 1px solid #ebeef5;
-  border-radius: 8px;
-  padding: 5px; /* 减小内边距，让图片更紧凑 */
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10);
   display: flex;
   justify-content: center;
 }
@@ -1863,6 +1840,17 @@ const handleViewProgress = () => {
   width: 100%;
   height: auto !important;
   display: block;
+}
+
+.qr-placeholder {
+  width: 220px;
+  height: 300px;
+  background: #f5f7fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #909399;
+  font-size: 12px;
 }
 
 /* 此时二维码中间的覆盖层已经画在图片里了，HTML里的 .qr-center 必须删掉 */
@@ -1875,18 +1863,6 @@ const handleViewProgress = () => {
   display: none !important;
 }
 
-
-/* 占位 */
-.qr-placeholder {
-  width: 140px;
-  height: 140px;
-  background: #f5f7fa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #909399;
-  font-size: 12px;
-}
 
 /* 中间覆盖层 */
 .qr-center {
@@ -1925,15 +1901,6 @@ const handleViewProgress = () => {
   text-align: center;
   line-height: 1.6;
   max-width: 160px;
-}
-
-/* 覆盖 element-plus：已完成模块即使 active 也不显示蓝色 */
-.el-menu-item.is-active.menu-done {
-  color: #303133 !important; /* 正常正文色 */
-}
-
-.el-menu-item.is-active .done-check {
-  color: #67c23a !important; /* success 绿 */
 }
 
 
@@ -2067,6 +2034,75 @@ const handleViewProgress = () => {
 .share-left {
   flex: 1;
   min-width: 0;
+}
+
+/* 侧边栏菜单基础样式 */
+.assessment-menu .el-menu-item {
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  color: #606266;
+}
+
+/* 当前选中模块：蓝色背景 + 左侧蓝条 */
+.assessment-menu .el-menu-item.menu-current,
+.assessment-menu .el-menu-item.is-active {
+  background-color: #ecf5ff !important;
+  color: #409eff !important;
+  font-weight: 600;
+  border-left: 4px solid #409eff;
+}
+
+/* 当前正在查看的模块：蓝色 */
+.menu-current,
+.el-menu-item.is-active {
+  background-color: #ecf5ff !important;
+  border-left: 4px solid #409eff;
+  color: #409eff !important;
+  font-weight: 600;
+}
+
+/* 已完成模块：整栏也变成蓝色状态 */
+.menu-done {
+  opacity: 1;
+  filter: none;
+  background-color: #ecf5ff !important;
+  border-left: 4px solid #409eff;
+  color: #409eff !important;
+}
+
+/* 已完成模块中的左侧图标和文字都变蓝 */
+.menu-done > .el-icon:not(.done-check),
+.menu-done > span {
+  color: #409eff !important;
+}
+
+/* 已完成且当前选中的模块，仍然保持蓝色 */
+.el-menu-item.is-active.menu-done {
+  background-color: #ecf5ff !important;
+  border-left: 4px solid #409eff;
+  color: #409eff !important;
+}
+
+/* 完成对号：继续保持绿色 */
+.done-check {
+  margin-left: auto;
+  color: #67c23a !important;
+  font-size: 18px;
+}
+
+/* 防止 active 状态把对号改成蓝色 */
+.el-menu-item.is-active .done-check,
+.el-menu-item.menu-done .done-check {
+  color: #67c23a !important;
+}
+
+/* 锁定模块：灰色，不可点击 */
+.menu-locked {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  filter: grayscale(1);
 }
 
 
