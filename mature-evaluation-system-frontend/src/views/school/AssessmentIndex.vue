@@ -476,9 +476,11 @@ const moduleDone = reactive({
 })
 
 const menuItemClass = (key) => {
-  const locked = isModuleLocked(key)
   const done = moduleDone[key]
   const current = activeModule.value === key
+
+  // 已完成的模块不应该再显示为锁定状态
+  const locked = !done && isModuleLocked(key)
 
   return {
     'menu-locked': locked,
