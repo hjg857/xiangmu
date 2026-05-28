@@ -109,9 +109,6 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
-                            <div class="volume-hint">
-                说明：数据中心指专门用于承载学校各类业务数据的集中存储、服务器部署、网络运维与安全保障的专用物理机房或云端专属服务环境。
-              </div>
 
       <!-- 3. 生机比 -->
       <el-form-item prop="student_device_ratio">
@@ -157,10 +154,6 @@
         </el-radio-group>
       </el-form-item>
 
-                                  <div class="volume-hint">
-                说明：数字终端包括多媒体一体机、智能黑板、希沃交互终端、教师办公电脑、学生机房计算机、学生平板等各类教学与学习智能终端设备。
-              </div>
-
                 <el-form-item prop="has_data_platform">
           <template #label>
             <div class="label-with-hint">
@@ -190,9 +183,6 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
-              <div class="volume-hint">
-                说明：依托区级统一教育平台、校外租用专业教育云服务、学校自主搭建校级云管理平台，实现校内数据集中管控与业务共享，均视为已建设数据治理平台。
-              </div>
 
         <!-- 2. 数据安全水平 -->
         <div class="section-title">2. 数据安全水平</div>
@@ -807,12 +797,12 @@ watch(() => formData.value.platform_build_mode, (newVal) => {
   width: 100%;
   margin-top: 14px;
   margin-bottom: 22px;
-  padding: 12px 16px;
-  background-color: #f5f7fa;
-  border-radius: 4px;
-  font-size: 13px;
+  padding: 12px 20px;
+  background-color: #fdf6ec;
+  border-radius: 0;
+  font-size: 16px;
   line-height: 1.8;
-  color: #909399;
+  color: #e6a23c;
   box-sizing: border-box;
 }
 
@@ -841,14 +831,14 @@ watch(() => formData.value.platform_build_mode, (newVal) => {
 
 .form-tip {
   width: 100%;
-  margin-top: 10px;
-  margin-bottom: 18px;
-  padding: 10px 14px;
-  background-color: #f5f7fa;
-  border-radius: 4px;
-  font-size: 13px;
+  margin-top: 14px;
+  margin-bottom: 22px;
+  padding: 12px 20px;
+  background-color: #fdf6ec;
+  border-radius: 0;
+  font-size: 16px;
   line-height: 1.8;
-  color: #909399;
+  color: #e6a23c;
   box-sizing: border-box;
 }
 

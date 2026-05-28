@@ -228,10 +228,6 @@
         <el-radio label="partial">部分学生开通账号</el-radio>
         <el-radio label="all">全校学生均开通账号</el-radio>
       </el-radio-group>
-
-      <div class="form-tip">
-        说明：若学生无法独立开通个人账号，由家长协助注册、绑定并可正常使用相关平台开展学习与学业查询，同样视为已配备账号，纳入计分范围。
-      </div>
     </el-form-item>
 
     <el-form-item>
@@ -289,9 +285,6 @@
         style="margin-top: 10px"
       />
 
-      <div class="form-tip">
-        说明：上述数据相关平台包括国家智慧教育平台、地方（省、市、区县级）智慧教育平台、教学平台、教务系统、校园一卡通等各类服务平台。
-      </div>
     </el-form-item>
 
         <!-- 2. 数据应用成效 -->
@@ -987,12 +980,12 @@ onBeforeUnmount(() => {
   width: 100%;
   margin-top: 14px;
   margin-bottom: 22px;
-  padding: 12px 16px;
-  background-color: #f5f7fa;
-  border-radius: 4px;
-  font-size: 13px;
+  padding: 12px 20px;
+  background-color: #fdf6ec;
+  border-radius: 0;
+  font-size: 16px;
   line-height: 1.8;
-  color: #909399;
+  color: #e6a23c;
   box-sizing: border-box;
 }
 

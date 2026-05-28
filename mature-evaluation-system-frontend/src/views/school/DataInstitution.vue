@@ -68,15 +68,6 @@
           <el-radio label="basic">已设置基础管理小组</el-radio>
           <el-radio label="none">未设置相关小组</el-radio>
         </el-radio-group>
-
-        <div class="form-tip">
-          规范管理型：专人分工负责全校数据的体系化管理，涵盖数据的收集、存储、分析、应用和整体规划，职责分工明确。<br>
-          例如：由信息技术教师、机房管理人员、行政内勤等兼任的人员组成小组，负责设备登记、教学数据记录、电脑及机房设备借阅登记等基础工作。虽然为小组形式，但没有专门的负责人统筹管理。
-        </div>
-        <div class="form-tip">
-          基础管理型：小组成员多为兼任人员，负责学校数据的日常登记、数据整理、常规维护等工作，但缺乏整体规划。<br>
-          例如：由校长担任总负责人，信息中心主任为分管负责人，其他行政部门、年级组指派专人组成小组，统筹全校各类教学、管理等数据的采集、归档、分析和规划。
-        </div>
       </el-form-item>
         <el-form-item prop="meeting_activity_count">
           <template #label>
@@ -94,9 +85,6 @@
           </template>
           <el-input-number v-model="formData.meeting_activity_count" :min="0" :controls="false" />
           <span class="unit">次</span>
-          <div class="form-tip">
-            数据工作会议或研讨：包括但不限于数据存储与管理规范化、智慧校园数据体系建设规划、学籍数据质量自查、跨部门数据协同与应用、设备台账与信息化资产登记规范化等会议或研讨。
-          </div>
         </el-form-item>
         <!-- 2. 数据人员配备 -->
         <div class="section-title">2. 数据人员配备</div>
@@ -949,12 +937,12 @@ onBeforeUnmount(() => {
   width: 100%;
   margin-top: 14px;
   margin-bottom: 22px;
-  padding: 12px 16px;
-  background-color: #f5f7fa;
-  border-radius: 4px;
-  font-size: 13px;
+  padding: 12px 20px;
+  background-color: #fdf6ec;
+  border-radius: 0;
+  font-size: 16px;
   line-height: 1.8;
-  color: #909399;
+  color: #e6a23c;
   box-sizing: border-box;
 }
 
