@@ -417,49 +417,68 @@
         </div>
 
         <!-- 数据应用成效 -->
-        <!-- 数据应用成效 -->
-        <div class="behavior-card">
+        <div class="behavior-card behavior-effect-card">
           <div class="card-header" style="display: flex; justify-content: center; align-items: center;">
             <span class="card-title">数据应用成效：{{ formatScore(secondaryScores.C2) }}</span>
           </div>
 
-          <div class="card-content">
-            <div class="achievement-section">
-              <h4>数据应用特色成果</h4>
-              <p>
-                学校公开发表数据相关论文{{ behaviorDetails.published_paper_count || 0 }}篇，
-                出版相关著作{{ behaviorDetails.published_book_count || 0 }}部，
-                入选典型案例{{ getTotalCases() }}个，
-                获得数据应用相关奖励或荣誉{{ getTotalAwards() }}个。
-              </p>
-            </div>
+          <div class="card-content behavior-effect-content">
+            <div class="effect-left">
+              <div class="effect-info-card">
+                <div class="effect-icon">
+                  <el-icon><Trophy /></el-icon>
+                </div>
+                <div class="effect-text">
+                  <h4>数据应用特色成果</h4>
+                  <p>
+                    学校公开发表数据相关论文{{ behaviorDetails.published_paper_count || 0 }}篇，
+                    出版相关著作{{ behaviorDetails.published_book_count || 0 }}部，
+                    入选典型案例{{ getTotalCases() }}个，
+                    获得数据应用相关奖励或荣誉{{ getTotalAwards() }}个。
+                  </p>
+                </div>
+              </div>
 
-            <div class="achievement-section">
-              <h4>数据应用社会影响</h4>
-              <p>
-                学校获得媒体宣传报道{{ getTotalMedia() }}次，
-                参与数据应用相关经验交流{{ getTotalConference() }}次，
-                通过公众号发布相关经验分享或创新实践{{ behaviorDetails.public_account_post_count || 0 }}次，
-                接待其他学校参观学习{{ behaviorDetails.visit_count || 0 }}次。
-              </p>
-            </div>
+              <div class="effect-divider"></div>
 
-            <div class="achievement-section">
-              <h4>教师对数据应用效果的主观评价</h4>
-              <p>该指标来自教师问卷中的数据应用效果评价题项。</p>
-
-              <div class="subjective-eval-cards single">
-                <div class="eval-card">
-                  <div class="eval-top-title">教师评价得分</div>
-                  <div ref="teacherEffectCircle" class="circle-chart"></div>
-                  <div class="eval-bottom-info">
-                    教师参评人数：{{ reportData.participant_counts?.teacher || 0 }} 人
-                  </div>
+              <div class="effect-info-card">
+                <div class="effect-icon">
+                  <el-icon><UserFilled /></el-icon>
+                </div>
+                <div class="effect-text">
+                  <h4>数据应用社会影响</h4>
+                  <p>
+                    学校获得媒体宣传报道{{ getTotalMedia() }}次，
+                    参与数据应用相关经验交流{{ getTotalConference() }}次，
+                    通过公众号发布相关经验分享或创新实践{{ behaviorDetails.public_account_post_count || 0 }}次，
+                    接待其他学校参观学习{{ behaviorDetails.visit_count || 0 }}次。
+                  </p>
                 </div>
               </div>
             </div>
+
+            <div class="effect-right">
+              <div class="effect-title-row">
+                <div class="effect-icon">
+                  <el-icon><StarFilled /></el-icon>
+                </div>
+                <h4>教师对数据应用效果的主观评价</h4>
+              </div>
+
+              <p class="effect-desc" style="text-indent: 2em;">
+                &nbsp;&nbsp;该指标来自教师问卷中的数据应用效果评价题项。
+              </p>
+
+              <div class="effect-circle-wrap">
+                <div ref="teacherEffectCircle" class="circle-chart effect-circle-chart"></div>
+              </div>
+
+              <div class="effect-participant">
+                教师参评人数：{{ reportData.participant_counts?.teacher || 0 }}人
+              </div>
+            </div>
           </div>
-        </div>
+</div>
 
         <!-- AI评估建议 -->
         <div class="ai-suggestion">
@@ -826,7 +845,20 @@ import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
 import html2canvas from 'html2canvas'
 import { jsPDF }from 'jspdf'
-import { ArrowLeft, Download, Loading, DataAnalysis, Reading, Document, TrendCharts, Files, Setting } from '@element-plus/icons-vue'
+import {
+  ArrowLeft,
+  Download,
+  Loading,
+  DataAnalysis,
+  Reading,
+  Document,
+  TrendCharts,
+  Files,
+  Setting,
+  Trophy,
+  UserFilled,
+  StarFilled
+} from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -874,12 +906,20 @@ const dimensionList = computed(() => [
 // 生命周期
 onMounted(async () => {
   const assessmentId = route.params.id
+
   if (!assessmentId) {
     ElMessage.error('缺少评估ID')
     router.back()
     return
   }
+
   await loadReportData(assessmentId)
+
+  if (route.query.download === '1') {
+    setTimeout(() => {
+      downloadPDF()
+    }, 1500)
+  }
 })
 
 onUnmounted(() => {
@@ -2761,6 +2801,120 @@ const getTeacherRatioText = () => {
   margin: 0 0 8px 0;
   line-height: 1.7;
   text-align: justify;
+}
+
+/* 数据应用成效新版卡片布局 */
+.behavior-effect-content {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  gap: 28px;
+  padding: 28px;
+  background: #eaf4ff;
+}
+
+.effect-left,
+.effect-right {
+  background: linear-gradient(180deg, #f7fbff 0%, #eef7ff 100%);
+  border-radius: 12px;
+  padding: 26px;
+  box-sizing: border-box;
+}
+
+.effect-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 22px;
+}
+
+.effect-info-card {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.effect-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #4da3ff 0%, #2f8df5 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.28);
+}
+
+.effect-icon :deep(.el-icon) {
+  font-size: 26px;
+  color: #ffffff;
+}
+
+.effect-text h4,
+.effect-title-row h4 {
+  margin: 0 0 12px 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #303133;
+}
+
+.effect-text p,
+.effect-desc {
+  margin: 0;
+  color: #606266;
+  font-size: 15px;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+.effect-divider {
+  height: 1px;
+  background: #dcecff;
+  margin-left: 60px;
+}
+
+.effect-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.effect-title-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.effect-desc {
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.effect-circle-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.effect-circle-chart {
+  width: 260px;
+  height: 220px;
+}
+
+.effect-participant {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  color: #606266;
+  font-size: 15px;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.08);
 }
 
 @media (max-width: 768px) {

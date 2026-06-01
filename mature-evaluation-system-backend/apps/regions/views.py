@@ -369,3 +369,19 @@ class RegionReportAISuggestionsView(APIView):
             "level_analysis": report_data.get("level_analysis") or [],
             "_hash_base": report_data.get("_hash_base") or {}
         }
+
+
+class AdminRegionReportAISuggestionsView(RegionReportAISuggestionsView):
+    """超级管理员：指定区域报告 AI 建议接口"""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if not request.user.is_admin_user():
+            return Response({
+                "success": False,
+                "message": "只有超级管理员可以访问",
+                "data": {}
+            }, status=403)
+
+        return super().post(request)

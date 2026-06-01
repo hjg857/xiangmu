@@ -260,10 +260,31 @@ const formatDate = (dateStr) => {
   return dateStr.replace('T', ' ').substring(0, 19)
 }
 
-// 在 script setup 中添加：
 const downloadReport = (id) => {
-  // 调用你后端下载 PDF 的接口
-  window.open(`${import.meta.env.VITE_API_BASE_URL}/reports/${id}/download/`, '_blank')
+  const target = router.resolve({
+    path: `/school/report/${id}`,
+    query: {
+      download: '1',
+      iframe: '1'
+    }
+  })
+
+  const iframe = document.createElement('iframe')
+  iframe.src = target.href
+  iframe.style.position = 'fixed'
+  iframe.style.left = '-9999px'
+  iframe.style.top = '-9999px'
+  iframe.style.width = '1200px'
+  iframe.style.height = '1600px'
+  iframe.style.border = '0'
+
+  document.body.appendChild(iframe)
+
+  setTimeout(() => {
+    if (iframe.parentNode) {
+      iframe.parentNode.removeChild(iframe)
+    }
+  }, 60000)
 }
 
 // 在 script 里面添加这个函数

@@ -285,6 +285,10 @@
         style="margin-top: 10px"
       />
 
+              <div class="form-tip">
+          说明：上述数据相关平台包括国家智慧教育平台、地方（省、市、区县级）智慧教育平台、教学平台、教务系统、校园一卡通等各类服务平台。
+        </div>
+
     </el-form-item>
 
         <!-- 2. 数据应用成效 -->
@@ -462,7 +466,7 @@
               :min="0"
               :controls="false"
             />
-            <span>次</span>
+            <span>篇</span>
           </div>
         </el-form-item>
 
@@ -983,7 +987,7 @@ onBeforeUnmount(() => {
   padding: 12px 20px;
   background-color: #fdf6ec;
   border-radius: 0;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.8;
   color: #e6a23c;
   box-sizing: border-box;

@@ -850,6 +850,8 @@ class RegionAdminSchoolImportView(RegionAdminBaseAPIView):
 
         # 用于“文件内重复”二次兜底（前端已经做了，这里再做一次更稳）
         seen_name = set()
+        seen_email = set()
+        seen_username = set()
 
         for idx, row in enumerate(rows):
             ser = RegionAdminSchoolImportRowSerializer(data=row)
@@ -908,14 +910,78 @@ class RegionAdminSchoolImportView(RegionAdminBaseAPIView):
                 })
                 continue
 
-            username = (data.get("username") or "").strip() or gen_unique_school_username(name, User)
-            password = (data.get("password") or "").strip() or gen_strong_password(8)
+            username = (data.get("username") or "").strip()
+            password = (data.get("password") or "").strip()
+
+            if not username:
+                report["failed"] += 1
+                report["details"].append({
+                    "row_index": idx,
+                    "status": "failed",
+                    "reason": "登录用户名不能为空",
+                })
+                continue
+
+            if not password:
+                report["failed"] += 1
+                report["details"].append({
+                    "row_index": idx,
+                    "status": "failed",
+                    "reason": "登录密码不能为空",
+                })
+                continue
+
+            if not re.fullmatch(r"[A-Za-z0-9]+", username):
+                report["failed"] += 1
+                report["details"].append({
+                    "row_index": idx,
+                    "status": "failed",
+                    "reason": "登录用户名只能包含数字或字母，不能包含特殊字符",
+                })
+                continue
+
+            if not re.fullmatch(r"[A-Za-z0-9]{8}", password):
+                report["failed"] += 1
+                report["details"].append({
+                    "row_index": idx,
+                    "status": "failed",
+                    "reason": "登录密码必须为8位数字或字母组合",
+                })
+                continue
+
+            norm_email = contact_email.lower()
+            norm_username = username.lower()
+
+            if norm_email in seen_email:
+                report["failed"] += 1
+                report["details"].append({
+                    "row_index": idx,
+                    "status": "failed",
+                    "reason": "文件内邮箱重复",
+                })
+                continue
+            seen_email.add(norm_email)
+
+            if norm_username in seen_username:
+                report["failed"] += 1
+                report["details"].append({
+                    "row_index": idx,
+                    "status": "failed",
+                    "reason": "文件内登录用户名重复",
+                })
+                continue
+            seen_username.add(norm_username)
+
+            if User.objects.filter(username=username).exists():
+                report["failed"] += 1
+                report["details"].append({
+                    "row_index": idx,
+                    "status": "failed",
+                    "reason": "登录用户名已存在，请更换用户名",
+                })
+                continue
 
             access_code = password
-
-            # username 唯一
-            if User.objects.filter(username=username).exists():
-                username = gen_unique_school_username(name, User)
 
             try:
                 with transaction.atomic():

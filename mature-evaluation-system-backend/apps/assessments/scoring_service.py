@@ -787,21 +787,62 @@ class ScoringService:
         # self_built / mixed：继续按认证数量和认证比例计分
         # external：直接给5分制2.5分，也就是原始分10/20
         if tech.platform_build_mode == 'external':
-            e21_raw = rules['E21'].get('external_platform_raw_score', 10)
+            e21_raw = rules['E21'].get('external_platform_raw_score', 12)
+            ratio_key = 'external'
+            count_score = 0
+            ratio_score = 0
         else:
             e21_raw = 0
 
-            # 安保认证数量
+            # 1. 数据安全认证数量
             count_rules = rules['E21']['sub_items'][0]['rules']
-            e21_raw += self._apply_range_rules(
+            count_score = self._apply_range_rules(
                 tech.security_certified_count or 0,
                 count_rules
             )
+            e21_raw += count_score
 
-            # 安保认证比例
+            # 2. 数据安全认证比例
             ratio_rules = rules['E21']['sub_items'][1]['rules']
-            if tech.security_certified_ratio in ratio_rules:
-                e21_raw += ratio_rules[tech.security_certified_ratio]
+            ratio_value = tech.security_certified_ratio
+
+            ratio_alias_map = {
+                'zero': 'zero',
+                '0': 'zero',
+                'none': 'zero',
+
+                'low': 'low',
+                'below_40': 'low',
+                'lt_40': 'low',
+                '0_40': 'low',
+                '0-40': 'low',
+                '0<认定比例≤40%': 'low',
+                '认定比例≤40%': 'low',
+
+                'medium': 'medium',
+                '40_80': 'medium',
+                '40-80': 'medium',
+                '40%<认定比例≤80%': 'medium',
+
+                'high': 'high',
+                'above_80': 'high',
+                'gt_80': 'high',
+                '认定比例>80%': 'high',
+            }
+
+            ratio_key = ratio_alias_map.get(ratio_value, ratio_value)
+            ratio_score = ratio_rules.get(ratio_key, 0)
+            e21_raw += ratio_score
+
+        logger.info(
+            f"E21计分: platform_build_mode={tech.platform_build_mode}, "
+            f"security_certified_count={tech.security_certified_count}, "
+            f"security_certified_ratio={tech.security_certified_ratio}, "
+            f"ratio_key={ratio_key}, "
+            f"count_score={count_score}, "
+            f"ratio_score={ratio_score}, "
+            f"e21_raw={e21_raw}"
+        )
 
         self.observation_scores['E21'] = self._normalize_score(
             e21_raw,

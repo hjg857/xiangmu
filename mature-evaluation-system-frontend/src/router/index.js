@@ -173,6 +173,15 @@ const router = createRouter({
           component: () => import('@/views/admin/NewsManage.vue'),
           meta: { requiresAuth: true, role: 'admin' }
         },
+        {
+          path: '/admin/region-report-detail',
+          name: 'AdminRegionReportDetail',
+          component: () => import('@/views/admin/AdminRegionReportDetail.vue'),
+          meta: {
+            requiresAuth: true,
+            roles: ['admin']
+          }
+        },
       ]
     },
     {

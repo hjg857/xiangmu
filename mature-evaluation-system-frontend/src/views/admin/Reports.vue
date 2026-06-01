@@ -20,12 +20,22 @@
         </template>
         
         <div class="region-grid">
+        <div
+          v-for="region in getDistrictRegions(province)"
+          :key="region.key"
+          class="region-item"
+        >
+          <span class="region-name">{{ region.displayName }}</span>
 
-          <div v-for="city in (province.cities || [])" :key="city?.name" class="region-item">
-            <span class="region-name">{{ city?.name }}市区</span>
-            <el-button link type="primary">查看区域报告</el-button>
-          </div>
+          <el-button
+            link
+            type="primary"
+            @click="viewRegionReport(region)"
+          >
+            查看区域报告
+          </el-button>
         </div>
+      </div>
       </el-card>
     </div>
 
@@ -212,6 +222,124 @@ const fetchSummaryData = async () => {
   }
 }
 
+const buildProvinceDistrictSummary = (rows) => {
+  const provinceMap = new Map()
+
+  ;(rows || []).forEach((item) => {
+    const school = item.school || {}
+
+    const province = item.province || school.province || item.school_province || ''
+    const city = item.city || school.city || item.school_city || ''
+    const district = item.district || school.district || item.school_district || ''
+
+    const schoolId =
+      item.school_id ||
+      school.id ||
+      item.school?.id ||
+      item.school_name ||
+      school.name ||
+      item.id
+
+    if (!province || !city || !district) {
+      return
+    }
+
+    if (!provinceMap.has(province)) {
+      provinceMap.set(province, {
+        name: province,
+        total_schools: 0,
+        schoolSet: new Set(),
+        cityMap: new Map()
+      })
+    }
+
+    const provinceItem = provinceMap.get(province)
+    provinceItem.schoolSet.add(schoolId)
+
+    if (!provinceItem.cityMap.has(city)) {
+      provinceItem.cityMap.set(city, {
+        name: city,
+        total_schools: 0,
+        schoolSet: new Set(),
+        districtMap: new Map()
+      })
+    }
+
+    const cityItem = provinceItem.cityMap.get(city)
+    cityItem.schoolSet.add(schoolId)
+
+    if (!cityItem.districtMap.has(district)) {
+      cityItem.districtMap.set(district, {
+        name: district,
+        total_schools: 0,
+        schoolSet: new Set()
+      })
+    }
+
+    const districtItem = cityItem.districtMap.get(district)
+    districtItem.schoolSet.add(schoolId)
+  })
+
+  return Array.from(provinceMap.values()).map((province) => {
+    const cities = Array.from(province.cityMap.values()).map((city) => {
+      const districts = Array.from(city.districtMap.values()).map((district) => ({
+        name: district.name,
+        total_schools: district.schoolSet.size
+      }))
+
+      return {
+        name: city.name,
+        total_schools: city.schoolSet.size,
+        districts
+      }
+    })
+
+    return {
+      name: province.name,
+      total_schools: province.schoolSet.size,
+      cities
+    }
+  })
+}
+
+const getDistrictRegions = (province) => {
+  const result = []
+  const provinceName = province?.name || ''
+
+  ;(province?.cities || []).forEach((city) => {
+    const cityName = city?.name || ''
+    const districts = city?.districts || []
+
+    districts.forEach((district) => {
+      const districtName = district?.name || district?.district || ''
+
+      result.push({
+        key: `${provinceName}-${cityName}-${districtName}`,
+        province: district?.province || provinceName,
+        city: district?.city || cityName,
+        district: district?.district || districtName,
+        region_id: district?.region_id || '',
+        total_schools: district?.total_schools || district?.school_count || 0,
+        displayName: `${cityName}${districtName}`
+      })
+    })
+  })
+
+  return result
+}
+
+const viewRegionReport = (region) => {
+  router.push({
+    path: '/admin/region-report-detail',
+    query: {
+      region_id: region.region_id || '',
+      province: region.province || '',
+      city: region.city || '',
+      district: region.district || ''
+    }
+  })
+}
+
 /* ======================
    表格数据（只负责拿数据）
 ====================== */
@@ -313,6 +441,7 @@ const getStatusLabel = (s) => ({
 const viewReport = (id) => {
   router.push(`/school/report/${id}`)
 }
+
 
 /* ======================
    生命周期

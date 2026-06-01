@@ -3,6 +3,7 @@ URL configuration for admin_panel app
 """
 from django.urls import path
 from . import views
+from apps.regions.views import AdminRegionReportAISuggestionsView
 
 urlpatterns = [
     # 申请管理
@@ -16,4 +17,14 @@ urlpatterns = [
     path('news/<int:pk>/', views.update_news, name='update_news'),
     path('news/<int:pk>/delete/', views.delete_news, name='delete_news'),
     path('news/upload-image/', views.upload_news_image, name='upload_news_image'),
+    path(
+        "region-report/assessments/",
+        views.admin_region_report_assessments,
+        name="admin_region_report_assessments"
+    ),
+    path(
+        "region-report/ai-suggestions/",
+        AdminRegionReportAISuggestionsView.as_view(),
+        name="admin_region_report_ai_suggestions"
+    ),
 ]

@@ -456,7 +456,7 @@ TECHNOLOGY_SCORING_RULES = {
         'max_score': 20,
         # 完全接入外部平台时，5分制直接给2.5分。
         # 因为后面会做 raw / max_score * 5，所以这里 raw_score = 10。
-        'external_platform_raw_score': 10,
+        'external_platform_raw_score': 12,
         'sub_items': [
             {
                 'name': '安保认证数量',
@@ -464,8 +464,8 @@ TECHNOLOGY_SCORING_RULES = {
                 'max_score': 10,
                 'rules': [
                     {'condition': 'lte', 'value': 0, 'score': 0},
-                    {'condition': 'between', 'min': 1, 'max': 2, 'score': 3},
-                    {'condition': 'between', 'min': 3, 'max': 4, 'score': 6},
+                    {'condition': 'between', 'min': 0, 'max': 2, 'score': 3},
+                    {'condition': 'between', 'min': 2, 'max': 4, 'score': 6},
                     {'condition': 'gte', 'value': 5, 'score': 10}
                 ]
             },

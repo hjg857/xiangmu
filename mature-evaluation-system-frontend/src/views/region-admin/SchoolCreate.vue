@@ -146,7 +146,7 @@
 <script setup>
 import { ref, reactive, watch, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { apiPost, apiGet } from "@/utils/api";
 
 import { regionData, codeToText } from "element-china-area-data";
@@ -158,7 +158,12 @@ const formRef = ref(null);
 const submitting = ref(false);
 
 const successVisible = ref(false);
-const successInfo = reactive({ name: "", username: "", email: "", password: "" });
+const successInfo = reactive({
+  name: "",
+  username: "",
+  contact_email: "",
+  password: "",
+});
 
 /** ✅ 合并后的 codeToText（港澳台补全） */
 const codeToTextFull = { ...codeToText, ...gatCodeToText };
@@ -405,6 +410,75 @@ function copyPassword() {
   copyText(form.password);
 }
 
+function formatCreateError(error) {
+  const data =
+    error?.response?.data ||
+    error?.data ||
+    error?.detail ||
+    error?.error ||
+    null;
+
+  if (typeof error === "string") {
+    return error;
+  }
+
+  if (typeof data === "string") {
+    return data;
+  }
+
+  if (data && typeof data === "object") {
+    if (data.message) return data.message;
+    if (data.error) return data.error;
+    if (data.detail) return data.detail;
+
+    const messages = [];
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        messages.push(`${key}：${value.join("；")}`);
+      } else if (typeof value === "string") {
+        messages.push(`${key}：${value}`);
+      } else if (value && typeof value === "object") {
+        messages.push(`${key}：${JSON.stringify(value)}`);
+      }
+    });
+
+    if (messages.length > 0) {
+      return messages.join("<br/>");
+    }
+  }
+
+  const msg = error?.message || "";
+
+  if (msg.includes("IntegrityError") || msg.includes("UNIQUE constraint")) {
+    return "创建失败：登录邮箱或用户名已存在，请更换邮箱，或点击“随机生成”更换用户名。";
+  }
+
+  if (msg.includes("500")) {
+    return "创建失败：后端服务异常。常见原因是登录邮箱、用户名或学校账号重复，请先检查邮箱和用户名是否已被使用。";
+  }
+
+  if (msg.includes("非JSON") || msg.includes("Unexpected token '<'")) {
+    return "创建失败：后端返回异常页面，可能是服务器内部错误。请检查邮箱、用户名是否重复，或查看后端日志。";
+  }
+
+  return msg || "创建失败，请检查填写信息后重试。";
+}
+
+function showCreateError(error) {
+  const message = formatCreateError(error);
+
+  ElMessageBox.alert(
+    message,
+    "创建失败",
+    {
+      type: "error",
+      confirmButtonText: "我知道了",
+      dangerouslyUseHTMLString: true,
+    }
+  );
+}
+
 /** 提交 */
 async function handleSubmit() {
   if (!formRef.value) return;
@@ -435,10 +509,12 @@ async function handleSubmit() {
         payload.username = form.username.trim();
       }
 
-      const { data: resp } = await apiPost("/api/region-admin/schools/create/", payload);
+      const result = await apiPost("/api/region-admin/schools/create/", payload);
+
+      const resp = result?.data || result;
 
       if (!resp?.success) {
-        throw new Error(resp?.message || "创建失败");
+        throw resp || new Error("创建失败");
       }
 
       successInfo.name = form.name;
@@ -448,17 +524,10 @@ async function handleSubmit() {
 
       ElMessage.success("创建成功");
       successVisible.value = true;
-    } catch (e) {
-      console.error(e);
-
-      // ✅ 你之前遇到的 500 + HTML (IntegrityError) 常见原因：email/username 唯一约束冲突
-      const msg = e?.message || "";
-      if (msg.includes("非JSON") || msg.includes("Unexpected token '<'") || msg.includes("500")) {
-        ElMessage.error("创建失败：后端 500（常见原因：登录邮箱或用户名重复）");
-      } else {
-        ElMessage.error(msg || "创建失败");
-      }
-    } finally {
+      } catch (e) {
+        console.error("创建学校账号失败：", e);
+        showCreateError(e);
+      } finally {
       submitting.value = false;
     }
   });

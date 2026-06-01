@@ -594,124 +594,319 @@ def send_contact_email(request):
 
     return JsonResponse({"success": False, "message": "请求方法错误"})
 
-
+import re
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def import_schools(request):
     """超级管理员批量导入学校账号"""
-    # 权限检查
     if not request.user.is_admin_user():
-        return Response({'success': False, 'message': '只有超级管理员可以操作'}, status=403)
+        return Response(
+            {'success': False, 'message': '只有超级管理员可以操作'},
+            status=403
+        )
 
     rows = request.data.get('rows', [])
-    if not rows:
-        return Response({'success': False, 'message': '数据为空'}, status=400)
 
-    created_count = 0
-    skipped_count = 0
+    if not isinstance(rows, list) or not rows:
+        return Response(
+            {'success': False, 'message': '数据为空'},
+            status=400
+        )
 
-    try:
-        with transaction.atomic():
-            for row in rows:
-                name = row.get('school_name')
-                email = row.get('contact_email')
+    if len(rows) > 100:
+        rows = rows[:100]
 
-                # 1. 检查学校是否已存在
-                if School.objects.filter(name=name).exists():
-                    skipped_count += 1
-                    continue
+    report = {
+        'total': len(rows),
+        'created': 0,
+        'skipped': 0,
+        'failed': 0,
+        'details': []
+    }
 
-                # 2. 准备账号密码
-                # 如果 Excel 里没写 username，则根据校名生成
-                username = row.get('username') or gen_unique_school_username(name, User)
-                password = row.get('password') or gen_strong_password(8)
+    seen_name = set()
+    seen_email = set()
+    seen_username = set()
 
-                access_code = password
+    valid_school_types = {
+        'primary',
+        'junior',
+        'senior',
+        'nine_year',
+        'twelve_year'
+    }
 
-                # 3. 创建 User 对象
+    for idx, row in enumerate(rows):
+        try:
+            name = (row.get('school_name') or row.get('name') or '').strip()
+            school_type = (row.get('school_type') or '').strip()
+
+            province = (row.get('province') or '').strip()
+            city = (row.get('city') or '').strip()
+            district = (row.get('district') or '').strip()
+
+            contact_name = (row.get('contact_name') or '').strip()
+            contact_position = (row.get('contact_position') or '').strip()
+            contact_phone = (row.get('contact_phone') or '').strip()
+            contact_email = (row.get('contact_email') or '').strip()
+
+            username = (row.get('username') or '').strip()
+            password = (row.get('password') or '').strip()
+
+            # 1. 必填校验
+            missing_fields = []
+
+            if not name:
+                missing_fields.append('学校名称')
+            if not school_type:
+                missing_fields.append('学校类型')
+            if not province:
+                missing_fields.append('省')
+            if not city:
+                missing_fields.append('市')
+            if not district:
+                missing_fields.append('区/县')
+            if not contact_name:
+                missing_fields.append('负责人')
+            if not contact_position:
+                missing_fields.append('职务')
+            if not contact_phone:
+                missing_fields.append('联系电话')
+            if not contact_email:
+                missing_fields.append('邮箱')
+            if not username:
+                missing_fields.append('登录用户名')
+            if not password:
+                missing_fields.append('登录密码')
+
+            if missing_fields:
+                report['failed'] += 1
+                report['details'].append({
+                    'row_index': idx,
+                    'status': 'failed',
+                    'reason': f"必填项缺失：{'、'.join(missing_fields)}"
+                })
+                continue
+
+            # 2. 字段格式校验
+            if school_type not in valid_school_types:
+                report['failed'] += 1
+                report['details'].append({
+                    'row_index': idx,
+                    'status': 'failed',
+                    'reason': '学校类型不合法'
+                })
+                continue
+
+            if not re.fullmatch(r'1[3-9]\d{9}', contact_phone):
+                report['failed'] += 1
+                report['details'].append({
+                    'row_index': idx,
+                    'status': 'failed',
+                    'reason': '联系电话格式不正确，请填写11位手机号'
+                })
+                continue
+
+            if not re.fullmatch(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', contact_email):
+                report['failed'] += 1
+                report['details'].append({
+                    'row_index': idx,
+                    'status': 'failed',
+                    'reason': '邮箱格式不正确'
+                })
+                continue
+
+            if not re.fullmatch(r'[A-Za-z0-9]+', username):
+                report['failed'] += 1
+                report['details'].append({
+                    'row_index': idx,
+                    'status': 'failed',
+                    'reason': '登录用户名只能包含数字或字母，不能包含特殊字符'
+                })
+                continue
+
+            if not re.fullmatch(r'[A-Za-z0-9]{8}', password):
+                report['failed'] += 1
+                report['details'].append({
+                    'row_index': idx,
+                    'status': 'failed',
+                    'reason': '登录密码必须为8位数字或字母组合'
+                })
+                continue
+
+            # 3. 文件内重复校验
+            norm_name = re.sub(r'\s+', '', name).lower()
+            norm_email = contact_email.lower()
+            norm_username = username.lower()
+
+            if norm_name in seen_name:
+                report['skipped'] += 1
+                report['details'].append({
+                    'row_index': idx,
+                    'status': 'skipped',
+                    'reason': '文件内学校名称重复，已跳过'
+                })
+                continue
+            seen_name.add(norm_name)
+
+            if norm_email in seen_email:
+                report['failed'] += 1
+                report['details'].append({
+                    'row_index': idx,
+                    'status': 'failed',
+                    'reason': '文件内邮箱重复'
+                })
+                continue
+            seen_email.add(norm_email)
+
+            if norm_username in seen_username:
+                report['failed'] += 1
+                report['details'].append({
+                    'row_index': idx,
+                    'status': 'failed',
+                    'reason': '文件内登录用户名重复'
+                })
+                continue
+            seen_username.add(norm_username)
+
+            # 4. 数据库唯一性校验
+            if User.objects.filter(email=contact_email).exists():
+                report['failed'] += 1
+                report['details'].append({
+                    'row_index': idx,
+                    'status': 'failed',
+                    'reason': '该邮箱已被注册'
+                })
+                continue
+
+            if User.objects.filter(username=username).exists():
+                report['failed'] += 1
+                report['details'].append({
+                    'row_index': idx,
+                    'status': 'failed',
+                    'reason': '登录用户名已存在，请更换用户名'
+                })
+                continue
+
+            # 5. 创建或获取区域
+            region = get_or_create_region_by_text(
+                province=province,
+                city=city,
+                district=district
+            )
+
+            # 同一区域下学校重名则跳过
+            if School.objects.filter(region=region, name=name).exists():
+                report['skipped'] += 1
+                report['details'].append({
+                    'row_index': idx,
+                    'status': 'skipped',
+                    'reason': '同一区域下已存在同名学校，已跳过'
+                })
+                continue
+
+            # 6. 创建账号和学校
+            with transaction.atomic():
                 user = User.objects.create_user(
                     username=username,
                     password=password,
-                    email=email,
-                    role='school'
+                    email=contact_email,
+                    role='school',
+                    is_active=True,
+                    is_staff=False
                 )
 
-                # 4. 关联或创建地域 (Region)
-                region = get_or_create_region_by_text(
-                    province=row.get('province'),
-                    city=row.get('city'),
-                    district=row.get('district')
-                )
+                # 如果 User 模型有锁定字段，可以保留
+                if hasattr(user, 'is_locked'):
+                    user.is_locked = False
+                if hasattr(user, 'locked_until'):
+                    user.locked_until = None
+                user.save()
 
-                # 5. 创建学校记录
-                School.objects.create(
+                school = School.objects.create(
                     user=user,
                     name=name,
-                    school_type=row.get('school_type'),
-                    province=row.get('province'),
-                    city=row.get('city'),
-                    district=row.get('district'),
+                    school_type=school_type,
+                    province=province,
+                    city=city,
+                    district=district,
                     region=region,
-                    contact_name=row.get('contact_name'),
-                    contact_position=row.get('contact_position'),
-                    contact_phone=row.get('contact_phone'),
-                    contact_email=email,
-                    access_code=access_code
+                    contact_name=contact_name,
+                    contact_position=contact_position,
+                    contact_phone=contact_phone,
+                    contact_email=contact_email,
+                    access_code=password
                 )
 
-                # 6. 发送邮件
-                subject = '【中小学数据文化成熟度评估监测系统】账号审批通过通知'
-                message = f"""尊敬的 {name} 用户：
+            # 7. 发送邮件，失败不影响导入结果
+            subject = '【中小学数据文化成熟度评估监测系统】账号审批通过通知'
+            message = f"""尊敬的 {name} 用户：
 
-                您好！
+您好！
 
-                您的账号申请已通过审核，以下是您的登录信息：
+您的账号申请已通过审核，以下是您的登录信息：
 
-                登录地址：{settings.FRONTEND_URL}
-                用户名：{username}
-                密码：{password}
+登录地址：{settings.FRONTEND_URL}
+用户名：{username}
+密码：{password}
 
-                祝 工作顺利，万事如意！
+祝 工作顺利，万事如意！
 
-                苏师YangTeam
+苏师YangTeam
 
-                此邮件由系统自动发送，请勿回复
+此邮件由系统自动发送，请勿回复
 
-                ======================================================
+======================================================
 
-                温馨提示：
+温馨提示：
 
-                1、请妥善保管您的账号信息
-                2、建议首次登录后及时修改密码
-                3、如有任何问题，请联系管理员
+1、请妥善保管您的账号信息
+2、建议首次登录后及时修改密码
+3、如有任何问题，请联系管理员
 
-                联系人：曾老师
-                电  话：18252169610
-                邮  件：2020250606@jsnu.edu.cn
-                邮  编：221116
-                地  址：江苏省徐州市铜山新区上海路101号
+联系人：曾老师
+电  话：18252169610
+邮  件：2020250606@jsnu.edu.cn
+邮  编：221116
+地  址：江苏省徐州市铜山新区上海路101号
 
-                ======================================================"""
+======================================================"""
 
+            email_sent = False
+            try:
                 send_mail(
                     subject,
                     message,
                     settings.EMAIL_HOST_USER,
-                    [email],
+                    [contact_email],
                     fail_silently=True
                 )
+                email_sent = True
+            except Exception:
+                email_sent = False
 
-                created_count += 1
+            report['created'] += 1
+            report['details'].append({
+                'row_index': idx,
+                'status': 'created',
+                'school_id': school.id,
+                'username': username,
+                'password': password,
+                'email_sent': email_sent
+            })
 
-        return Response({
-            'success': True,
-            'data': {
-                'created': created_count,
-                'skipped': skipped_count
-            }
-        })
-    except Exception as e:
-        return Response({'success': False, 'message': f'导入失败: {str(e)}'}, status=500)
+        except Exception as e:
+            report['failed'] += 1
+            report['details'].append({
+                'row_index': idx,
+                'status': 'failed',
+                'reason': str(e)
+            })
+
+    return Response({
+        'success': True,
+        'data': report
+    })
 
 
 @api_view(['POST'])

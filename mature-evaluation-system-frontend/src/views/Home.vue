@@ -167,15 +167,7 @@ const hasCompletedBasicInfo = (assessment = null) => {
   )
 }
 
-const goToAssessmentEntry = (assessment = null) => {
-  // 只要已经存在评估记录，就直接进入评估流程页
-  // 不再从首页反复进入基础信息采集页
-  if (assessment?.id) {
-    router.push('/school/assessment')
-    return
-  }
-
-  // 没有评估记录时才进入基础信息采集页
+const goToAssessmentEntry = () => {
   router.push('/school/basic-info')
 }
 
@@ -200,22 +192,17 @@ onMounted(async () => {
 // 开始评估
 // 开始评估
 const handleStartAssessment = async () => {
-  // 情况 A：没有评估记录，或者最近一份已经完成，开启新一轮评估
   if (!currentAssessment.value || currentAssessment.value.status === 'completed') {
     try {
       loading.value = true
 
       const res = await createAssessment()
-
-      // 兼容不同接口返回格式
       const newAssessment = res?.data?.data || res?.data || res
 
       currentAssessment.value = newAssessment
 
       ElMessage.success('已为您开启新一轮评估')
-
-      // 基础信息完整则直接进入评估流程；不完整才进入基础信息采集
-      goToAssessmentEntry(newAssessment)
+      router.push('/school/basic-info')
     } catch (error) {
       console.error('开启评估失败:', error)
       ElMessage.error(error.response?.data?.error || '无法开启新评估，请联系管理员')
@@ -226,13 +213,11 @@ const handleStartAssessment = async () => {
     return
   }
 
-  // 情况 B：当前有一份评估是 draft，继续填写
   if (currentAssessment.value.status === 'draft') {
-    goToAssessmentEntry(currentAssessment.value)
+    router.push('/school/basic-info')
     return
   }
 
-  // 情况 C：当前评估正在处理中
   if (['collecting', 'analyzing'].includes(currentAssessment.value.status)) {
     ElMessageBox.alert(
       '您当前有一份评估正在计算中，请等待结果生成后再开启新一轮评估。',

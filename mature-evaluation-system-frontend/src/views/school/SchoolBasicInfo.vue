@@ -140,23 +140,29 @@ const typeMap = {
 }
 
 onMounted(async () => {
-  const storedUser = JSON.parse(localStorage.getItem('user'))
+  const storedUser = JSON.parse(localStorage.getItem('user') || 'null')
+
   if (storedUser) {
     form.school_name = storedUser.school_name || ''
   }
 
   try {
     const res = await request({ url: '/school/info/', method: 'get' })
+
     if (res.data) {
       const data = res.data
-      form.school_name = data.school_name || form.school_name
-      form.school_type = data.school_type_display || typeMap[data.school_type] || data.school_type
-      form.area_display = `${data.province}/${data.city}/${data.district}`
-      form.founding_year = ''
-      form.student_count = ''
-      form.teacher_count = ''
+
+      form.school_name = data.school_name || data.name || form.school_name
+      form.school_type = data.school_type_display || typeMap[data.school_type] || data.school_type || ''
+      form.area_display = [data.province, data.city, data.district].filter(Boolean).join('/')
+
+      // 关键修改：如果后端已有基础信息，这里要回显，不能清空
+      form.founding_year = data.founding_year ?? ''
+      form.student_count = data.student_count ?? ''
+      form.teacher_count = data.teacher_count ?? ''
     }
   } catch (error) {
+    console.error('无法加载学校信息:', error)
     ElMessage.error('无法加载学校信息')
   } finally {
     loading.value = false
@@ -165,9 +171,11 @@ onMounted(async () => {
 
 const handleStart = async () => {
   if (!formRef.value) return
+
   await formRef.value.validate(async (valid) => {
     if (valid) {
       loading.value = true
+
       try {
         await request({
           url: '/school/update-count/',
@@ -178,9 +186,20 @@ const handleStart = async () => {
             founding_year: form.founding_year
           }
         })
+
+        const storedUser = JSON.parse(localStorage.getItem('user') || 'null')
+
+        if (storedUser) {
+          storedUser.founding_year = form.founding_year
+          storedUser.student_count = form.student_count
+          storedUser.teacher_count = form.teacher_count
+          localStorage.setItem('user', JSON.stringify(storedUser))
+        }
+
         ElMessage.success('基础信息确认成功，进入评估')
         router.push('/school/assessment')
       } catch (error) {
+        console.error('保存失败:', error)
         ElMessage.error('保存失败，请重试')
       } finally {
         loading.value = false

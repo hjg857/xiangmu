@@ -30,9 +30,9 @@
         <div class="import-right">
           <div class="import-tip-title">📌 批量导入须知：</div>
           <ol class="import-tip">
-            <li><strong>自动发信：</strong>导入成功后，系统将自动生成账号并发送至联系人邮箱。</li>
-            <li><strong>地域必填：</strong>超级管理员导入请务必填准确的“省、市、区”全称。</li>
-            <li><strong>账号规则：</strong>账号为学校拼音首字母+随机码，密码为8位随机字符。</li>
+            <li>所有填报信息必须真实有效、准确无误，严格对照表格填报要求及标准示例规范填写；</li>
+            <li>不能对模板字段、表头、列序及格式进行任何修改，以确保数据能够正常导入系统；</li>
+            <li>填报完成后需逐项核对校验，排查错填、漏填、格式错乱等问题，确认无误后再提交。</li>
           </ol>
         </div>
       </div>
@@ -118,21 +118,55 @@
           </div>
           <el-table :data="previewRows" stripe height="400px" size="small">
             <el-table-column prop="__rownum" label="行号" width="60" />
-            <el-table-column prop="school_name" label="学校名称" min-width="150" show-overflow-tooltip />
-            <!-- 找到预览弹窗里的 el-table，插入这一列 -->
+            <el-table-column prop="index" label="序号" width="60" />
+            <el-table-column prop="school_name" label="学校名称" min-width="160" show-overflow-tooltip />
+            <el-table-column prop="school_type_display" label="学校类型" width="110" />
             <el-table-column label="所在地" min-width="180">
               <template #default="{ row }">
                 {{ row.province }} / {{ row.city }} / {{ row.district }}
               </template>
             </el-table-column>
-            <el-table-column prop="contact_email" label="邮箱" min-width="150" />
+            <el-table-column prop="contact_name" label="负责人" width="90" />
+            <el-table-column prop="contact_position" label="职务" width="120" show-overflow-tooltip />
+            <el-table-column prop="contact_phone" label="联系电话" width="130" />
+            <el-table-column prop="contact_email" label="邮箱" min-width="150" show-overflow-tooltip />
+            <el-table-column prop="username" label="登录用户名" width="130" show-overflow-tooltip />
+            <el-table-column prop="password" label="登录密码" width="110" show-overflow-tooltip />
             <el-table-column label="校验状态" width="100">
-              <template #default="{ row }">
-                <el-tag :type="row.__status === 'valid' ? 'success' : (row.__status === 'skip' ? 'warning' : 'danger')" size="small">
-                  {{ row.__status === 'valid' ? '正常' : (row.__status === 'skip' ? '跳过' : '错误') }}
-                </el-tag>
-              </template>
-            </el-table-column>
+  <template #default="{ row }">
+    <el-tag
+      v-if="row.__status === 'created'"
+      type="success"
+      size="small"
+    >
+      已创建
+    </el-tag>
+
+    <el-tag
+      v-else-if="row.__status === 'valid'"
+      type="success"
+      size="small"
+    >
+      正常
+    </el-tag>
+
+    <el-tag
+      v-else-if="row.__status === 'skip'"
+      type="warning"
+      size="small"
+    >
+      跳过
+    </el-tag>
+
+    <el-tag
+      v-else
+      type="danger"
+      size="small"
+    >
+      错误
+    </el-tag>
+  </template>
+</el-table-column>
             <el-table-column prop="__reason" label="原因说明" min-width="150" show-overflow-tooltip />
           </el-table>
         </div>
@@ -206,7 +240,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Refresh } from '@element-plus/icons-vue'
-import * as XLSX from 'xlsx'
+import * as XLSX from 'xlsx-js-style'
 import { getApplicationList, approveApplication, rejectApplication } from '@/api/admin'
 import { apiPost } from '@/utils/api' // 确保你的 utils 下有通用 post
 import { formatDateTime } from '@/utils'
@@ -259,45 +293,213 @@ const handleReset = () => { filterForm.status = ''; filterForm.school_type = '';
 // --- 批量导入逻辑 ---
 
 const downloadTemplate = () => {
-  // 1. 定义表头：加入了省(province)、市(city)、区/县(district)
-  const header = [
-    "学校名称(name)*", 
-    "学校类型(school_type)*", 
-    "省(province)*", 
-    "市(city)*", 
-    "区/县(district)*", 
-    "联系人(contact_name)*", 
-    "职务(contact_position)*", 
-    "联系电话(contact_phone)*", 
-    "邮箱(contact_email)*",
-    "用户名(username,可选)",
-    "初始密码(password,可选,>=8)"
-  ];
+  const rows = [
+    [
+      "序号",
+      "学校名称",
+      "学校类型",
+      "省",
+      "市",
+      "区/县",
+      "负责人",
+      "职务",
+      "联系电话",
+      "邮箱",
+      "登录用户名",
+      "登录密码",
+    ],
+    [
+      "填报说明",
+      "填写学校官方完整全称",
+      "仅限选择：小学、初中、高中、九年一贯制、十二年一贯制",
+      "填写学校所在省份全称，如：江苏省",
+      "填写学校所在城市全称，如：徐州市",
+      "填写学校所在区县全称，如：泉山区",
+      "填写各学校负责人姓名",
+      "填写负责人岗位职务",
+      "填写负责人有效联系电话",
+      "填写负责人有效邮箱",
+      "学校全称大写首字母组合，无特殊字符",
+      "8位字符（数字或字母组合）",
+    ],
+    [
+      "填报示例",
+      "徐州市泉山实验小学",
+      "小学",
+      "江苏省",
+      "徐州市",
+      "泉山区",
+      "易XX",
+      "信息中心主任",
+      "18864471307",
+      "204142312@gq.com",
+      "XZQSSYXX",
+      "QSSYXX11",
+    ],
+    [
+      "① 所有填报信息必须真实有效、准确无误，严格对照表格填报要求及标准示例规范填写；\n② 不能对模板字段、表头、列序及格式进行任何修改，以确保数据能够正常导入系统；\n③ 填报完成后需逐项核对校验，排查错填、漏填、格式错乱等问题，确认无误后再提交。",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ],
+  ]
 
-  // 2. 示例行
-  const example = [
-    "示例小学", 
-    "primary", 
-    "江苏省", 
-    "徐州市", 
-    "泉山区", 
-    "张老师", 
-    "主任", 
-    "13800000000", 
-    "test@edu.cn",
-    "",
-    ""
-  ];
+  // 第5行开始预留正式填写区域
+  for (let i = 1; i <= 100; i++) {
+    rows.push([i, "", "", "", "", "", "", "", "", "", "", ""])
+  }
 
-  // 3. 组装并设置列宽
-  const ws = XLSX.utils.aoa_to_sheet([header, example]);
-  ws["!cols"] = header.map(() => ({ wch: 20 })); // 设置每列宽度为20
+  const ws = XLSX.utils.aoa_to_sheet(rows)
 
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Template");
-  
-  // 4. 下载文件
-  XLSX.writeFile(wb, "超级管理员-学校账号批量导入模板.xlsx");
+  // 合并第4行说明区域：A4-L4
+  ws["!merges"] = [
+    {
+      s: { r: 3, c: 0 },
+      e: { r: 3, c: 11 },
+    },
+  ]
+
+  // 列宽
+  ws["!cols"] = [
+    { wch: 8 },   // 序号
+    { wch: 28 },  // 学校名称
+    { wch: 34 },  // 学校类型
+    { wch: 16 },  // 省
+    { wch: 16 },  // 市
+    { wch: 16 },  // 区/县
+    { wch: 18 },  // 负责人
+    { wch: 18 },  // 职务
+    { wch: 18 },  // 联系电话
+    { wch: 26 },  // 邮箱
+    { wch: 24 },  // 登录用户名
+    { wch: 20 },  // 登录密码
+  ]
+
+  // 行高
+  ws["!rows"] = [
+    { hpt: 28 },
+    { hpt: 44 },
+    { hpt: 26 },
+    { hpt: 60 },
+  ]
+
+  const borderStyle = {
+    top: { style: "thin", color: { rgb: "000000" } },
+    bottom: { style: "thin", color: { rgb: "000000" } },
+    left: { style: "thin", color: { rgb: "000000" } },
+    right: { style: "thin", color: { rgb: "000000" } },
+  }
+
+  const headerStyle = {
+    font: {
+      name: "宋体",
+      bold: true,
+      color: { rgb: "FFFFFF" },
+      sz: 12,
+    },
+    fill: {
+      fgColor: { rgb: "305496" },
+    },
+    alignment: {
+      horizontal: "center",
+      vertical: "center",
+      wrapText: true,
+    },
+    border: borderStyle,
+  }
+
+  const noteStyle = {
+    font: {
+      name: "宋体",
+      color: { rgb: "000000" },
+      sz: 11,
+    },
+    fill: {
+      fgColor: { rgb: "D9E2F3" },
+    },
+    alignment: {
+      horizontal: "center",
+      vertical: "center",
+      wrapText: true,
+    },
+    border: borderStyle,
+  }
+
+  const mergedNoteStyle = {
+    font: {
+      name: "宋体",
+      color: { rgb: "000000" },
+      sz: 11,
+    },
+    fill: {
+      fgColor: { rgb: "D9E2F3" },
+    },
+    alignment: {
+      horizontal: "left",
+      vertical: "center",
+      wrapText: true,
+    },
+    border: borderStyle,
+  }
+
+  const emptyStyle = {
+    font: {
+      name: "宋体",
+      color: { rgb: "000000" },
+      sz: 11,
+    },
+    alignment: {
+      horizontal: "center",
+      vertical: "center",
+      wrapText: true,
+    },
+    border: borderStyle,
+  }
+
+  // 前4行样式
+  for (let r = 0; r <= 3; r++) {
+    for (let c = 0; c <= 11; c++) {
+      const cellRef = XLSX.utils.encode_cell({ r, c })
+
+      if (!ws[cellRef]) {
+        ws[cellRef] = { t: "s", v: "" }
+      }
+
+      if (r === 0) {
+        ws[cellRef].s = headerStyle
+      } else if (r === 3) {
+        ws[cellRef].s = mergedNoteStyle
+      } else {
+        ws[cellRef].s = noteStyle
+      }
+    }
+  }
+
+  // 第5行以后正式填写区域样式
+  for (let r = 4; r < rows.length; r++) {
+    for (let c = 0; c <= 11; c++) {
+      const cellRef = XLSX.utils.encode_cell({ r, c })
+
+      if (!ws[cellRef]) {
+        ws[cellRef] = { t: "s", v: "" }
+      }
+
+      ws[cellRef].s = emptyStyle
+    }
+  }
+
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, "学校账号导入模板")
+
+  XLSX.writeFile(wb, "超级管理员-学校账号批量导入模板.xlsx")
 }
 
 const onPickFile = (file) => {
@@ -310,118 +512,395 @@ const parseExcel = async (file) => {
   previewLoading.value = true
   previewVisible.value = true
   previewErrors.value = []
-  
+  previewRows.value = []
+
   try {
     const data = await file.arrayBuffer()
-    const workbook = XLSX.read(data)
+    const workbook = XLSX.read(data, { type: "array" })
     const worksheet = workbook.Sheets[workbook.SheetNames[0]]
-    // 使用 header: 1 以获取二维数组，方便根据索引取值
-    const json = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" })
-    
-    if (json.length < 2) throw new Error("文件内无有效数据")
-    
-    const rows = json.slice(1) // 去掉表头
-    const existingNames = new Set(applications.value.map(a => a.school_name))
 
-    previewRows.value = rows.map((r, i) => {
-      // 按照新模板顺序解构：名称、类型、省、市、区、联系人、职务、电话、邮箱、用户名、密码
-      const [name, type, prov, city, dist, contact, pos, phone, email, username, pwd] = r.map(v => String(v || '').trim())
-      
-      let status = 'valid'
-      let reason = ''
-      
-      // 1. 必填项校验（超级管理员多了省市区）
-      if (!name || !type || !prov || !city || !dist || !contact || !phone || !email) {
-        status = 'invalid'
-        reason = '必填项缺失（学校、类型、省市区、联系人、电话、邮箱均为必填）'
-      } 
-      // 2. 邮箱格式校验
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        status = 'invalid'
-        reason = '邮箱格式不正确'
-      } 
-      // 3. 手机号校验
-      else if (!/^1[3-9]\d{9}$/.test(phone)) {
-        status = 'invalid'
-        reason = '手机号格式不正确'
-      }
-      // 4. 系统重名校验
-      else if (existingNames.has(name)) {
-        status = 'skip'
-        reason = '系统当前列表中已存在同名学校'
+    const aoa = XLSX.utils.sheet_to_json(worksheet, {
+      header: 1,
+      defval: ""
+    })
+
+    if (!aoa || aoa.length < 5) {
+      throw new Error("Excel格式不正确：第5行开始才是正式数据，请使用新版导入模板")
+    }
+
+    const headerRow = (aoa[0] || []).map((x) => String(x || "").trim())
+    const idx = buildHeaderIndex(headerRow)
+
+    const requiredFields = [
+      "index",
+      "school_name",
+      "school_type",
+      "province",
+      "city",
+      "district",
+      "contact_name",
+      "contact_position",
+      "contact_phone",
+      "contact_email",
+      "username",
+      "password"
+    ]
+
+    const fieldNameMap = {
+      index: "序号",
+      school_name: "学校名称",
+      school_type: "学校类型",
+      province: "省",
+      city: "市",
+      district: "区/县",
+      contact_name: "负责人",
+      contact_position: "职务",
+      contact_phone: "联系电话",
+      contact_email: "邮箱",
+      username: "登录用户名",
+      password: "登录密码"
+    }
+
+    const missing = requiredFields.filter((key) => idx[key] == null)
+
+    if (missing.length) {
+      previewErrors.value.push(
+        `表头缺少必要列：${missing.map((key) => fieldNameMap[key] || key).join("、")}。请使用新版导入模板。`
+      )
+      return
+    }
+
+    // 第2、3、4行是说明和示例，第5行开始才是正式数据
+    const dataRows = aoa
+      .slice(4)
+      .map((row, i) => ({
+        excelRowNum: i + 5,
+        row
+      }))
+      .filter(({ row }) => {
+        // A列是序号，可能自动填了数字；判断 B-L 是否有实际内容
+        return row.slice(1, 12).some((cell) => String(cell || "").trim() !== "")
+      })
+      .slice(0, 100)
+
+    const existingNames = new Set(
+      applications.value.map((a) => normalizeName(a.school_name))
+    )
+
+    const seenName = new Set()
+    const seenEmail = new Set()
+    const seenUsername = new Set()
+
+    previewRows.value = dataRows.map(({ row, excelRowNum }) => {
+      const get = (key) => String(row[idx[key]] ?? "").trim()
+
+      const schoolTypeText = get("school_type")
+      const schoolTypeValue = normalizeSchoolType(schoolTypeText)
+
+      const item = {
+        __rownum: excelRowNum,
+        index: get("index"),
+        school_name: get("school_name"),
+        school_type: schoolTypeValue,
+        school_type_display: schoolTypeText,
+        province: get("province"),
+        city: get("city"),
+        district: get("district"),
+        contact_name: get("contact_name"),
+        contact_position: get("contact_position"),
+        contact_phone: get("contact_phone"),
+        contact_email: get("contact_email"),
+        username: get("username"),
+        password: get("password"),
+        __status: "valid",
+        __reason: ""
       }
 
-      return {
-        __rownum: i + 2, 
-        school_name: name, 
-        school_type: type, 
-        province: prov, 
-        city: city, 
-        district: dist,
-        contact_name: contact, 
-        contact_position: pos, 
-        contact_phone: phone, 
-        contact_email: email,
-        username: username, // 传递给后端
-        password: pwd,      // 传递给后端
-        __status: status, 
-        __reason: reason
-      }
-    }).filter(r => r.school_name) // 过滤掉空行
+      const errs = []
 
-    // 更新预览统计
+      if (!item.index) errs.push("序号必填")
+      if (!item.school_name) errs.push("学校名称必填")
+      if (!item.school_type_display) errs.push("学校类型必填")
+      if (!item.school_type) errs.push("学校类型不合法")
+      if (!item.province) errs.push("省必填")
+      if (!item.city) errs.push("市必填")
+      if (!item.district) errs.push("区/县必填")
+      if (!item.contact_name) errs.push("负责人必填")
+      if (!item.contact_position) errs.push("职务必填")
+      if (!item.contact_phone) errs.push("联系电话必填")
+      if (!item.contact_email) errs.push("邮箱必填")
+      if (!item.username) errs.push("登录用户名必填")
+      if (!item.password) errs.push("登录密码必填")
+
+      if (item.contact_phone && !isValidPhone(item.contact_phone)) {
+        errs.push("联系电话格式不正确")
+      }
+
+      if (item.contact_email && !isValidEmail(item.contact_email)) {
+        errs.push("邮箱格式不正确")
+      }
+
+      if (item.username && !/^[A-Za-z0-9]+$/.test(item.username)) {
+        errs.push("登录用户名只能包含数字或字母，不能包含特殊字符")
+      }
+
+      if (item.password && !/^[A-Za-z0-9]{8}$/.test(item.password)) {
+        errs.push("登录密码必须为8位数字或字母组合")
+      }
+
+      const normName = normalizeName(item.school_name)
+      const normEmail = item.contact_email.toLowerCase()
+      const normUsername = item.username.toLowerCase()
+
+      if (normName) {
+        if (seenName.has(normName)) {
+          errs.push("文件内学校名称重复")
+        }
+        seenName.add(normName)
+      }
+
+      if (normEmail) {
+        if (seenEmail.has(normEmail)) {
+          errs.push("文件内邮箱重复")
+        }
+        seenEmail.add(normEmail)
+      }
+
+      if (normUsername) {
+        if (seenUsername.has(normUsername)) {
+          errs.push("文件内登录用户名重复")
+        }
+        seenUsername.add(normUsername)
+      }
+
+      if (normName && existingNames.has(normName)) {
+        item.__status = "skip"
+        item.__reason = "系统当前列表中已存在同名学校"
+        return item
+      }
+
+      if (errs.length) {
+        item.__status = "invalid"
+        item.__reason = errs.join("；")
+      }
+
+      return item
+    })
+
     previewSummary.total = previewRows.value.length
-    previewSummary.valid = previewRows.value.filter(r => r.__status === 'valid').length
-    previewSummary.skip = previewRows.value.filter(r => r.__status === 'skip').length
-    previewSummary.invalid = previewRows.value.filter(r => r.__status === 'invalid').length
-
+    previewSummary.valid = previewRows.value.filter((r) => r.__status === "valid").length
+    previewSummary.skip = previewRows.value.filter((r) => r.__status === "skip").length
+    previewSummary.invalid = previewRows.value.filter((r) => r.__status === "invalid").length
   } catch (e) {
-    console.error('解析失败:', e)
-    previewErrors.value.push(e.message)
+    console.error("解析失败:", e)
+    previewErrors.value.push(e.message || "解析失败")
   } finally {
     previewLoading.value = false
   }
 }
 
+function normalizeName(value) {
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, "")
+    .toLowerCase()
+}
+
+function normalizeSchoolType(value) {
+  const text = String(value || "").trim()
+
+  const map = {
+    小学: "primary",
+    初中: "junior",
+    高中: "senior",
+    九年一贯制: "nine_year",
+    十二年一贯制: "twelve_year",
+
+    primary: "primary",
+    junior: "junior",
+    senior: "senior",
+    nine_year: "nine_year",
+    twelve_year: "twelve_year"
+  }
+
+  return map[text] || ""
+}
+
+function isValidPhone(value) {
+  return /^1[3-9]\d{9}$/.test(String(value || "").trim())
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim())
+}
+
+function buildHeaderIndex(headers) {
+  const normalizeHeader = (value) => {
+    return String(value || "")
+      .trim()
+      .replace(/\s+/g, "")
+      .replace(/[()（）]/g, "")
+      .toLowerCase()
+  }
+
+  const normalizedHeaders = headers.map(normalizeHeader)
+
+  const findByNames = (names) => {
+    const normalizedNames = names.map(normalizeHeader)
+
+    const idx = normalizedHeaders.findIndex((header) => {
+      return normalizedNames.some((name) => header === name || header.includes(name))
+    })
+
+    return idx >= 0 ? idx : null
+  }
+
+  return {
+    index: findByNames(["序号", "序列号", "编号", "no", "no."]),
+    school_name: findByNames(["学校名称", "学校全称"]),
+    school_type: findByNames(["学校类型", "办学类型"]),
+    province: findByNames(["省", "省份", "province"]),
+    city: findByNames(["市", "城市", "city"]),
+    district: findByNames(["区/县", "区县", "区", "县", "district"]),
+    contact_name: findByNames(["负责人", "联系人", "联系人姓名"]),
+    contact_position: findByNames(["职务", "岗位", "负责人职务"]),
+    contact_phone: findByNames(["联系电话", "电话", "手机号码", "手机号"]),
+    contact_email: findByNames(["邮箱", "联系邮箱", "电子邮箱"]),
+    username: findByNames(["登录用户名", "用户名", "账号", "登录账号"]),
+    password: findByNames(["登录密码", "初始密码", "密码"])
+  }
+}
+
+function formatImportReason(reason) {
+  if (!reason) {
+    return "导入失败"
+  }
+
+  if (typeof reason === "string") {
+    return reason
+  }
+
+  if (Array.isArray(reason)) {
+    return reason.join("；")
+  }
+
+  if (typeof reason === "object") {
+    const messages = []
+
+    Object.entries(reason).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        messages.push(`${key}：${value.join("；")}`)
+      } else if (typeof value === "string") {
+        messages.push(`${key}：${value}`)
+      } else {
+        messages.push(`${key}：${JSON.stringify(value)}`)
+      }
+    })
+
+    return messages.join("；") || "导入失败"
+  }
+
+  return String(reason)
+}
+
 const startImport = async () => {
-  // 只提交校验状态为 'valid' 的行
-  const validData = previewRows.value.filter(r => r.__status === 'valid')
-  
-  if (validData.length === 0) {
-    ElMessage.warning('没有可导入的有效数据')
+  const validRows = previewRows.value.filter((row) => row.__status === "valid")
+
+  if (validRows.length === 0) {
+    ElMessage.warning("没有可导入的有效数据")
     return
   }
 
+  const payload = {
+    rows: validRows.map((row) => ({
+      school_name: row.school_name,
+      school_type: row.school_type,
+      province: row.province,
+      city: row.city,
+      district: row.district,
+      contact_name: row.contact_name,
+      contact_position: row.contact_position,
+      contact_phone: row.contact_phone,
+      contact_email: row.contact_email,
+      username: row.username,
+      password: row.password,
+    })),
+  }
+
   previewLoading.value = true
+
   try {
-    // 构造后端需要的格式
-    const payload = {
-      rows: validData.map(r => ({
-        school_name: r.school_name,
-        school_type: r.school_type,
-        province: r.province,
-        city: r.city,
-        district: r.district,
-        contact_name: r.contact_name,
-        contact_position: r.contact_position,
-        contact_phone: r.contact_phone,
-        contact_email: r.contact_email,
-        username: r.username || "",
-        password: r.password || ""
-      }))
+    const { data: resp } = await apiPost("/api/schools/import/", payload)
+
+    if (!resp?.success) {
+      throw new Error(resp?.message || "导入失败")
     }
 
-    const res = await apiPost('/api/schools/import/', { rows: validData })
-    
-    if (res.data.success || res.success) {
-      const result = res.data?.data || res.data
-      ElMessage.success(`导入完成！成功：${result.created}，跳过：${result.skipped}`)
-      previewVisible.value = false
-      loadApplications() // 刷新下方列表
+    const result = resp.data || {
+      created: 0,
+      skipped: 0,
+      failed: 0,
+      details: [],
     }
-  } catch (e) {
-    console.error('导入失败:', e)
-    ElMessage.error(e.response?.data?.message || '导入请求失败，请检查网络或权限')
+
+    /**
+     * 后端返回的 row_index 通常是 validRows 的下标，
+     * 不是 previewRows 的原始下标。
+     * 所以这里通过 validRows[row_index].__rownum 找回原 Excel 行号。
+     */
+    const detailByExcelRow = new Map()
+
+    ;(result.details || []).forEach((detail) => {
+      const validRow = validRows[detail.row_index]
+
+      if (validRow) {
+        detailByExcelRow.set(validRow.__rownum, detail)
+      }
+    })
+
+    previewRows.value = previewRows.value.map((row) => {
+      const detail = detailByExcelRow.get(row.__rownum)
+
+      if (!detail) {
+        return row
+      }
+
+      if (detail.status === "created") {
+        return {
+          ...row,
+          __status: "created",
+          __reason: `已创建，用户名：${detail.username || row.username}`,
+        }
+      }
+
+      if (detail.status === "skipped") {
+        return {
+          ...row,
+          __status: "skip",
+          __reason: detail.reason || "已跳过",
+        }
+      }
+
+      return {
+        ...row,
+        __status: "invalid",
+        __reason: formatImportReason(detail.reason),
+      }
+    })
+
+    previewSummary.total = previewRows.value.length
+    previewSummary.valid = previewRows.value.filter((row) => row.__status === "valid").length
+    previewSummary.skip = previewRows.value.filter((row) => row.__status === "skip").length
+    previewSummary.invalid = previewRows.value.filter((row) => row.__status === "invalid").length
+
+    ElMessage.success(
+      `导入完成：成功${result.created || 0}，跳过${result.skipped || 0}，失败${result.failed || 0}`
+    )
+
+    await loadApplications()
+  } catch (error) {
+    console.error("导入失败:", error)
+    ElMessage.error(error?.message || "导入请求失败，请检查网络或权限")
   } finally {
     previewLoading.value = false
   }

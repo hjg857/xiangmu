@@ -63,30 +63,47 @@
 
       <el-table :data="previewRows" stripe height="420" style="width:100%">
         <el-table-column prop="__rownum" label="行号" width="70" />
-        <el-table-column prop="name" label="学校名称" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="school_type" label="类型" width="110" />
-        <el-table-column prop="contact_name" label="联系人" width="110" />
-        <el-table-column prop="contact_phone" label="电话" width="140" />
+        <el-table-column prop="index" label="序号" width="70" />
+        <el-table-column prop="name" label="学校名称" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="school_type_display" label="学校类型" width="130" />
+        <el-table-column prop="contact_name" label="负责人" width="110" />
+        <el-table-column prop="contact_position" label="职务" width="140" show-overflow-tooltip />
+        <el-table-column prop="contact_phone" label="联系电话" width="140" />
         <el-table-column prop="contact_email" label="邮箱" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="username" label="登录用户名" min-width="140" show-overflow-tooltip />
+        <el-table-column prop="password" label="登录密码" min-width="120" show-overflow-tooltip />
 
         <el-table-column label="状态" width="120">
-          <template #default="{ row }">
-            <el-tag
-              v-if="row.__status==='valid'"
-              type="success"
-            >可导入</el-tag>
-            <el-tag
-              v-else-if="row.__status==='skip'"
-              type="warning"
-            >将跳过</el-tag>
-            <el-tag
-              v-else
-              type="danger"
-            >无效</el-tag>
-          </template>
-        </el-table-column>
+        <template #default="{ row }">
+          <el-tag
+            v-if="row.__status === 'created'"
+            type="success"
+          >
+            已创建
+          </el-tag>
 
-        <el-table-column prop="__reason" label="说明" min-width="200" show-overflow-tooltip />
+          <el-tag
+            v-else-if="row.__status === 'valid'"
+            type="success"
+          >
+            可导入
+          </el-tag>
+
+          <el-tag
+            v-else-if="row.__status === 'skip'"
+            type="warning"
+          >
+            将跳过
+          </el-tag>
+
+          <el-tag
+            v-else
+            type="danger"
+          >
+            无效
+          </el-tag>
+        </template>
+      </el-table-column>
       </el-table>
     </div>
   </div>
@@ -104,9 +121,9 @@
         <div class="import-right">
           <div class="import-tip-title">📌 导入说明：</div>
           <ol class="import-tip">
-            <li>账号规则：学校名称首字母 + 6位随机数（示例：XWZS3Z123456）</li>
-            <li>密码规则：8位随机字母数字组合（创建后可重置）</li>
-            <li>重复学校名称会自动跳过，避免重复创建</li>
+            <li>所有填报信息必须真实有效、准确无误，严格对照表格填报要求及标准示例规范填写；</li>
+            <li>不能对模板字段、表头、列序及格式进行任何修改，以确保数据能够正常导入系统；</li>
+            <li>填报完成后需逐项核对校验，排查错填、漏填、格式错乱等问题，确认无误后再提交。</li>
           </ol>
         </div>
       </div>
@@ -175,10 +192,9 @@
   class="table"
   header-cell-class-name="thead"
 >
-  <el-table-column prop="id" label="ID" width="60" />
+  <el-table-column prop="id" label="ID" width="70" align="center" />
 
-  <!-- 学校名称 + 账号 -->
-  <el-table-column label="学校名称" min-width="200" show-overflow-tooltip>
+  <el-table-column label="学校名称" min-width="170" show-overflow-tooltip>
     <template #default="{ row }">
       <div class="name-cell">
         <div class="name">{{ row.name }}</div>
@@ -187,36 +203,34 @@
     </template>
   </el-table-column>
 
-  <el-table-column label="学校类型" width="90">
+  <el-table-column label="学校类型" width="100" align="center">
     <template #default="{ row }">
       {{ schoolTypeLabel(row.school_type) }}
     </template>
   </el-table-column>
 
-  <el-table-column label="所在地" min-width="130" show-overflow-tooltip>
+  <el-table-column label="所在地" min-width="150" show-overflow-tooltip align="center">
     <template #default="{ row }">
       {{ formatLocation(row) }}
     </template>
   </el-table-column>
 
-  <!-- 联系人 + 电话 -->
-  <el-table-column label="联系人" width="120">
+  <el-table-column label="联系人" width="130" align="center">
     <template #default="{ row }">
-      <div>
+      <div class="contact-cell">
         <div>{{ row.contact_name || "-" }}</div>
         <div class="sub">{{ row.contact_phone || "-" }}</div>
       </div>
     </template>
   </el-table-column>
 
-  <!-- ✅ 邮箱：单独一列 -->
-  <el-table-column label="邮箱" min-width="180" show-overflow-tooltip>
+  <el-table-column label="邮箱" min-width="190" show-overflow-tooltip align="center">
     <template #default="{ row }">
       {{ row.contact_email || "-" }}
     </template>
   </el-table-column>
 
-  <el-table-column label="申请状态" width="100">
+  <el-table-column label="申请状态" width="110" align="center">
     <template #default="{ row }">
       <el-tag :type="applyTagType(row.apply_status || row.status)">
         {{ applyStatusLabel(row.apply_status || row.status) }}
@@ -224,14 +238,13 @@
     </template>
   </el-table-column>
 
-  <el-table-column label="申请时间" width="150">
+  <el-table-column label="申请时间" width="165" align="center">
     <template #default="{ row }">
       {{ formatDateTime(row.created_at || row.applied_at) }}
     </template>
   </el-table-column>
 
-  <!-- 操作：下拉，防止重叠 -->
-  <el-table-column label="操作" width="100" fixed="right">
+  <el-table-column label="操作" width="100" fixed="right" align="center">
   <template #default="{ row }">
     <el-dropdown trigger="click">
       <el-button type="primary" size="small">操作</el-button>
@@ -324,7 +337,7 @@ import { onMounted, reactive, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { apiGet, apiPost, apiDelete, apiPostForm } from "@/utils/api";
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx-js-style";
 
 const router = useRouter();
 
@@ -615,42 +628,217 @@ const pickedFile = ref(null);
 
 
 function downloadTemplate() {
-  // 1 表头
-  const header = [
-    "学校名称(name)",
-    "学校类型(school_type)",
-    "联系人(contact_name)",
-    "职务(contact_position)",
-    "联系电话(contact_phone)",
-    "邮箱(contact_email)",
-    "用户名(username，可选)",
-    "初始密码(password，可选，>=8)",
-  ];
+  const rows = [
+    [
+      "序号",
+      "学校名称",
+      "学校类型",
+      "负责人",
+      "职务",
+      "联系电话",
+      "邮箱",
+      "登录用户名",
+      "登录密码",
+    ],
+    [
+      "填报说明",
+      "填写学校官方完整全称",
+      "仅限选择：小学、初中、高中、九年一贯制、十二年一贯制",
+      "填写各学校负责人姓名",
+      "填写负责人岗位职务",
+      "填写负责人有效联系电话",
+      "填写负责人有效邮箱",
+      "学校全称大写首字母组合，无特殊字符",
+      "8位字符（数字或字母组合）",
+    ],
+    [
+      "填报示例",
+      "徐州市泉山实验小学",
+      "小学",
+      "易XX",
+      "信息中心主任",
+      "18864471307",
+      "204142312@gq.com",
+      "XZQSSYXX",
+      "QSSYXX11",
+    ],
+    [
+      "① 所有填报信息必须真实有效、准确无误，严格对照表格填报要求及标准示例规范填写；\n② 不能对模板字段、表头、列序及格式进行任何修改，以确保数据能够正常导入系统；\n③ 填报完成后需逐项核对校验，排查错填、漏填、格式错乱等问题，确认无误后再提交。",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ],
+  ]
 
-  // 2 示例行
-  const example = [
-    "玄武一小",
-    "primary",
-    "张三",
-    "信息中心主任",
-    "13800000000",
-    "xw001@example.com",
-    "",
-    "",
-  ];
+  // 第5行开始预留正式填写区域
+  for (let i = 1; i <= 100; i++) {
+    rows.push([i, "", "", "", "", "", "", "", ""])
+  }
 
-  // 3 组装成 sheet
-  const ws = XLSX.utils.aoa_to_sheet([header, example]);
+  const ws = XLSX.utils.aoa_to_sheet(rows)
 
-  // 4 设置列宽
-  ws["!cols"] = header.map((h) => ({ wch: Math.max(16, h.length + 2) }));
+  // 合并第4行说明区域
+  ws["!merges"] = [
+    {
+      s: { r: 3, c: 0 },
+      e: { r: 3, c: 8 },
+    },
+  ]
 
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "schools");
+  // 列宽
+  ws["!cols"] = [
+    { wch: 8 },
+    { wch: 28 },
+    { wch: 30 },
+    { wch: 18 },
+    { wch: 18 },
+    { wch: 18 },
+    { wch: 26 },
+    { wch: 24 },
+    { wch: 20 },
+  ]
 
-  // 5 下载
-  const fileName = "学校账号导入模板.xlsx";
-  XLSX.writeFile(wb, fileName);
+  // 行高
+  ws["!rows"] = [
+    { hpt: 28 },
+    { hpt: 44 },
+    { hpt: 26 },
+    { hpt: 60 },
+  ]
+
+  const borderStyle = {
+    top: { style: "thin", color: { rgb: "000000" } },
+    bottom: { style: "thin", color: { rgb: "000000" } },
+    left: { style: "thin", color: { rgb: "000000" } },
+    right: { style: "thin", color: { rgb: "000000" } },
+  }
+
+  const headerStyle = {
+    font: {
+      name: "宋体",
+      bold: true,
+      color: { rgb: "FFFFFF" },
+      sz: 12,
+    },
+    fill: {
+      fgColor: { rgb: "305496" },
+    },
+    alignment: {
+      horizontal: "center",
+      vertical: "center",
+      wrapText: true,
+    },
+    border: borderStyle,
+  }
+
+  const noteStyle = {
+    font: {
+      name: "宋体",
+      color: { rgb: "000000" },
+      sz: 11,
+    },
+    fill: {
+      fgColor: { rgb: "D9E2F3" },
+    },
+    alignment: {
+      horizontal: "center",
+      vertical: "center",
+      wrapText: true,
+    },
+    border: borderStyle,
+  }
+
+  const exampleStyle = {
+    font: {
+      name: "宋体",
+      color: { rgb: "000000" },
+      sz: 11,
+    },
+    fill: {
+      fgColor: { rgb: "D9E2F3" },
+    },
+    alignment: {
+      horizontal: "center",
+      vertical: "center",
+      wrapText: true,
+    },
+    border: borderStyle,
+  }
+
+  const mergedNoteStyle = {
+    font: {
+      name: "宋体",
+      color: { rgb: "000000" },
+      sz: 11,
+    },
+    fill: {
+      fgColor: { rgb: "D9E2F3" },
+    },
+    alignment: {
+      horizontal: "left",
+      vertical: "center",
+      wrapText: true,
+    },
+    border: borderStyle,
+  }
+
+  const emptyStyle = {
+    font: {
+      name: "宋体",
+      color: { rgb: "000000" },
+      sz: 11,
+    },
+    alignment: {
+      horizontal: "center",
+      vertical: "center",
+      wrapText: true,
+    },
+    border: borderStyle,
+  }
+
+  // 设置前4行样式
+  for (let r = 0; r <= 3; r++) {
+    for (let c = 0; c <= 8; c++) {
+      const cellRef = XLSX.utils.encode_cell({ r, c })
+
+      if (!ws[cellRef]) {
+        ws[cellRef] = { t: "s", v: "" }
+      }
+
+      if (r === 0) {
+        ws[cellRef].s = headerStyle
+      } else if (r === 1) {
+        ws[cellRef].s = noteStyle
+      } else if (r === 2) {
+        ws[cellRef].s = exampleStyle
+      } else if (r === 3) {
+        ws[cellRef].s = mergedNoteStyle
+      }
+    }
+  }
+
+  // 设置第5行以后空白填写区域样式
+  for (let r = 4; r < rows.length; r++) {
+    for (let c = 0; c <= 8; c++) {
+      const cellRef = XLSX.utils.encode_cell({ r, c })
+
+      if (!ws[cellRef]) {
+        ws[cellRef] = { t: "s", v: "" }
+      }
+
+      ws[cellRef].s = emptyStyle
+    }
+  }
+
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, "学校账号导入模板")
+
+  XLSX.writeFile(wb, "学校账号导入模板.xlsx")
 }
 
 /** ====== 1预览状态 ====== */
@@ -720,112 +908,149 @@ async function parseAndPreview(file) {
 
     const ws = wb.Sheets[firstSheetName];
 
-    // 用 AOA 保留表头行
     const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
-    if (!aoa || aoa.length < 2) throw new Error("Excel 至少需要表头 + 1 行数据");
+
+    if (!aoa || aoa.length < 5) {
+      throw new Error("Excel格式不正确：第5行开始才是正式数据，请使用新版导入模板");
+    }
 
     const headerRow = (aoa[0] || []).map((x) => String(x || "").trim());
-    const dataRows = aoa.slice(1);
-
-    // 根据表头识别字段列索引（兼容你模板里的中英混合表头）
     const idx = buildHeaderIndex(headerRow);
-    const requiredFields = ["name", "school_type", "contact_name", "contact_position", "contact_phone", "contact_email"];
+
+    const requiredFields = [
+      "index",
+      "name",
+      "school_type",
+      "contact_name",
+      "contact_position",
+      "contact_phone",
+      "contact_email",
+      "username",
+      "password",
+    ];
+
     const missing = requiredFields.filter((k) => idx[k] == null);
 
     if (missing.length) {
       previewErrors.value.push(
-        `表头缺少必要列：${missing.join(", ")}。请使用“下载导入模板”生成的表头。`
+        `表头缺少必要列：${missing.join("、")}。请使用新版“学校账号导入模板”。`
       );
       previewVisible.value = true;
       return;
     }
 
-    // 最多100条
+    // 第2、3、4行为说明和示例，不参与导入
+    // 第5行开始才是正式数据
+    // 注意：模板第5行以后 A列有序号，所以不能只判断整行是否为空；
+    // 要判断 B-I 列是否有实际填写内容。
+    const dataRows = aoa.slice(4).filter((row) => {
+      const meaningfulCells = row.slice(1, 9);
+      return meaningfulCells.some((cell) => String(cell || "").trim() !== "");
+    });
+
     const limitedRows = dataRows.slice(0, 100);
 
-    const seenInFile = new Set(); // 文件内重复检查
+    const seenNameInFile = new Set();
+    const seenEmailInFile = new Set();
+    const seenUsernameInFile = new Set();
     const dupNames = new Set();
 
-    const parsed = limitedRows
-      .map((r, i) => {
-        const rownum = i + 2; // Excel 行号（含表头）
-        const get = (key) => String(r[idx[key]] ?? "").trim();
+    const parsed = limitedRows.map((r, i) => {
+      const rownum = i + 5;
+      const get = (key) => String(r[idx[key]] ?? "").trim();
 
-        const item = {
-          __rownum: rownum,
-          name: get("name"),
-          school_type: get("school_type"),
-          contact_name: get("contact_name"),
-          contact_position: get("contact_position"),
-          contact_phone: get("contact_phone"),
-          contact_email: get("contact_email"),
-          username: idx.username != null ? get("username") : "",
-          password: idx.password != null ? get("password") : "",
+      const schoolTypeText = get("school_type");
+      const schoolTypeValue = normalizeSchoolType(schoolTypeText);
 
-          __status: "valid",      // valid | skip | invalid
-          __reason: "",           // 提示原因
-          __normalizedName: normalizeName(get("name")),
-        };
+      const item = {
+        __rownum: rownum,
+        index: get("index"),
+        name: get("name"),
+        school_type: schoolTypeValue,
+        school_type_display: schoolTypeText,
+        contact_name: get("contact_name"),
+        contact_position: get("contact_position"),
+        contact_phone: get("contact_phone"),
+        contact_email: get("contact_email"),
+        username: get("username"),
+        password: get("password"),
 
-        // 校验必填
-        const errs = [];
-        if (!item.name) errs.push("学校名称必填");
-        if (!item.school_type) errs.push("学校类型必填");
-        if (!item.contact_name) errs.push("联系人必填");
-        if (!item.contact_position) errs.push("职务必填");
-        if (!item.contact_phone) errs.push("电话必填");
-        if (!item.contact_email) errs.push("邮箱必填");
+        __status: "valid",
+        __reason: "",
+        __normalizedName: normalizeName(get("name")),
+      };
 
-        // school_type 校验（按你的 choices）
-        if (item.school_type && !isValidSchoolType(item.school_type)) {
-          errs.push("学校类型不合法");
-        }
+      const errs = [];
 
-        // phone/email 基本校验
-        if (item.contact_phone && !isValidPhone(item.contact_phone)) {
-          errs.push("电话格式不正确");
-        }
-        if (item.contact_email && !isValidEmail(item.contact_email)) {
-          errs.push("邮箱格式不正确");
-        }
+      if (!item.index) errs.push("序号必填");
+      if (!item.name) errs.push("学校名称必填");
+      if (!item.school_type_display) errs.push("学校类型必填");
+      if (!item.school_type) errs.push("学校类型不合法");
+      if (!item.contact_name) errs.push("负责人必填");
+      if (!item.contact_position) errs.push("职务必填");
+      if (!item.contact_phone) errs.push("联系电话必填");
+      if (!item.contact_email) errs.push("邮箱必填");
+      if (!item.username) errs.push("登录用户名必填");
+      if (!item.password) errs.push("登录密码必填");
 
-        // password 可选：如果填了，建议>=8（你规则8位）
-        if (item.password && item.password.length < 8) {
-          errs.push("初始密码至少 8 位");
-        }
+      if (item.contact_phone && !isValidPhone(item.contact_phone)) {
+        errs.push("联系电话格式不正确");
+      }
 
-        if (errs.length) {
-          item.__status = "invalid";
-          item.__reason = errs.join("；");
-          return item;
-        }
+      if (item.contact_email && !isValidEmail(item.contact_email)) {
+        errs.push("邮箱格式不正确");
+      }
 
-        // 重复学校名：文件内重复
-        if (item.__normalizedName) {
-          if (seenInFile.has(item.__normalizedName)) {
-            item.__status = "skip";
-            item.__reason = "文件内学校名称重复（将跳过）";
-            dupNames.add(item.name || item.__normalizedName);
-            return item;
-          }
-          seenInFile.add(item.__normalizedName);
-        }
+      if (item.username && !/^[A-Za-z0-9]+$/.test(item.username)) {
+        errs.push("登录用户名只能包含数字或字母，不能包含特殊字符");
+      }
 
-        // 与当前列表重名（已存在）
-        if (item.__normalizedName && existingNameSet.value.has(item.__normalizedName)) {
-          item.__status = "skip";
-          item.__reason = "系统已存在同名学校（将跳过）";
+      if (item.password && !/^[A-Za-z0-9]{8}$/.test(item.password)) {
+        errs.push("登录密码必须为8位数字或字母组合");
+      }
+
+      const normalizedEmail = item.contact_email.toLowerCase();
+      const normalizedUsername = item.username.toLowerCase();
+
+      if (item.__normalizedName) {
+        if (seenNameInFile.has(item.__normalizedName)) {
+          errs.push("文件内学校名称重复");
           dupNames.add(item.name || item.__normalizedName);
-          return item;
         }
+        seenNameInFile.add(item.__normalizedName);
+      }
 
+      if (normalizedEmail) {
+        if (seenEmailInFile.has(normalizedEmail)) {
+          errs.push("文件内邮箱重复");
+        }
+        seenEmailInFile.add(normalizedEmail);
+      }
+
+      if (normalizedUsername) {
+        if (seenUsernameInFile.has(normalizedUsername)) {
+          errs.push("文件内登录用户名重复");
+        }
+        seenUsernameInFile.add(normalizedUsername);
+      }
+
+      if (item.__normalizedName && existingNameSet.value.has(item.__normalizedName)) {
+        item.__status = "skip";
+        item.__reason = "系统已存在同名学校（将跳过）";
+        dupNames.add(item.name || item.__normalizedName);
         return item;
-      })
-      .filter(Boolean);
+      }
+
+      if (errs.length) {
+        item.__status = "invalid";
+        item.__reason = errs.join("；");
+      }
+
+      return item;
+    });
 
     previewRows.value = parsed;
 
-    // 汇总
     const total = parsed.length;
     const valid = parsed.filter((x) => x.__status === "valid").length;
     const skipDuplicate = parsed.filter((x) => x.__status === "skip").length;
@@ -853,26 +1078,57 @@ function normalizeName(s) {
 }
 
 function buildHeaderIndex(headers) {
-  // 支持这些表头写法（你模板里是：学校名称(name)）
-  // 也兼容纯中文、纯字段名
-  const find = (keys) => {
-    const idx = headers.findIndex((h) => {
-      const t = String(h || "").trim().toLowerCase();
-      return keys.some((k) => t === k || t.includes(k));
-    });
-    return idx >= 0 ? idx : null;
-  };
+  const normalizeHeader = (value) => {
+    return String(value || "")
+      .trim()
+      .replace(/\s+/g, "")
+      .replace(/[()（）]/g, "")
+      .toLowerCase()
+  }
+
+  const normalizedHeaders = headers.map(normalizeHeader)
+
+  const findByNames = (names) => {
+    const normalizedNames = names.map(normalizeHeader)
+
+    const idx = normalizedHeaders.findIndex((header) => {
+      return normalizedNames.some((name) => header === name || header.includes(name))
+    })
+
+    return idx >= 0 ? idx : null
+  }
 
   return {
-    name: find(["学校名称", "name", "(name)"]),
-    school_type: find(["学校类型", "school_type", "(school_type)"]),
-    contact_name: find(["联系人", "contact_name", "(contact_name)"]),
-    contact_position: find(["职务", "contact_position", "(contact_position)"]),
-    contact_phone: find(["联系电话", "电话", "contact_phone", "(contact_phone)"]),
-    contact_email: find(["邮箱", "联系邮箱", "contact_email", "(contact_email)"]),
-    username: find(["用户名", "username", "(username)"]),
-    password: find(["初始密码", "密码", "password", "(password)"]),
+    index: findByNames(["序号", "序列号", "编号", "no", "no."]),
+    name: findByNames(["学校名称", "学校全称"]),
+    school_type: findByNames(["学校类型", "办学类型"]),
+    contact_name: findByNames(["负责人", "联系人", "联系人姓名"]),
+    contact_position: findByNames(["职务", "岗位", "负责人职务"]),
+    contact_phone: findByNames(["联系电话", "电话", "手机号码", "手机号"]),
+    contact_email: findByNames(["邮箱", "联系邮箱", "电子邮箱"]),
+    username: findByNames(["登录用户名", "用户名", "账号", "登录账号"]),
+    password: findByNames(["登录密码", "初始密码", "密码"]),
+  }
+}
+
+function normalizeSchoolType(v) {
+  const text = String(v || "").trim();
+
+  const map = {
+    小学: "primary",
+    初中: "junior",
+    高中: "senior",
+    九年一贯制: "nine_year",
+    十二年一贯制: "twelve_year",
+
+    primary: "primary",
+    junior: "junior",
+    senior: "senior",
+    nine_year: "nine_year",
+    twelve_year: "twelve_year",
   };
+
+  return map[text] || "";
 }
 
 function isValidSchoolType(v) {
@@ -902,62 +1158,139 @@ function closePreview() {
   previewVisible.value = false;
 }
 
+function formatImportReason(reason) {
+  if (!reason) {
+    return "导入失败"
+  }
+
+  if (typeof reason === "string") {
+    return reason
+  }
+
+  if (Array.isArray(reason)) {
+    return reason.join("；")
+  }
+
+  if (typeof reason === "object") {
+    const messages = []
+
+    Object.entries(reason).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        messages.push(`${key}：${value.join("；")}`)
+      } else if (typeof value === "string") {
+        messages.push(`${key}：${value}`)
+      } else {
+        messages.push(`${key}：${JSON.stringify(value)}`)
+      }
+    })
+
+    return messages.join("；") || "导入失败"
+  }
+
+  return String(reason)
+}
+
 
 /** 点击“开始导入” */
 async function startImport() {
-  // 只提交 valid 行
-  const valid = previewRows.value.filter((r) => r.__status === "valid");
-  if (!valid.length) {
-    ElMessage.warning("没有可导入的数据");
-    return;
+  const validRows = previewRows.value.filter((r) => r.__status === "valid")
+
+  if (!validRows.length) {
+    ElMessage.warning("没有可导入的数据")
+    return
   }
 
-  // 后端需要 rows: [...]
   const payload = {
-    rows: valid.map((r) => ({
+    rows: validRows.map((r) => ({
       name: r.name,
       school_type: r.school_type,
       contact_name: r.contact_name,
       contact_position: r.contact_position,
       contact_phone: r.contact_phone,
       contact_email: r.contact_email,
-      // username/password 可选：Excel 里如果有列就传，否则不传让后端生成
-      username: r.username || "",
-      password: r.password || "",
+      username: r.username,
+      password: r.password,
     })),
-  };
+  }
 
-  previewLoading.value = true;
+  previewLoading.value = true
+
   try {
-    const { data: resp } = await apiPost(API_IMPORT, payload);
-    if (!resp?.success) throw new Error(resp?.message || "导入失败");
+    const { data: resp } = await apiPost(API_IMPORT, payload)
 
-    const rep = resp.data;
+    if (!resp?.success) {
+      throw new Error(resp?.message || "导入失败")
+    }
 
-    ElMessage.success(`导入完成：成功${rep.created}，跳过${rep.skipped}，失败${rep.failed}`);
+    const rep = resp.data || {
+      created: 0,
+      skipped: 0,
+      failed: 0,
+      details: [],
+    }
 
-    // 可选：把后端回传的结果覆盖显示在预览表里（更直观）
-    const detailMap = new Map((rep.details || []).map((d) => [d.row_index, d]));
-    previewRows.value = previewRows.value.map((r, i) => {
-      const d = detailMap.get(i);
-      if (!d) return r;
-      if (d.status === "created") {
-        return { ...r, __status: "created", __reason: `已创建：${d.username}` };
+    /**
+     * 后端返回的 row_index 是 validRows 的下标，
+     * 不是 previewRows 的下标。
+     * 所以这里先用 validRows[row_index].__rownum 找回原始 Excel 行号。
+     */
+    const detailByExcelRow = new Map()
+
+    ;(rep.details || []).forEach((detail) => {
+      const validRow = validRows[detail.row_index]
+
+      if (validRow) {
+        detailByExcelRow.set(validRow.__rownum, detail)
       }
-      if (d.status === "skipped") {
-        return { ...r, __status: "skip", __reason: d.reason || "已跳过" };
-      }
-      return { ...r, __status: "invalid", __reason: JSON.stringify(d.reason || "失败") };
-    });
+    })
 
-    // 关闭弹窗并刷新列表（你也可以不关，留着看结果）
-    previewVisible.value = false;
-    await load();
+    previewRows.value = previewRows.value.map((row) => {
+      const detail = detailByExcelRow.get(row.__rownum)
+
+      if (!detail) {
+        return row
+      }
+
+      if (detail.status === "created") {
+        return {
+          ...row,
+          __status: "created",
+          __reason: `已创建，用户名：${detail.username || row.username}`,
+        }
+      }
+
+      if (detail.status === "skipped") {
+        return {
+          ...row,
+          __status: "skip",
+          __reason: detail.reason || "已跳过",
+        }
+      }
+
+      return {
+        ...row,
+        __status: "invalid",
+        __reason: formatImportReason(detail.reason),
+      }
+    })
+
+    previewSummary.value = {
+      total: previewRows.value.length,
+      valid: previewRows.value.filter((x) => x.__status === "valid").length,
+      skipDuplicate: previewRows.value.filter((x) => x.__status === "skip").length,
+      invalid: previewRows.value.filter((x) => x.__status === "invalid").length,
+    }
+
+    ElMessage.success(
+      `导入完成：成功${rep.created || 0}，跳过${rep.skipped || 0}，失败${rep.failed || 0}`
+    )
+
+    await load()
   } catch (e) {
-    console.error(e);
-    ElMessage.error(e?.message || "导入失败");
+    console.error(e)
+    ElMessage.error(e?.message || "导入失败")
   } finally {
-    previewLoading.value = false;
+    previewLoading.value = false
   }
 }
 
@@ -1041,6 +1374,63 @@ flex: none !important;}
   width: 100%;
 }
 
+/* 表格整体更紧凑 */
+.table {
+  width: 100%;
+  font-size: 13px;
+}
+
+/* 表头和单元格上下间距压缩 */
+.table :deep(.el-table__cell) {
+  padding: 6px 0 !important;
+}
+
+/* 单元格内部左右留白统一 */
+.table :deep(.cell) {
+  padding: 0 8px !important;
+  line-height: 18px;
+}
+
+/* 表头文字居中，间距统一 */
+.table :deep(.el-table__header .cell) {
+  text-align: center;
+  font-weight: 600;
+}
+
+/* 表格内容垂直居中 */
+.table :deep(.el-table__body .el-table__cell) {
+  vertical-align: middle;
+}
+
+/* 压缩两行内容的行距 */
+.name-cell .name,
+.contact-cell > div:first-child {
+  font-weight: 600;
+  color: #303133;
+  line-height: 18px;
+}
+
+.sub {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 1px;
+  line-height: 16px;
+}
+
+/* 状态标签稍微变小，避免撑高行 */
+.table :deep(.el-tag) {
+  height: 22px;
+  line-height: 20px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+/* 操作按钮压缩 */
+.table :deep(.el-button--small) {
+  height: 24px;
+  padding: 4px 10px;
+}
+
 /* 固定列背景/层级，避免覆盖错乱 */
 :deep(.el-table__fixed-right) {
   z-index: 6;
@@ -1059,7 +1449,7 @@ flex: none !important;}
 .name-cell .name {
   font-weight: 600;
   color: #303133;
-  line-height: 1.2;
+  line-height: 18px;
 }
 .sub {
   font-size: 12px;

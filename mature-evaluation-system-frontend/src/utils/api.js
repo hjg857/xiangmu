@@ -2,48 +2,97 @@ const BASE_URL = import.meta.env.VITE_API_BASE || "";
 import axios from "axios";
 
 export function getToken() {
-  return localStorage.getItem("access_token") || "";
+  return (
+    localStorage.getItem("access_token") ||
+    localStorage.getItem("access") ||
+    localStorage.getItem("token") ||
+    ""
+  );
 }
 
 export async function apiGet(path) {
   const token = getToken();
+
+  const headers = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { Authorization: `Bearer ${token}` }
+    headers
   });
-  const data = await res.json();
+
+  const data = await safeRead(res);
+
+  if (res.status === 401) {
+    console.warn("[apiGet] 401 未认证：", {
+      path,
+      tokenExists: !!token,
+      data
+    });
+
+    throw new Error("登录已失效，请重新登录");
+  }
+
   return { res, data };
 }
 
 
 export async function apiPost(path, body) {
   const token = getToken();
+
+  const headers = {
+    "Content-Type": "application/json"
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${BASE_URL}${path}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
-    },
+    headers,
     body: JSON.stringify(body)
   });
-  const data = await res.json();
+
+  const data = await safeRead(res);
+
+  if (res.status === 401) {
+    console.warn("[apiPost] 401 未认证：", {
+      path,
+      tokenExists: !!token,
+      data
+    });
+
+    throw new Error("登录已失效，请重新登录");
+  }
+
   return { res, data };
 }
 
 export async function apiDelete(path) {
   const token = getToken();
+
+  const headers = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${BASE_URL}${path}`, {
     method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` }
+    headers
   });
 
-  let data = null;
-  const ct = res.headers.get("content-type") || "";
-  if (ct.includes("application/json")) {
-    data = await res.json();
-  } else {
-    // 不是 JSON（比如 404 HTML），读成文本，方便你调试
-    const text = await res.text();
-    data = { success: false, message: text };
+  const data = await safeRead(res);
+
+  if (res.status === 401) {
+    console.warn("[apiDelete] 401 未认证：", {
+      path,
+      tokenExists: !!token,
+      data
+    });
+
+    throw new Error("登录已失效，请重新登录");
   }
 
   return { res, data };
@@ -65,24 +114,31 @@ async function safeRead(res) {
 
 export async function apiPostForm(path, formData) {
   const token = getToken();
+
+  const headers = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${BASE_URL}${path}`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      // ⚠️ 不要手动写 Content-Type，让浏览器自动带 boundary
-    },
+    headers,
     body: formData,
   });
 
-  // 兼容后端异常返回 HTML
-  const text = await res.text();
-  try {
-    const data = JSON.parse(text);
-    return { res, data };
-  } catch {
-    console.error("[apiPostForm] 非 JSON 响应：", { url: `${BASE_URL}${path}`, status: res.status, rawPreview: text.slice(0, 300) });
-    throw new Error("后端返回非JSON（可能500）");
+  const data = await safeRead(res);
+
+  if (res.status === 401) {
+    console.warn("[apiPostForm] 401 未认证：", {
+      path,
+      tokenExists: !!token,
+      data
+    });
+
+    throw new Error("登录已失效，请重新登录");
   }
+
+  return { res, data };
 }
 
 

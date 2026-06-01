@@ -627,39 +627,78 @@ class AdminAssessmentListView(APIView):
 
 
 class AdminProvinceSummaryView(APIView):
-    """超级管理员专用：按省份和“市区”聚合统计"""
+    """超级管理员专用：按省、市、区县聚合统计"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         if not request.user.is_admin_user():
             return Response({'success': False, 'message': '权限不足'}, status=403)
 
-        # 获取所有省份
-        provinces = School.objects.values_list('province', flat=True).distinct()
+        # 只统计有省份的学校
+        school_qs = School.objects.exclude(province__isnull=True).exclude(province='')
+
+        provinces = (
+            school_qs
+            .values_list('province', flat=True)
+            .distinct()
+            .order_by('province')
+        )
+
         result_data = []
 
-        for p_name in provinces:
-            if not p_name: continue
+        for province_name in provinces:
+            # 按 city + district + region_id 分组
+            district_rows = (
+                school_qs
+                .filter(province=province_name)
+                .values('city', 'district', 'region_id')
+                .annotate(school_count=Count('id'))
+                .order_by('city', 'district')
+            )
 
-            # 🌟 核心修改：按 city 分组，统计该城市下的学校总数
-            city_list = School.objects.filter(province=p_name).values('city').annotate(
-                count=Count('id')
-            ).order_by('city')
-
-            cities = []
+            city_map = {}
             total_schools_in_province = 0
-            for c in city_list:
-                city_name = c['city'] or "未知城市"
-                cities.append({
-                    "name": city_name,
-                    "school_count": c['count']
+
+            for row in district_rows:
+                city_name = row.get('city') or '未知城市'
+                district_name = row.get('district') or '未知区县'
+                region_id = row.get('region_id')
+                school_count = row.get('school_count') or 0
+
+                if city_name not in city_map:
+                    city_map[city_name] = {
+                        'name': city_name,
+                        'school_count': 0,
+                        'total_schools': 0,
+                        'districts': []
+                    }
+
+                city_map[city_name]['districts'].append({
+                    'name': district_name,
+                    'province': province_name,
+                    'city': city_name,
+                    'district': district_name,
+                    'region_id': region_id,
+                    'school_count': school_count,
+                    'total_schools': school_count
                 })
-                total_schools_in_province += c['count']
+
+                city_map[city_name]['school_count'] += school_count
+                city_map[city_name]['total_schools'] += school_count
+                total_schools_in_province += school_count
+
+            cities = list(city_map.values())
 
             result_data.append({
-                "name": p_name,
-                "total_schools": total_schools_in_province,
-                "cities": cities  # 建议将 Key 名改为 cities 语义更准
+                'name': province_name,
+                'total_schools': total_schools_in_province,
+                'school_count': total_schools_in_province,
+                'city_count': len(cities),
+                'district_count': sum(len(city.get('districts', [])) for city in cities),
+                'cities': cities
             })
 
-        return Response({"success": True, "data": result_data})
+        return Response({
+            'success': True,
+            'data': result_data
+        })

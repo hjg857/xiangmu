@@ -27,11 +27,6 @@
             <span>学校账户申请</span>
           </el-menu-item>
 
-          <el-menu-item index="/region-admin/school-count">
-            <el-icon><School /></el-icon>
-            <span>学校账户管理</span>
-          </el-menu-item>
-
         <el-menu-item index="/region-admin/assessments">
           <el-icon><DataLine /></el-icon>
           <span>学校评估报告</span>
@@ -78,7 +73,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import {
@@ -91,6 +86,7 @@ import {
 } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { useRegionStore } from '@/stores/region'
+import { apiGet } from '@/utils/api'
 
 const router = useRouter()
 const route = useRoute()
@@ -101,6 +97,20 @@ const activeMenu = computed(() => route.path)
 
 
 const regionStore = useRegionStore()
+
+const refreshCurrentRegion = async () => {
+  regionStore.currentRegion = null
+
+  try {
+    const { data: resp } = await apiGet('/api/region-admin/overview/')
+
+    if (resp?.success && resp?.data?.region) {
+      regionStore.currentRegion = resp.data.region
+    }
+  } catch (error) {
+    console.error('刷新区域信息失败:', error)
+  }
+}
 
 const pageTitle = computed(() => {
   const r = regionStore.currentRegion
@@ -121,6 +131,17 @@ const pageTitle = computed(() => {
   return '区域管理后台'
 })
 
+onMounted(async () => {
+  await refreshCurrentRegion()
+})
+
+watch(
+  () => userStore.userInfo?.id || userStore.userInfo?.username,
+  async () => {
+    await refreshCurrentRegion()
+  }
+)
+
 const handleMenuSelect = (index) => {
   router.push(index)
 }
@@ -128,6 +149,17 @@ const handleMenuSelect = (index) => {
 const handleCommand = (command) => {
   if (command === 'logout') {
     userStore.logout()
+
+    if (regionStore.$reset) {
+      regionStore.$reset()
+    } else {
+      regionStore.currentRegion = null
+    }
+
+    localStorage.removeItem('region')
+    localStorage.removeItem('regionStore')
+    localStorage.removeItem('pinia-region')
+
     router.push('/login')
     ElMessage.success('已退出登录')
   }

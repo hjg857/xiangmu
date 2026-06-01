@@ -202,6 +202,9 @@
           <el-radio value="mixed">接入外部和自建平台并行</el-radio>
         </el-radio-group>
       </el-form-item>
+                    <div class="volume-hint">
+                说明：以上主要包括学校自主部署的各类服务平台，如教务系统、校园一卡通、综合素质评价平台、校园门禁出入管理系统、考试管理与题库组卷平台等。
+              </div>
         
         <template v-if="formData.platform_build_mode === 'self_built' || formData.platform_build_mode === 'mixed'">
         <el-form-item prop="security_certified_count">
@@ -241,9 +244,7 @@
                 <el-radio value="high">认定比例＞80%</el-radio>
               </el-radio-group>
           </el-form-item>
-              <div class="volume-hint">
-                说明：以上主要包括学校自主部署的各类服务平台，如教务系统、校园一卡通、综合素质评价平台、校园门禁出入管理系统、考试管理与题库组卷平台等。
-              </div>
+
 
           </template>
 
@@ -800,7 +801,7 @@ watch(() => formData.value.platform_build_mode, (newVal) => {
   padding: 12px 20px;
   background-color: #fdf6ec;
   border-radius: 0;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.8;
   color: #e6a23c;
   box-sizing: border-box;

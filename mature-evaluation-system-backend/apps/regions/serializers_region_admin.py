@@ -252,15 +252,57 @@ class RegionAdminAssessmentDetailSerializer(serializers.ModelSerializer):
             return TechnologyAssessmentSerializer(obj.technology).data
         return None
 
-
+import re
 class RegionAdminSchoolImportRowSerializer(serializers.Serializer):
-    name = serializers.CharField(required=True)
-    school_type = serializers.CharField(required=True)
-    contact_name = serializers.CharField(required=True)
-    contact_position = serializers.CharField(required=True)
-    contact_phone = serializers.CharField(required=True)
-    contact_email = serializers.EmailField(required=True)
+    name = serializers.CharField(required=True, allow_blank=False)
+    school_type = serializers.CharField(required=True, allow_blank=False)
+    contact_name = serializers.CharField(required=True, allow_blank=False)
+    contact_position = serializers.CharField(required=True, allow_blank=False)
+    contact_phone = serializers.CharField(required=True, allow_blank=False)
+    contact_email = serializers.EmailField(required=True, allow_blank=False)
 
-    # 可选：区域管理员支持自定义账号密码
-    username = serializers.CharField(required=False, allow_blank=True)
-    password = serializers.CharField(required=False, allow_blank=True)
+    # 新模板要求：登录用户名、登录密码必填
+    username = serializers.CharField(required=True, allow_blank=False, max_length=150)
+    password = serializers.CharField(required=True, allow_blank=False, min_length=8, max_length=8)
+
+    def validate_school_type(self, value):
+        value = (value or "").strip()
+
+        valid_types = {
+            "primary",
+            "junior",
+            "senior",
+            "nine_year",
+            "twelve_year",
+        }
+
+        if value not in valid_types:
+            raise serializers.ValidationError(
+                "学校类型不合法，仅支持小学、初中、高中、九年一贯制、十二年一贯制"
+            )
+
+        return value
+
+    def validate_contact_phone(self, value):
+        value = (value or "").strip()
+
+        if not re.fullmatch(r"1[3-9]\d{9}", value):
+            raise serializers.ValidationError("联系电话格式不正确，请填写11位手机号")
+
+        return value
+
+    def validate_username(self, value):
+        value = (value or "").strip()
+
+        if not re.fullmatch(r"[A-Za-z0-9]+", value):
+            raise serializers.ValidationError("登录用户名只能包含数字或字母，不能包含特殊字符")
+
+        return value
+
+    def validate_password(self, value):
+        value = (value or "").strip()
+
+        if not re.fullmatch(r"[A-Za-z0-9]{8}", value):
+            raise serializers.ValidationError("登录密码必须为8位数字或字母组合")
+
+        return value

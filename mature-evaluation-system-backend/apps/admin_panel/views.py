@@ -9,11 +9,12 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q
 
-from apps.schools.models import AccountApplication
+from apps.schools.models import AccountApplication, School
 from apps.schools.serializers import AccountApplicationSerializer
 from .models import ContentPage, News
 from .serializers import ContentPageSerializer, NewsSerializer
 from utils.response import APIResponse
+from ..assessments.models import Assessment
 
 
 @api_view(['GET'])
@@ -278,3 +279,146 @@ class UploadNewsImageView(APIView):
 
 # 创建视图实例
 upload_news_image = UploadNewsImageView.as_view()
+
+
+from django.core.paginator import Paginator
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def admin_region_report_assessments(request):
+    """
+    超级管理员查看指定区域的区域评估报告数据
+
+    支持：
+    /api/admin/region-report/assessments/?region_id=1
+    /api/admin/region-report/assessments/?province=江苏省&city=南京市&district=鼓楼区
+    """
+    if not request.user.is_admin_user():
+        return Response(
+            {"success": False, "message": "只有超级管理员可以访问"},
+            status=403
+        )
+
+    region_id = (request.query_params.get("region_id") or "").strip()
+    province = (request.query_params.get("province") or "").strip()
+    city = (request.query_params.get("city") or "").strip()
+    district = (request.query_params.get("district") or "").strip()
+
+    page = int(request.query_params.get("page", 1))
+    page_size = int(request.query_params.get("page_size", 1000))
+    status_value = (request.query_params.get("status") or "completed").strip()
+
+    if not region_id and not (province and city and district):
+        return Response(
+            {
+                "success": False,
+                "message": "请提供 region_id，或完整的 province、city、district"
+            },
+            status=400
+        )
+
+    school_qs = School.objects.all()
+
+    if region_id:
+        school_qs = school_qs.filter(region_id=region_id)
+    else:
+        school_qs = school_qs.filter(
+            province=province,
+            city=city,
+            district=district
+        )
+
+    first_school = school_qs.first()
+
+    # 没有学校也返回空报告结构，避免前端报错
+    if first_school:
+        region_data = {
+            "id": first_school.region_id,
+            "province": first_school.province,
+            "city": first_school.city,
+            "name": first_school.district,
+        }
+    else:
+        region_data = {
+            "id": region_id or "",
+            "province": province,
+            "city": city,
+            "name": district,
+        }
+
+    assessment_qs = (
+        Assessment.objects
+        .select_related("school")
+        .filter(school__in=school_qs)
+        .order_by("-created_at")
+    )
+
+    if status_value:
+        assessment_qs = assessment_qs.filter(status=status_value)
+
+    paginator = Paginator(assessment_qs, page_size)
+    page_obj = paginator.get_page(page)
+
+    assessments = []
+
+    for assessment in page_obj:
+        school = assessment.school
+
+        assessments.append({
+            "id": assessment.id,
+            "status": assessment.status,
+            "maturity_level": assessment.maturity_level,
+
+            "school": {
+                "id": school.id,
+                "name": school.name,
+                "school_type": school.school_type,
+                "province": school.province,
+                "city": school.city,
+                "district": school.district,
+                "region_id": school.region_id,
+            },
+
+            "scores": {
+                "total_score": str(assessment.total_score or 0),
+                "literacy_score": str(assessment.literacy_score or 0),
+                "institution_score": str(assessment.institution_score or 0),
+                "behavior_score": str(assessment.behavior_score or 0),
+                "asset_score": str(assessment.asset_score or 0),
+                "technology_score": str(assessment.technology_score or 0),
+            },
+
+            "times": {
+                "created_at": assessment.created_at.strftime("%Y-%m-%d %H:%M:%S") if assessment.created_at else "",
+                "completed_at": assessment.completed_at.strftime("%Y-%m-%d %H:%M:%S") if getattr(assessment, "completed_at", None) else "",
+            }
+        })
+
+    completed_count = (
+        Assessment.objects
+        .filter(school__in=school_qs, status="completed")
+        .count()
+    )
+
+    summary = {
+        "school_count": school_qs.count(),
+        "assessment_count": Assessment.objects.filter(school__in=school_qs).count(),
+        "completed_count": completed_count,
+        "report_count": completed_count,
+    }
+
+    return Response({
+        "success": True,
+        "data": {
+            "region": region_data,
+            "summary": summary,
+            "assessments": assessments,
+            "pagination": {
+                "total": paginator.count,
+                "page": page,
+                "page_size": page_size,
+            }
+        }
+    })

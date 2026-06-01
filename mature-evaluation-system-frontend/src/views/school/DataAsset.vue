@@ -92,15 +92,26 @@
         </div>
 
         <template v-if="formData.has_unified_data_management === true && formData.can_query_data_assets === true">
+          <div class="form-section-label data-volume-label-row">
           <span>数据资产统计：教育教学、师生管理、数字资源、校园管理与行政以及其他类型数据总量：</span>
-          <el-popover placement="top-start" :width="300" trigger="hover" popper-class="custom-hint-popper">
-                <template #reference>
-                  <span class="hint-tag">填写说明</span>
-                </template>
-                <div class="hint-body">
-                  <p class="hint-text">说明：数据资产包括教育教学数据（学生学习数据、教师教学数据）、师生管理数据（基本信息数据、心理生理健康数据等）、数字资源数据（电子教材与教案、学科资料库等）、校园管理与行政数据（财务数据、安全管理数据等）等。</p>
-                </div>
-              </el-popover>
+
+          <el-popover
+            placement="top-start"
+            :width="300"
+            trigger="hover"
+            popper-class="custom-hint-popper"
+          >
+            <template #reference>
+              <span class="hint-tag">填写说明</span>
+            </template>
+
+            <div class="hint-body">
+              <p class="hint-text">
+                说明：数据资产包括教育教学数据（学生学习数据、教师教学数据）、师生管理数据（基本信息数据、心理生理健康数据等）、数字资源数据（电子教材与教案、学科资料库等）、校园管理与行政数据（财务数据、安全管理数据等）等。
+              </p>
+            </div>
+          </el-popover>
+        </div>
           <div class="data-volume-section">
             <!-- 教育教学数据 -->
             <div class="data-volume-block">
@@ -695,7 +706,7 @@ onBeforeUnmount(() => {
   padding: 12px 16px;
   background-color: #f5f7fa;
   border-radius: 4px;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.8;
   color: #909399;
   box-sizing: border-box;
@@ -750,4 +761,12 @@ onBeforeUnmount(() => {
   font-style: italic;
 }
 
+.data-volume-label-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+  line-height: 1.8;
+}
 </style>
