@@ -24,6 +24,12 @@
           <div class="import-actions">
             <el-button @click="downloadTemplate">下载导入模板</el-button>
             <!-- 保留原有或新增单个创建入口（可选） -->
+            <el-button
+              type="primary"
+              @click="goCreateRegionAdmin"
+            >
+              创建单个区域账号
+            </el-button>
           </div>
         </div>
 
@@ -70,9 +76,15 @@
     <el-card class="table-card">
       <el-table :data="applications" v-loading="loading" stripe style="width: 100%">
         <el-table-column prop="id" label="ID" width="60" />
-        <el-table-column prop="school_name" label="学校名称" min-width="200" />
-        <el-table-column prop="school_type" label="学校类型" width="120">
-          <template #default="{ row }">{{ getSchoolTypeText(row.school_type) }}</template>
+        <el-table-column label="学校名称" min-width="200">
+          <template #default="{ row }">
+            {{ getApplicationName(row) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="学校类型" width="120">
+          <template #default="{ row }">
+            {{ getSchoolTypeText(row) }}
+          </template>
         </el-table-column>
         <el-table-column label="所在地" width="200">
           <template #default="{ row }">{{ row.province }} {{ row.city }}</template>
@@ -192,7 +204,13 @@
 
     <el-dialog v-model="detailDialogVisible" title="申请详情" width="600px">
       <el-descriptions :column="2" border v-if="currentApplication">
-        <el-descriptions-item label="学校名称" :span="2">{{ currentApplication.school_name }}</el-descriptions-item>
+        <el-descriptions-item label="名称" :span="2">
+          {{ getApplicationName(currentApplication) }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="账号类型">
+          {{ getSchoolTypeText(currentApplication) }}
+        </el-descriptions-item>
         <el-descriptions-item label="所在地">{{ currentApplication.province }} {{ currentApplication.city }}</el-descriptions-item>
         <el-descriptions-item label="联系人">{{ currentApplication.contact_name }}</el-descriptions-item>
         <el-descriptions-item label="邮箱">{{ currentApplication.contact_email }}</el-descriptions-item>
@@ -245,6 +263,9 @@ import { getApplicationList, approveApplication, rejectApplication } from '@/api
 import { apiPost } from '@/utils/api' // 确保你的 utils 下有通用 post
 import { formatDateTime } from '@/utils'
 import { SCHOOL_TYPES } from '@/utils/constants'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 // --- 基础状态 ---
 const loading = ref(false)
@@ -266,8 +287,50 @@ const rejecting = ref(false)
 const currentApplication = ref(null)
 const rejectForm = reactive({ reject_reason: '' })
 
+const goCreateRegionAdmin = () => {
+  router.push('/admin/region-admin/create')
+}
+
 // --- 辅助函数 ---
-const getSchoolTypeText = (type) => SCHOOL_TYPES.find(t => t.value === type)?.label || type
+const getApplicationName = (row) => {
+  if (row.apply_role === 'region_admin' || row.school_type === 'region_admin') {
+    return row.display_name || row.school_name || `${row.district || ''}区域管理`
+  }
+
+  return row.display_name || row.school_name || '-'
+}
+
+const getSchoolTypeText = (row) => {
+  if (!row) return '-'
+
+  if (row.apply_role === 'region_admin' || row.school_type === 'region_admin') {
+    return '区域管理'
+  }
+
+  const map = {
+    primary: '小学',
+    junior: '初中',
+    senior: '高中',
+    nine_year: '九年一贯制',
+    twelve_year: '十二年一贯制',
+
+    小学: '小学',
+    初中: '初中',
+    高中: '高中',
+    九年一贯制: '九年一贯制',
+    十二年一贯制: '十二年一贯制'
+  }
+
+  return (
+    map[row.school_type] ||
+    map[row.school_type_display] ||
+    SCHOOL_TYPES.find(t => t.value === row.school_type)?.label ||
+    SCHOOL_TYPES.find(t => t.value === row.school_type_display)?.label ||
+    row.school_type_display ||
+    row.school_type ||
+    '-'
+  )
+}
 const getStatusText = (s) => ({ pending: '待审批', approved: '已通过', rejected: '已拒绝' }[s] || s)
 const getStatusType = (s) => ({ pending: 'warning', approved: 'success', rejected: 'danger' }[s] || 'info')
 

@@ -422,3 +422,262 @@ def admin_region_report_assessments(request):
             }
         }
     })
+
+
+import re
+from django.conf import settings
+from django.core.mail import send_mail
+from django.db import transaction
+from apps.accounts.models import User
+from apps.schools.models import School
+from apps.regions.models import Region
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_region_admin(request):
+    """超级管理员创建单个区域管理员账号"""
+
+    if not request.user.is_admin_user():
+        return Response({
+            'success': False,
+            'message': '只有超级管理员可以操作'
+        }, status=403)
+
+    province = (request.data.get('province') or '').strip()
+    city = (request.data.get('city') or '').strip()
+    district = (request.data.get('district') or '').strip()
+
+    contact_name = (request.data.get('contact_name') or '').strip()
+    contact_position = (request.data.get('contact_position') or '').strip()
+    contact_phone = (request.data.get('contact_phone') or '').strip()
+    contact_email = (request.data.get('contact_email') or '').strip()
+
+    username = (request.data.get('username') or '').strip()
+    password = (request.data.get('password') or '').strip()
+
+    missing = []
+
+    if not province:
+        missing.append('省份')
+    if not city:
+        missing.append('城市')
+    if not district:
+        missing.append('区县')
+    if not contact_name:
+        missing.append('联系人姓名')
+    if not contact_position:
+        missing.append('职务')
+    if not contact_phone:
+        missing.append('联系电话')
+    if not contact_email:
+        missing.append('联系邮箱')
+    if not username:
+        missing.append('用户名')
+    if not password:
+        missing.append('初始密码')
+
+    if missing:
+        return Response({
+            'success': False,
+            'message': f"必填项缺失：{'、'.join(missing)}"
+        }, status=400)
+
+    if not re.fullmatch(r'1[3-9]\d{9}', contact_phone):
+        return Response({
+            'success': False,
+            'message': '联系电话格式不正确，请填写11位手机号'
+        }, status=400)
+
+    if not re.fullmatch(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', contact_email):
+        return Response({
+            'success': False,
+            'message': '邮箱格式不正确'
+        }, status=400)
+
+    if not re.fullmatch(r'[A-Za-z0-9]+', username):
+        return Response({
+            'success': False,
+            'message': '用户名只能包含数字或字母，不能包含特殊字符'
+        }, status=400)
+
+    if not re.fullmatch(r'[A-Za-z0-9]{8}', password):
+        return Response({
+            'success': False,
+            'message': '初始密码必须为8位数字或字母组合'
+        }, status=400)
+
+    if User.objects.filter(username=username).exists():
+        return Response({
+            'success': False,
+            'message': '用户名已存在，请更换用户名'
+        }, status=400)
+
+    if User.objects.filter(email=contact_email).exists():
+        return Response({
+            'success': False,
+            'message': '该邮箱已被注册，请更换邮箱'
+        }, status=400)
+
+    # 防止同一区域重复创建区域管理员
+    existing_region = Region.objects.filter(
+        province=province,
+        city=city,
+        name=district
+    ).first()
+
+    if existing_region and User.objects.filter(
+        role='region_admin',
+        region=existing_region
+    ).exists():
+        return Response({
+            'success': False,
+            'message': f'{province}{city}{district}已存在区域管理员账号'
+        }, status=400)
+
+    try:
+        with transaction.atomic():
+            region, _ = Region.objects.get_or_create(
+                province=province,
+                city=city,
+                name=district,
+                defaults={
+                    'code': f'{province}-{city}-{district}'
+                }
+            )
+
+            user = User.objects.create_user(
+                username=username,
+                email=contact_email,
+                password=password,
+                role='region_admin',
+                is_active=True,
+                is_staff=False
+            )
+
+            # 如果 User 模型里有这些字段，就同步保存
+            if hasattr(user, 'real_name'):
+                user.real_name = contact_name
+
+            if hasattr(user, 'phone'):
+                user.phone = contact_phone
+
+            if hasattr(user, 'region'):
+                user.region = region
+
+            if hasattr(user, 'is_locked'):
+                user.is_locked = False
+
+            if hasattr(user, 'locked_until'):
+                user.locked_until = None
+
+            user.save()
+
+            # 如果你的 Region 模型里有管理员字段，也同步绑定
+            if hasattr(region, 'admin_user'):
+                region.admin_user = user
+
+            if hasattr(region, 'contact_name'):
+                region.contact_name = contact_name
+
+            if hasattr(region, 'contact_position'):
+                region.contact_position = contact_position
+
+            if hasattr(region, 'contact_phone'):
+                region.contact_phone = contact_phone
+
+            if hasattr(region, 'contact_email'):
+                region.contact_email = contact_email
+
+            region.save()
+
+        subject = '【中小学数据文化成熟度评估监测系统】区域管理员账号创建通知'
+        message = f"""尊敬的 {contact_name}：
+
+您好！
+
+您的区域管理员账号已创建成功，以下是登录信息：
+
+管理区域：{province}{city}{district}
+登录地址：{settings.FRONTEND_URL}
+用户名：{username}
+初始密码：{password}
+
+请妥善保管账号信息，并建议首次登录后及时修改密码。
+
+此邮件由系统自动发送，请勿回复。
+"""
+
+        try:
+            send_mail(
+                subject,
+                message,
+                settings.EMAIL_HOST_USER,
+                [contact_email],
+                fail_silently=True
+            )
+        except Exception:
+            pass
+
+        return Response({
+            'success': True,
+            'message': '区域管理员账号创建成功',
+            'data': {
+                'region_id': region.id,
+                'username': username,
+                'province': province,
+                'city': city,
+                'district': district
+            }
+        })
+
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': f'创建失败：{str(e)}'
+        }, status=500)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_region_admin(request, user_id):
+    """超级管理员删除区域管理员账号"""
+
+    if not request.user.is_admin_user():
+        return APIResponse.error(
+            message='只有管理员可以操作',
+            status_code=status.HTTP_403_FORBIDDEN
+        )
+
+    try:
+        user = User.objects.get(id=user_id, role='region_admin')
+    except User.DoesNotExist:
+        return APIResponse.error(
+            message='区域管理员账号不存在',
+            status_code=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        with transaction.atomic():
+            # 先解除区域和管理员账号的绑定，避免误删区域
+            try:
+                region = getattr(user, 'managed_region', None)
+            except Exception:
+                region = None
+
+            if region:
+                # 如果 Region 里有 admin_user 字段，则置空
+                if hasattr(region, 'admin_user'):
+                    region.admin_user = None
+                    region.save()
+
+            username = user.username
+            user.delete()
+
+        return APIResponse.success(
+            message=f'区域管理员账号 {username} 删除成功'
+        )
+
+    except Exception as e:
+        return APIResponse.error(
+            message=f'删除失败：{str(e)}',
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

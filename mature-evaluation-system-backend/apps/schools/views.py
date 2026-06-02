@@ -89,102 +89,274 @@ def get_application_status(request, application_id):
 def list_applications(request):
     """获取申请列表（管理员）"""
     print(f"用户: {request.user.username}, 角色: {request.user.role}")
-    
+
     if not request.user.is_admin_user():
         return APIResponse.error(
             message='只有管理员可以访问',
             status_code=status.HTTP_403_FORBIDDEN
         )
-    
+
     # 获取查询参数
     status_filter = request.query_params.get('status', None)
     school_type_filter = request.query_params.get('school_type', None)
+    apply_role_filter = request.query_params.get('apply_role', None)
     start_date = request.query_params.get('start_date', None)
     end_date = request.query_params.get('end_date', None)
-    
-    # 构建查询
+
+    # 构建查询：默认显示所有申请，包括学校用户和区域管理员
     queryset = AccountApplication.objects.all().order_by('-applied_at')
     print(f"总申请数: {queryset.count()}")
-    
+
+    # 按申请角色筛选：school / region_admin
+    if apply_role_filter and apply_role_filter not in ['all', 'undefined', 'null', '']:
+        queryset = queryset.filter(apply_role=apply_role_filter)
+        print(f"按申请角色筛选后: {queryset.count()}")
+
     # 按状态筛选
-    if status_filter:
+    if status_filter and status_filter not in ['all', 'undefined', 'null', '']:
         queryset = queryset.filter(status=status_filter)
         print(f"按状态筛选后: {queryset.count()}")
-    
+
     # 按学校类型筛选
-    if school_type_filter:
-        queryset = queryset.filter(school_type=school_type_filter)
-        print(f"按学校类型筛选后: {queryset.count()}")
-    
+    # 注意：region_admin 不是学校类型，而是申请角色
+    if school_type_filter and school_type_filter not in ['all', 'undefined', 'null', '']:
+        if school_type_filter == 'region_admin':
+            queryset = queryset.filter(apply_role='region_admin')
+        else:
+            queryset = queryset.filter(apply_role='school', school_type=school_type_filter)
+
+        print(f"按学校类型/角色筛选后: {queryset.count()}")
+
     # 按时间范围筛选
     if start_date:
         from datetime import datetime
         start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
         queryset = queryset.filter(applied_at__gte=start_datetime)
         print(f"按开始时间筛选后: {queryset.count()}")
-    
+
     if end_date:
         from datetime import datetime, timedelta
         end_datetime = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
         queryset = queryset.filter(applied_at__lt=end_datetime)
         print(f"按结束时间筛选后: {queryset.count()}")
-    
+
     # 分页
     from rest_framework.pagination import PageNumberPagination
     paginator = PageNumberPagination()
     paginator.page_size = int(request.query_params.get('page_size', 20))
     page = paginator.paginate_queryset(queryset, request)
-    
+
     if page is not None:
         serializer = AccountApplicationSerializer(page, many=True)
         print(f"返回数据: {len(serializer.data)} 条")
         return paginator.get_paginated_response(serializer.data)
-    
+
     serializer = AccountApplicationSerializer(queryset, many=True)
     return APIResponse.success(data=serializer.data)
 
 
+from django.core.paginator import Paginator
+from django.utils import timezone
+
+from apps.schools.models import School
+from apps.regions.models import Region
+from apps.accounts.models import User
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_schools(request):
-    """获取学校列表（管理员）"""
+    """获取区校账户列表（管理员）：学校账号 + 区域管理员账号"""
     if not request.user.is_admin_user():
         return APIResponse.error(
             message='只有管理员可以访问',
             status_code=status.HTTP_403_FORBIDDEN
         )
-    
+
     # 获取查询参数
     name = request.query_params.get('name', None)
+    account_type = request.query_params.get('account_type', None)
     school_type = request.query_params.get('school_type', None)
     province = request.query_params.get('province', None)
     city = request.query_params.get('city', None)
-    
-    # 构建查询
-    queryset = School.objects.all().order_by('-created_at')
-    
-    # 筛选
-    if name:
-        queryset = queryset.filter(name__icontains=name)
-    if school_type:
-        queryset = queryset.filter(school_type=school_type)
-    if province:
-        queryset = queryset.filter(province=province)
-    if city:
-        queryset = queryset.filter(city=city)
-    
-    # 分页
-    from rest_framework.pagination import PageNumberPagination
-    paginator = PageNumberPagination()
-    paginator.page_size = int(request.query_params.get('page_size', 20))
-    page = paginator.paginate_queryset(queryset, request)
-    
-    if page is not None:
-        serializer = SchoolAdminSerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
-    
-    serializer = SchoolAdminSerializer(queryset, many=True)
-    return APIResponse.success(data=serializer.data)
+
+    page = int(request.query_params.get('page', 1))
+    page_size = int(request.query_params.get('page_size', 20))
+
+    result_rows = []
+
+    # =========================
+    # 1. 学校账号
+    # =========================
+    if account_type in [None, '', 'school']:
+        school_qs = School.objects.all().order_by('-created_at')
+
+        if name:
+            school_qs = school_qs.filter(name__icontains=name)
+
+        if school_type:
+            school_qs = school_qs.filter(school_type=school_type)
+
+        if province:
+            school_qs = school_qs.filter(province=province)
+
+        if city:
+            school_qs = school_qs.filter(city=city)
+
+        school_data = SchoolAdminSerializer(school_qs, many=True).data
+
+        # 给原学校数据补统一字段
+        school_map = {school.id: school for school in school_qs}
+
+        for item in school_data:
+            school_id = item.get('id')
+            school_obj = school_map.get(school_id)
+
+            user = getattr(school_obj, 'user', None) if school_obj else None
+
+            item['account_type'] = 'school'
+            item['username'] = getattr(user, 'username', '') if user else ''
+            item['school_name'] = item.get('name') or ''
+            item['display_name'] = item.get('name') or ''
+            item['region_name'] = ''
+
+            # 用于统一排序，返回前删除
+            item['_sort_time'] = school_obj.created_at if school_obj else None
+
+            result_rows.append(item)
+
+    # =========================
+    # 2. 区域管理员账号
+    # =========================
+    # =========================
+    # 2. 区域管理员账号
+    # =========================
+    if account_type in [None, '', 'region_admin']:
+        region_admin_qs = User.objects.filter(role='region_admin').order_by('-created_at')
+
+        for user in region_admin_qs:
+            # 优先从 user.managed_region 获取区域
+            try:
+                region = getattr(user, 'managed_region', None)
+            except Exception:
+                region = None
+
+            # 兼容 user.region
+            if not region:
+                try:
+                    region = getattr(user, 'region', None)
+                except Exception:
+                    region = None
+
+            # 兼容 Region.admin_user
+            if not region:
+                try:
+                    region = Region.objects.filter(admin_user=user).first()
+                except Exception:
+                    region = None
+
+            region_province = getattr(region, 'province', '') if region else ''
+            region_city = getattr(region, 'city', '') if region else ''
+            region_district = getattr(region, 'name', '') if region else ''
+
+            if name:
+                name_text = (
+                    f'{region_province}{region_city}{region_district}'
+                    f'{user.username or ""}'
+                    f'{user.email or ""}'
+                )
+                if name not in name_text:
+                    continue
+
+            if province and region_province != province:
+                continue
+
+            if city and region_city != city:
+                continue
+
+            if school_type and school_type != 'region_admin':
+                continue
+
+            application = AccountApplication.objects.filter(
+                apply_role='region_admin',
+                province=region_province,
+                city=region_city,
+                district=region_district
+            ).order_by('-applied_at').first()
+
+            contact_name = (
+                    getattr(region, 'contact_name', '') or
+                    (application.contact_name if application else '') or
+                    ''
+            )
+
+            contact_phone = (
+                    getattr(region, 'contact_phone', '') or
+                    (application.contact_phone if application else '') or
+                    ''
+            )
+
+            contact_email = (
+                    getattr(region, 'contact_email', '') or
+                    (application.contact_email if application else '') or
+                    user.email or
+                    ''
+            )
+
+            region_name = (
+                f'{region_city}{region_district}区域管理'
+                if (region_city or region_district)
+                else '区域管理'
+            )
+
+            result_rows.append({
+                'id': user.id,
+                'account_type': 'region_admin',
+                'name': region_name,
+                'school_name': region_name,
+                'display_name': region_name,
+                'school_type': 'region_admin',
+                'school_type_display': '区域管理',
+
+                'province': region_province,
+                'city': region_city,
+                'district': region_district,
+                'region_id': getattr(region, 'id', None) if region else None,
+                'region_name': region_name,
+
+                'contact_name': contact_name,
+                'contact_phone': contact_phone,
+                'contact_email': contact_email,
+
+                'username': user.username,
+                'created_at': user.created_at,
+                'latest_assessment': None,
+
+                '_sort_time': user.created_at,
+            })
+
+    # =========================
+    # 3. 统一排序
+    # =========================
+    result_rows.sort(
+        key=lambda x: x.get('_sort_time') or timezone.datetime.min.replace(tzinfo=timezone.utc),
+        reverse=True
+    )
+
+    for item in result_rows:
+        item.pop('_sort_time', None)
+
+    # =========================
+    # 4. 手动分页
+    # =========================
+    paginator = Paginator(result_rows, page_size)
+    page_obj = paginator.get_page(page)
+
+    return Response({
+        'count': paginator.count,
+        'next': page_obj.next_page_number() if page_obj.has_next() else None,
+        'previous': page_obj.previous_page_number() if page_obj.has_previous() else None,
+        'results': list(page_obj.object_list)
+    })
 
 
 @api_view(['GET'])

@@ -1,7 +1,7 @@
 <template>
   <div class="schools-container">
     <div class="page-header">
-      <h2 class="page-title">学校管理</h2>
+      <h2 class="page-title">区校账户管理</h2>
       <el-button @click="loadSchools" :icon="Refresh">
         刷新
       </el-button>
@@ -10,28 +10,24 @@
     <!-- 筛选条件 -->
     <el-card class="filter-card">
       <el-form :inline="true" :model="filterForm" size="default">
-        <el-form-item label="学校名称">
+        <el-form-item label="名称">
           <el-input
             v-model="filterForm.name"
-            placeholder="请输入学校名称"
+            placeholder="请输入学校或区域名称"
             clearable
-            style="width: 200px"
+            style="width: 220px"
           />
         </el-form-item>
         
-        <el-form-item label="学校类型">
+        <el-form-item label="账号类型">
           <el-select 
-            v-model="filterForm.school_type" 
+            v-model="filterForm.account_type" 
             placeholder="全部类型" 
             clearable
-            style="width: 150px"
+            style="width: 160px"
           >
-            <el-option 
-              v-for="type in SCHOOL_TYPES" 
-              :key="type.value" 
-              :label="type.label" 
-              :value="type.value" 
-            />
+            <el-option label="学校账号" value="school" />
+            <el-option label="区域管理" value="region_admin" />
           </el-select>
         </el-form-item>
         
@@ -79,10 +75,18 @@
         style="width: 100%"
       >
         <el-table-column prop="id" label="ID" width="60" />
-        <el-table-column prop="name" label="学校名称" min-width="200" />
-        <el-table-column prop="school_type" label="学校类型" width="120">
+        <el-table-column label="名称" min-width="220">
           <template #default="{ row }">
-            {{ getSchoolTypeText(row.school_type) }}
+            <div class="name-cell">
+              <div class="main-name">{{ getAccountName(row) }}</div>
+              <div v-if="row.username" class="sub-name">账号：{{ row.username }}</div>
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="账号类型" width="120">
+          <template #default="{ row }">
+            {{ getAccountTypeText(row) }}
           </template>
         </el-table-column>
         <el-table-column label="所在地" width="180">
@@ -94,14 +98,18 @@
         <el-table-column prop="contact_phone" label="联系电话" width="120" />
         <el-table-column label="评估状态" width="120">
           <template #default="{ row }">
-            <el-tag :type="getAssessmentStatusType(row.latest_assessment?.status)">
-              {{ row.latest_assessment?.status_display || '数据采集中' }}
-            </el-tag>
+            <template v-if="row.account_type !== 'region_admin'">
+              <el-tag :type="getAssessmentStatusType(row.latest_assessment?.status)">
+                {{ row.latest_assessment?.status_display || '数据采集中' }}
+              </el-tag>
+            </template>
+            <span v-else class="no-result">-</span>
           </template>
         </el-table-column>
+
         <el-table-column label="评估结果" min-width="200">
           <template #default="{ row }">
-            <div v-if="row.latest_assessment?.status === 'completed'">
+            <div v-if="row.account_type !== 'region_admin' && row.latest_assessment?.status === 'completed'">
               <span class="score-text">总分: {{ parseFloat(row.latest_assessment.total_score).toFixed(1) }}</span>
               <el-tag size="small" effect="plain" class="level-tag">
                 {{ row.latest_assessment.maturity_level_display }}
@@ -115,9 +123,11 @@
             {{ formatDateTime(row.created_at) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="80" fixed="right">
+        <el-table-column label="操作" width="100" fixed="right">
           <template #default="{ row }">
-            <el-button type="danger" link size="small" @click="handleDelete(row)">删除</el-button>
+            <el-button type="danger" link size="small" @click="handleDelete(row)">
+  删除
+</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -173,7 +183,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { Refresh, Download } from '@element-plus/icons-vue'
-import { getSchools, deleteSchool } from '@/api/admin'
+import { getSchools, deleteSchool, deleteRegionAdmin } from '@/api/admin'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getAllAccountsData } from '@/api/admin'
 import * as XLSX from 'xlsx'
@@ -198,7 +208,7 @@ const pagination = reactive({
 
 const filterForm = reactive({
   name: '',
-  school_type: '',
+  account_type: '',
   province: '',
   city: ''
 })
@@ -216,7 +226,7 @@ const loadSchools = async () => {
       page: pagination.page,
       page_size: pagination.pageSize,
       name: filterForm.name || undefined,
-      school_type: filterForm.school_type || undefined,
+      account_type: filterForm.account_type || undefined,
       province: filterForm.province || undefined,
       city: filterForm.city || undefined
     }
@@ -280,15 +290,43 @@ const handleExportAllAccounts = async () => {
 
 const handleReset = () => {
   filterForm.name = ''
-  filterForm.school_type = ''
+  filterForm.account_type = ''
   filterForm.province = ''
   filterForm.city = ''
   handleSearch()
 }
 
+const getAccountName = (row) => {
+  if (row.account_type === 'region_admin') {
+    return row.name || row.region_name || `${row.district || ''}区域管理`
+  }
+
+  return row.name || row.school_name || '-'
+}
+
+const getAccountTypeText = (row) => {
+  if (row.account_type === 'region_admin') {
+    return '区域管理'
+  }
+
+  return getSchoolTypeText(row.school_type)
+}
+
 const getSchoolTypeText = (type) => {
-  const found = SCHOOL_TYPES.find(t => t.value === type)
-  return found ? found.label : type
+  const map = {
+    primary: '小学',
+    junior: '初中',
+    senior: '高中',
+    nine_year: '九年一贯制',
+    twelve_year: '十二年一贯制',
+    小学: '小学',
+    初中: '初中',
+    高中: '高中',
+    九年一贯制: '九年一贯制',
+    十二年一贯制: '十二年一贯制'
+  }
+
+  return map[type] || SCHOOL_TYPES.find(t => t.value === type)?.label || type || '-'
 }
 
 const getAssessmentStatusType = (status) => {
@@ -314,9 +352,14 @@ const formatDateTime = (dateStr) => {
 }
 
 const handleDelete = async (row) => {
+  const isRegion = row.account_type === 'region_admin'
+  const name = getAccountName(row)
+
   try {
     await ElMessageBox.confirm(
-      `确定要删除学校"${row.name}"吗？\n\n此操作将同时删除：\n• 该学校的用户账号\n• 所有评估记录及数据\n• 对应的账号申请记录\n\n此操作不可恢复！`,
+      isRegion
+        ? `确定要删除区域账号"${name}"吗？\n\n此操作仅删除该区域管理员登录账号，不会删除区域、学校和评估数据。\n\n此操作不可恢复！`
+        : `确定要删除学校"${name}"吗？\n\n此操作将同时删除：\n• 该学校的用户账号\n• 所有评估记录及数据\n• 对应的账号申请记录\n\n此操作不可恢复！`,
       '删除确认',
       {
         confirmButtonText: '确定删除',
@@ -325,21 +368,32 @@ const handleDelete = async (row) => {
         confirmButtonClass: 'el-button--danger'
       }
     )
-    
+
     loading.value = true
-    const res = await deleteSchool(row.id)
-    
+
+    const res = isRegion
+      ? await deleteRegionAdmin(row.id)
+      : await deleteSchool(row.id)
+
     if (res.success) {
       ElMessage.success(res.message || '删除成功')
       loadSchools()
     }
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error(error.response?.data?.error?.message || '删除失败')
+      ElMessage.error(error.response?.data?.error?.message || error.message || '删除失败')
     }
   } finally {
     loading.value = false
   }
+}
+
+const isRegionAccount = (row) => {
+  return (
+    row?.account_type === 'region_admin' ||
+    row?.apply_role === 'region_admin' ||
+    row?.school_type === 'region_admin'
+  )
 }
 </script>
 
@@ -471,5 +525,19 @@ const handleDelete = async (row) => {
   color: #9ca3af;            /* 浅灰色 */
   font-style: italic;        /* 微斜体，学术/说明感 */
   line-height: 1.6;
+}
+
+.name-cell {
+  line-height: 1.5;
+}
+
+.main-name {
+  font-weight: 600;
+  color: #303133;
+}
+
+.sub-name {
+  font-size: 12px;
+  color: #909399;
 }
 </style>

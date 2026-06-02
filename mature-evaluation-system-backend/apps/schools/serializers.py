@@ -41,16 +41,76 @@ class SchoolAdminSerializer(serializers.ModelSerializer):
 
 class AccountApplicationSerializer(serializers.ModelSerializer):
     """账号申请序列化器"""
-    
+
+    apply_role_display = serializers.CharField(
+        source='get_apply_role_display',
+        read_only=True
+    )
+    status_display = serializers.CharField(
+        source='get_status_display',
+        read_only=True
+    )
+    display_name = serializers.SerializerMethodField()
+    school_type_display = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
+
     class Meta:
         model = AccountApplication
         fields = [
-            'id', 'school_name', 'school_type', 'province', 'city', 'district', 'district_code',
-            'contact_name', 'contact_position', 'contact_phone', 'contact_email',
-            'status', 'reject_reason', 'applied_at', 'reviewed_at'
+            'id',
+
+            # 新增：申请身份
+            'apply_role',
+            'apply_role_display',
+
+            # 原有字段
+            'school_name',
+            'display_name',
+            'school_type',
+            'school_type_display',
+
+            'province',
+            'city',
+            'district',
+            'district_code',
+            'location',
+
+            'contact_name',
+            'contact_position',
+            'contact_phone',
+            'contact_email',
+
+            'status',
+            'status_display',
+            'reject_reason',
+            'applied_at',
+            'reviewed_at'
         ]
-        read_only_fields = ['id', 'status', 'reject_reason', 'applied_at', 'reviewed_at']
-    
+
+        read_only_fields = [
+            'id',
+            'status',
+            'reject_reason',
+            'applied_at',
+            'reviewed_at'
+        ]
+
+    def get_display_name(self, obj):
+        """列表展示名称"""
+        if obj.apply_role == 'region_admin':
+            return f'{obj.province}{obj.city}{obj.district}区域管理'
+        return obj.school_name
+
+    def get_school_type_display(self, obj):
+        """列表展示类型"""
+        if obj.apply_role == 'region_admin':
+            return '区域管理员'
+        return obj.school_type
+
+    def get_location(self, obj):
+        """所在地展示"""
+        return f'{obj.province} {obj.city} {obj.district}'.strip()
+
     def validate_contact_phone(self, value):
         """验证手机号格式"""
         import re

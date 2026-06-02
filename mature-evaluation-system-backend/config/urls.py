@@ -25,7 +25,7 @@ urlpatterns = [
     # 根路径重定向到admin
     path('', RedirectView.as_view(url='/admin/', permanent=False)),
     
-    path('admin/', admin.site.urls),
+    path('django-admin/', admin.site.urls),
     
     # API文档
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

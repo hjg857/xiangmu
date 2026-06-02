@@ -27,4 +27,15 @@ urlpatterns = [
         AdminRegionReportAISuggestionsView.as_view(),
         name="admin_region_report_ai_suggestions"
     ),
+    path(
+        'create-region-admin/',
+        views.create_region_admin,
+        name='create_region_admin'
+    ),
+
+    path(
+        'region-admin/<int:user_id>/delete/',
+        views.delete_region_admin,
+        name='delete_region_admin'
+    ),
 ]

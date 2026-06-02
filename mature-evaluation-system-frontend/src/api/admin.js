@@ -35,6 +35,10 @@ export function rejectApplication(applicationId, data) {
   })
 }
 
+export function deleteRegionAdmin(userId) {
+  return request.delete(`/admin/region-admin/${userId}/delete/`)
+}
+
 /**
  * 获取学校列表
  */

@@ -182,6 +182,15 @@ const router = createRouter({
             roles: ['admin']
           }
         },
+        {
+          path: '/admin/region-admin/create',
+          name: 'AdminCreateRegionAdmin',
+          component: () => import('@/views/admin/AdminCreateRegionAdmin.vue'),
+          meta: {
+            requiresAuth: true,
+            roles: ['admin']
+          }
+        },
       ]
     },
     {
