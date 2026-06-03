@@ -16,17 +16,57 @@
       >
         <div class="section-title">区域基本信息</div>
 
-        <el-form-item label="省份" prop="province">
-          <el-input v-model="form.province" placeholder="请输入省份，如：江苏省" />
-        </el-form-item>
+        <el-form-item label="省份" prop="provinceCode">
+        <el-select
+          v-model="form.provinceCode"
+          placeholder="请选择省份"
+          style="width: 100%"
+          filterable
+          @change="onProvinceChange"
+        >
+          <el-option
+            v-for="item in provinceOptions"
+            :key="item.code"
+            :label="item.name"
+            :value="item.code"
+          />
+        </el-select>
+      </el-form-item>
 
-        <el-form-item label="城市" prop="city">
-          <el-input v-model="form.city" placeholder="请输入城市，如：徐州市" />
-        </el-form-item>
+      <el-form-item label="城市" prop="cityCode">
+        <el-select
+          v-model="form.cityCode"
+          placeholder="请选择城市"
+          style="width: 100%"
+          filterable
+          :disabled="!form.provinceCode"
+          @change="onCityChange"
+        >
+          <el-option
+            v-for="item in cityOptions"
+            :key="item.code"
+            :label="item.name"
+            :value="item.code"
+          />
+        </el-select>
+      </el-form-item>
 
-        <el-form-item label="区县" prop="district">
-          <el-input v-model="form.district" placeholder="请输入区县，如：铜山区" />
-        </el-form-item>
+      <el-form-item label="区县" prop="districtCode">
+        <el-select
+          v-model="form.districtCode"
+          placeholder="请选择区县"
+          style="width: 100%"
+          filterable
+          :disabled="!form.cityCode"
+        >
+          <el-option
+            v-for="item in districtOptions"
+            :key="item.code"
+            :label="item.name"
+            :value="item.code"
+          />
+        </el-select>
+      </el-form-item>
 
         <el-divider />
 
@@ -90,10 +130,12 @@
   </div>
 </template>
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { apiPost } from '@/utils/api'
+import { regionData, codeToText } from 'element-china-area-data'
+import { gatProvinces, gatChildren, gatCodeToText } from '@/utils/gat_area_patch'
 
 const router = useRouter()
 const formRef = ref(null)
@@ -103,6 +145,12 @@ const form = reactive({
   province: '',
   city: '',
   district: '',
+  district_code: '',
+
+  provinceCode: '',
+  cityCode: '',
+  districtCode: '',
+
   contact_name: '',
   contact_position: '',
   contact_phone: '',
@@ -111,10 +159,126 @@ const form = reactive({
   password: ''
 })
 
+const codeToTextFull = {
+  ...codeToText,
+  ...gatCodeToText
+}
+
+const provinceOptions = ref([])
+const cityOptions = ref([])
+const districtOptions = ref([])
+
+provinceOptions.value = [
+  ...regionData.map(p => ({
+    code: p.value,
+    name: p.label,
+    children: p.children || []
+  })),
+  ...gatProvinces.map(p => ({
+    code: p.code,
+    name: p.name,
+    children: []
+  }))
+]
+
+const onProvinceChange = (provinceCode) => {
+  form.cityCode = ''
+  form.districtCode = ''
+  form.city = ''
+  form.district = ''
+  form.district_code = ''
+
+  cityOptions.value = []
+  districtOptions.value = []
+
+  form.province = codeToTextFull[provinceCode] || ''
+
+  // 港澳：用自身作为“城市”层
+  if (provinceCode === '810000' || provinceCode === '820000') {
+    cityOptions.value = [
+      {
+        code: provinceCode,
+        name: form.province,
+        children: []
+      }
+    ]
+    return
+  }
+
+  // 台湾
+  if (provinceCode === '710000') {
+    const m = gatChildren['710000'] || {}
+    cityOptions.value = Object.entries(m).map(([code, name]) => ({
+      code,
+      name,
+      children: []
+    }))
+    return
+  }
+
+  // 大陆地区
+  const provinceItem = regionData.find(item => item.value === provinceCode)
+  cityOptions.value = (provinceItem?.children || []).map(city => ({
+    code: city.value,
+    name: city.label,
+    children: city.children || []
+  }))
+}
+
+const onCityChange = (cityCode) => {
+  form.districtCode = ''
+  form.district = ''
+  form.district_code = ''
+
+  districtOptions.value = []
+  form.city = codeToTextFull[cityCode] || ''
+
+  // 港澳
+  if (cityCode === '810000' || cityCode === '820000') {
+    const m = gatChildren[cityCode] || {}
+    districtOptions.value = Object.entries(m).map(([code, name]) => ({
+      code,
+      name
+    }))
+    return
+  }
+
+  // 台湾
+  if (cityCode && cityCode.startsWith('71')) {
+    const m = gatChildren[cityCode] || {}
+    districtOptions.value = Object.entries(m).map(([code, name]) => ({
+      code,
+      name
+    }))
+    return
+  }
+
+  // 大陆地区
+  const cityItem = cityOptions.value.find(item => item.code === cityCode)
+  districtOptions.value = (cityItem?.children || []).map(district => ({
+    code: district.value,
+    name: district.label
+  }))
+}
+
+watch(
+  () => form.districtCode,
+  (newCode) => {
+    form.district = codeToTextFull[newCode] || ''
+    form.district_code = newCode || ''
+  }
+)
+
 const rules = {
-  province: [{ required: true, message: '请输入省份', trigger: 'blur' }],
-  city: [{ required: true, message: '请输入城市', trigger: 'blur' }],
-  district: [{ required: true, message: '请输入区县', trigger: 'blur' }],
+  provinceCode: [
+  { required: true, message: '请选择省份', trigger: 'change' }
+  ],
+  cityCode: [
+    { required: true, message: '请选择城市', trigger: 'change' }
+  ],
+  districtCode: [
+    { required: true, message: '请选择区县', trigger: 'change' }
+  ],
   contact_name: [{ required: true, message: '请输入联系人姓名', trigger: 'blur' }],
   contact_position: [{ required: true, message: '请输入职务', trigger: 'blur' }],
   contact_phone: [
@@ -184,8 +348,21 @@ function copyPassword() {
 
 function resetForm() {
   formRef.value?.resetFields()
+
+  form.province = ''
+  form.city = ''
+  form.district = ''
+  form.district_code = ''
+
+  form.provinceCode = ''
+  form.cityCode = ''
+  form.districtCode = ''
+
   form.username = ''
   form.password = ''
+
+  cityOptions.value = []
+  districtOptions.value = []
 }
 
 function goBack() {
@@ -199,16 +376,18 @@ async function submitForm() {
 
   try {
     const payload = {
-      province: form.province,
-      city: form.city,
-      district: form.district,
-      contact_name: form.contact_name,
-      contact_position: form.contact_position,
-      contact_phone: form.contact_phone,
-      contact_email: form.contact_email,
-      username: form.username,
-      password: form.password
-    }
+    province: form.province,
+    city: form.city,
+    district: form.district,
+    district_code: form.district_code,
+
+    contact_name: form.contact_name,
+    contact_position: form.contact_position,
+    contact_phone: form.contact_phone,
+    contact_email: form.contact_email,
+    username: form.username,
+    password: form.password
+  }
 
     const { data: resp } = await apiPost('/api/admin/create-region-admin/', payload)
 
@@ -219,11 +398,28 @@ async function submitForm() {
     ElMessage.success('区域管理员账号创建成功')
     router.push('/admin/applications')
   } catch (error) {
-    console.error(error)
-    ElMessage.error(error?.message || '创建失败')
-  } finally {
-    submitting.value = false
+  console.error('创建区域管理员失败:', error)
+
+  ElMessage.error(
+    getErrorMessage(error, '创建失败，请检查区域、邮箱或用户名是否已存在')
+  )
+} finally {
+  submitting.value = false
+}
+}
+
+function getErrorMessage(error, fallback = '操作失败') {
+  const data = error?.response?.data
+
+  if (data?.message) return data.message
+  if (data?.error?.message) return data.error.message
+  if (data?.detail) return data.detail
+
+  if (error?.message && error.message !== '非JSON响应') {
+    return error.message
   }
+
+  return fallback
 }
 </script>
 <style scoped>
