@@ -86,18 +86,19 @@
         
         <div class="detail-content">
           <h4>详细内容</h4>
-          <div v-html="currentNews.content"></div>
+          <div class="rich-content" v-html="currentNews.content"></div>
         </div>
       </div>
     </el-dialog>
 
     <!-- 发布/编辑对话框 -->
     <el-dialog
-      v-model="formDialogVisible"
-      :title="isEdit ? '编辑动态' : '发布动态'"
-      width="900px"
-      :close-on-click-modal="false"
-    >
+  v-model="formDialogVisible"
+  :title="isEdit ? '编辑动态' : '发布动态'"
+  width="900px"
+  :close-on-click-modal="false"
+  @closed="handleFormDialogClosed"
+>
       <el-form :model="newsForm" :rules="formRules" ref="newsFormRef" label-width="100px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="newsForm.title" placeholder="请输入标题" maxlength="200" show-word-limit />
@@ -116,33 +117,63 @@
         
         <el-form-item label="封面图片" prop="cover_image">
           <el-upload
-            class="cover-uploader"
-            :action="uploadUrl"
-            :headers="uploadHeaders"
-            name="image"
-            :show-file-list="false"
-            :on-success="handleCoverSuccess"
-            :on-error="handleCoverError"
-            :before-upload="beforeCoverUpload"
-          >
-            <img v-if="newsForm.cover_image_url" :src="newsForm.cover_image_url" class="cover-preview" />
-            <div v-else class="upload-placeholder">
-              <el-icon class="upload-icon"><Plus /></el-icon>
-              <div class="upload-text">点击上传封面</div>
-            </div>
-          </el-upload>
-          <div class="upload-tip">建议尺寸：800x450px，支持JPG、PNG格式，大小不超过5MB</div>
+  class="cover-uploader"
+  :action="uploadUrl"
+  :headers="uploadHeaders"
+  name="image"
+  :show-file-list="false"
+  :on-success="handleCoverSuccess"
+  :on-error="handleCoverError"
+  :before-upload="beforeCoverUpload"
+>
+  <div v-if="newsForm.cover_image_url" class="cover-preview-wrap">
+    <img :src="newsForm.cover_image_url" class="cover-preview" />
+
+    <div class="cover-mask">
+      <span class="cover-mask-text">点击更换图片</span>
+    </div>
+
+    <button
+      type="button"
+      class="cover-remove-btn"
+      @click.stop.prevent="clearCoverImage"
+    >
+      ×
+    </button>
+  </div>
+
+  <div v-else class="upload-placeholder">
+    <el-icon class="upload-icon"><Plus /></el-icon>
+    <div class="upload-text">点击上传封面</div>
+  </div>
+</el-upload>
+
+<div class="upload-tip">
+  建议尺寸：800x450px，支持JPG、PNG格式，大小不超过5MB。已上传后可点击图片更换，也可点击右上角 × 移除。
+</div>
         </el-form-item>
         
         <el-form-item label="详细内容" prop="content">
-          <el-input
-            v-model="newsForm.content"
-            type="textarea"
-            :rows="12"
-            placeholder="请输入详细内容（支持HTML格式）"
-          />
-          <div class="content-tip">提示：可以使用HTML标签来格式化内容，如 &lt;p&gt;、&lt;h3&gt;、&lt;strong&gt; 等</div>
-        </el-form-item>
+  <div v-if="editorVisible" class="editor-wrapper">
+    <Toolbar
+      class="editor-toolbar"
+      :editor="editorRef"
+      :defaultConfig="toolbarConfig"
+      mode="default"
+    />
+    <Editor
+      class="editor-content"
+      v-model="newsForm.content"
+      :defaultConfig="editorConfig"
+      mode="default"
+      @onCreated="handleEditorCreated"
+    />
+  </div>
+
+  <div class="content-tip">
+    提示：可直接输入文字、设置标题、加粗、分段，也可以在正文中插入图片，无需手写HTML标签。
+  </div>
+</el-form-item>
         
         <el-form-item label="发布日期" prop="publish_date">
           <el-date-picker
@@ -204,10 +235,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, shallowRef, onBeforeUnmount, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { getNewsList, getNewsDetail, createNews, updateNews, deleteNews } from '@/api/news'
+import '@wangeditor/editor/dist/css/style.css'
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 
 const loading = ref(false)
 const newsList = ref([])
@@ -217,6 +250,71 @@ const formDialogVisible = ref(false)
 const isEdit = ref(false)
 const submitting = ref(false)
 const newsFormRef = ref(null)
+const editorRef = shallowRef(null)
+const editorVisible = ref(false)
+
+const toolbarConfig = {}
+
+const editorConfig = {
+  placeholder: '请输入详细内容，可直接排版、插入图片，无需手写HTML标签',
+  MENU_CONF: {}
+}
+
+const handleEditorCreated = (editor) => {
+  editorRef.value = editor
+}
+
+const handleFormDialogClosed = () => {
+  editorVisible.value = false
+  destroyEditor()
+}
+
+const destroyEditor = () => {
+  const editor = editorRef.value
+  if (editor) {
+    editor.destroy()
+    editorRef.value = null
+  }
+}
+
+onBeforeUnmount(() => {
+  destroyEditor()
+})
+
+const uploadUrl = computed(() => {
+  // 使用相对路径，通过vite代理转发到后端
+  return '/api/admin/news/upload-image/'
+})
+
+const uploadHeaders = computed(() => {
+  const token = localStorage.getItem('access_token')
+  return {
+    'Authorization': `Bearer ${token}`
+  }
+})
+
+editorConfig.MENU_CONF.uploadImage = {
+  server: '/api/admin/news/upload-image/',
+  fieldName: 'image',
+  headers: uploadHeaders.value,
+
+  maxFileSize: 5 * 1024 * 1024,
+  allowedFileTypes: ['image/*'],
+
+  customInsert(res, insertFn) {
+    if (res?.success && res?.data?.url) {
+      insertFn(res.data.url, '', res.data.url)
+    } else {
+      ElMessage.error(res?.message || '图片上传失败')
+    }
+  },
+
+  onError(file, err, res) {
+    console.error('内容图片上传失败:', err, res)
+    ElMessage.error('内容图片上传失败')
+  }
+}
+
 
 const newsForm = ref({
   title: '',
@@ -235,17 +333,7 @@ const formRules = {
   publish_date: [{ required: true, message: '请选择发布日期', trigger: 'change' }]
 }
 
-const uploadUrl = computed(() => {
-  // 使用相对路径，通过vite代理转发到后端
-  return '/api/admin/news/upload-image/'
-})
 
-const uploadHeaders = computed(() => {
-  const token = localStorage.getItem('access_token')
-  return {
-    'Authorization': `Bearer ${token}`
-  }
-})
 
 onMounted(() => {
   loadNewsList()
@@ -280,7 +368,7 @@ const viewDetail = async (item) => {
 }
 
 // 显示发布对话框
-const showAddDialog = () => {
+const showAddDialog = async () => {
   isEdit.value = false
   newsForm.value = {
     title: '',
@@ -291,23 +379,39 @@ const showAddDialog = () => {
     publish_date: new Date().toISOString().split('T')[0],
     is_published: true
   }
+
+  editorVisible.value = false
   formDialogVisible.value = true
+
+  await nextTick()
+  editorVisible.value = true
 }
 
 // 编辑动态
-const editNews = (item) => {
+const editNews = async (item) => {
   isEdit.value = true
   newsForm.value = {
     id: item.id,
     title: item.title,
     summary: item.summary,
-    content: item.content,
+    content: item.content || '',
     cover_image: item.cover_image,
     cover_image_url: item.cover_image_url,
     publish_date: item.publish_date,
     is_published: item.is_published
   }
+
+  editorVisible.value = false
   formDialogVisible.value = true
+
+  await nextTick()
+  editorVisible.value = true
+}
+
+const clearCoverImage = () => {
+  newsForm.value.cover_image = ''
+  newsForm.value.cover_image_url = ''
+  ElMessage.success('封面图片已移除')
 }
 
 // 确认删除
@@ -496,19 +600,71 @@ const submitForm = async () => {
   cursor: pointer;
   overflow: hidden;
   transition: border-color 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
+  position: relative;
 }
 
 .cover-uploader:hover {
   border-color: #409eff;
 }
 
+.cover-uploader :deep(.el-upload) {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.cover-preview-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .cover-preview {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+}
+
+.cover-mask {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 1;
+}
+
+.cover-preview-wrap:hover .cover-mask {
+  opacity: 1;
+}
+
+.cover-remove-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 5;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: #f56c6c;
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 22px;
+  text-align: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.cover-remove-btn:hover {
+  background: #f78989;
 }
 
 .upload-placeholder {
@@ -549,6 +705,47 @@ const submitForm = async () => {
   margin-left: 12px;
   font-size: 12px;
   color: #909399;
+}
+
+.editor-wrapper {
+  width: 100%;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.editor-toolbar {
+  border-bottom: 1px solid #dcdfe6;
+}
+
+.editor-content {
+  min-height: 320px;
+}
+
+.rich-content {
+  font-size: 14px;
+  line-height: 1.9;
+  color: #303133;
+  word-break: break-word;
+}
+
+.rich-content :deep(img) {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 12px auto;
+  border-radius: 6px;
+}
+
+.rich-content :deep(p) {
+  margin: 10px 0;
+}
+
+.rich-content :deep(h1),
+.rich-content :deep(h2),
+.rich-content :deep(h3) {
+  margin: 16px 0 10px;
+  font-weight: 600;
 }
 
 /* 底部页脚 */
@@ -631,5 +828,48 @@ const submitForm = async () => {
   color: #9ca3af;            /* 浅灰色 */
   font-style: italic;        /* 微斜体，学术/说明感 */
   line-height: 1.6;
+}
+
+.cover-preview-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cover-mask {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.cover-preview-wrap:hover .cover-mask {
+  opacity: 1;
+}
+
+.cover-remove-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 2;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.plain-content {
+  font-size: 14px;
+  line-height: 1.9;
+  color: #303133;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 </style>

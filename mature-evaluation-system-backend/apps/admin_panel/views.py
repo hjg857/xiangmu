@@ -431,6 +431,8 @@ from django.db import transaction
 from apps.accounts.models import User
 from apps.schools.models import School
 from apps.regions.models import Region
+from django.contrib.auth import get_user_model
+from django.utils import timezone
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_region_admin(request):
@@ -442,9 +444,12 @@ def create_region_admin(request):
             'message': '只有超级管理员可以操作'
         }, status=403)
 
+    User = get_user_model()
+
     province = (request.data.get('province') or '').strip()
     city = (request.data.get('city') or '').strip()
     district = (request.data.get('district') or '').strip()
+    district_code = (request.data.get('district_code') or '').strip()
 
     contact_name = (request.data.get('contact_name') or '').strip()
     contact_position = (request.data.get('contact_position') or '').strip()
@@ -461,7 +466,7 @@ def create_region_admin(request):
     if not city:
         missing.append('城市')
     if not district:
-        missing.append('区县')
+        missing.append('区县/县级市')
     if not contact_name:
         missing.append('联系人姓名')
     if not contact_position:
@@ -517,33 +522,38 @@ def create_region_admin(request):
             'message': '该邮箱已被注册，请更换邮箱'
         }, status=400)
 
-    # 防止同一区域重复创建区域管理员
-    existing_region = Region.objects.filter(
-        province=province,
-        city=city,
-        name=district
-    ).first()
-
-    if existing_region and User.objects.filter(
-        role='region_admin',
-        region=existing_region
-    ).exists():
-        return Response({
-            'success': False,
-            'message': f'{province}{city}{district}已存在区域管理员账号'
-        }, status=400)
+    region_code = district_code or f'{province}-{city}-{district}'
 
     try:
         with transaction.atomic():
-            region, _ = Region.objects.get_or_create(
+            # 1. 优先按省市区找 Region；找不到再按 code 找；都没有才创建
+            region = Region.objects.filter(
                 province=province,
                 city=city,
-                name=district,
-                defaults={
-                    'code': f'{province}-{city}-{district}'
-                }
-            )
+                name=district
+            ).first()
 
+            if region is None:
+                region = Region.objects.filter(code=region_code).first()
+
+            if region is None:
+                region = Region.objects.create(
+                    code=region_code,
+                    province=province,
+                    city=city,
+                    name=district,
+                    level='district',
+                    is_active=True
+                )
+
+            # 2. 防止同一区域重复绑定区域管理员
+            if region.region_admin_id:
+                return Response({
+                    'success': False,
+                    'message': f'{province}{city}{district}已存在区域管理员账号'
+                }, status=400)
+
+            # 3. 创建区域管理员用户
             user = User.objects.create_user(
                 username=username,
                 email=contact_email,
@@ -553,42 +563,48 @@ def create_region_admin(request):
                 is_staff=False
             )
 
-            # 如果 User 模型里有这些字段，就同步保存
-            if hasattr(user, 'real_name'):
+            # 4. 兼容 User 模型可能存在的字段
+            user_field_names = {field.name for field in User._meta.fields}
+
+            if 'real_name' in user_field_names:
                 user.real_name = contact_name
 
-            if hasattr(user, 'phone'):
+            if 'phone' in user_field_names:
                 user.phone = contact_phone
 
-            if hasattr(user, 'region'):
-                user.region = region
-
-            if hasattr(user, 'is_locked'):
+            if 'is_locked' in user_field_names:
                 user.is_locked = False
 
-            if hasattr(user, 'locked_until'):
+            if 'locked_until' in user_field_names:
                 user.locked_until = None
 
             user.save()
 
-            # 如果你的 Region 模型里有管理员字段，也同步绑定
-            if hasattr(region, 'admin_user'):
-                region.admin_user = user
+            # 5. 核心绑定：你的 Region 模型正向字段是 region_admin
+            region.region_admin = user
+            region.save(update_fields=['region_admin'])
 
-            if hasattr(region, 'contact_name'):
-                region.contact_name = contact_name
+            # 6. 同步写入一条已通过的账号申请记录，用于列表显示联系人和电话
+            AccountApplication.objects.update_or_create(
+                apply_role='region_admin',
+                province=province,
+                city=city,
+                district=district,
+                contact_email=contact_email,
+                defaults={
+                    'school_name': f'{district}区域管理',
+                    'school_type': 'region_admin',
+                    'district_code': district_code,
+                    'contact_name': contact_name,
+                    'contact_position': contact_position,
+                    'contact_phone': contact_phone,
+                    'status': 'approved',
+                    'reviewed_by': request.user,
+                    'reviewed_at': timezone.now(),
+                }
+            )
 
-            if hasattr(region, 'contact_position'):
-                region.contact_position = contact_position
-
-            if hasattr(region, 'contact_phone'):
-                region.contact_phone = contact_phone
-
-            if hasattr(region, 'contact_email'):
-                region.contact_email = contact_email
-
-            region.save()
-
+        # 7. 发送邮件
         subject = '【中小学数据文化成熟度评估监测系统】区域管理员账号创建通知'
         message = f"""尊敬的 {contact_name}：
 

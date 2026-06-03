@@ -264,7 +264,9 @@ const onCityChange = (cityCode) => {
 watch(
   () => form.districtCode,
   (newCode) => {
-    form.district = codeToTextFull[newCode] || ''
+    const selected = districtOptions.value.find(item => item.code === newCode)
+
+    form.district = selected?.name || codeToTextFull[newCode] || ''
     form.district_code = newCode || ''
   }
 )
@@ -370,24 +372,47 @@ function goBack() {
 }
 
 async function submitForm() {
-  await formRef.value?.validate()
+  if (!formRef.value) return
+
+  let valid = false
+
+  try {
+    valid = await formRef.value.validate()
+  } catch (e) {
+    valid = false
+  }
+
+  if (!valid) {
+    ElMessage.warning('请先完善必填信息')
+    return
+  }
+
+  if (!form.provinceCode || !form.cityCode || !form.districtCode) {
+    ElMessage.warning('请选择完整的省、市、区县/县级市')
+    return
+  }
+
+  if (!form.province || !form.city || !form.district) {
+    ElMessage.warning('区域信息解析失败，请重新选择省、市、区县/县级市')
+    return
+  }
 
   submitting.value = true
 
   try {
     const payload = {
-    province: form.province,
-    city: form.city,
-    district: form.district,
-    district_code: form.district_code,
+      province: form.province,
+      city: form.city,
+      district: form.district,
+      district_code: form.district_code,
 
-    contact_name: form.contact_name,
-    contact_position: form.contact_position,
-    contact_phone: form.contact_phone,
-    contact_email: form.contact_email,
-    username: form.username,
-    password: form.password
-  }
+      contact_name: form.contact_name,
+      contact_position: form.contact_position,
+      contact_phone: form.contact_phone,
+      contact_email: form.contact_email,
+      username: form.username,
+      password: form.password
+    }
 
     const { data: resp } = await apiPost('/api/admin/create-region-admin/', payload)
 
@@ -398,14 +423,14 @@ async function submitForm() {
     ElMessage.success('区域管理员账号创建成功')
     router.push('/admin/applications')
   } catch (error) {
-  console.error('创建区域管理员失败:', error)
+    console.error('创建区域管理员失败:', error)
 
-  ElMessage.error(
-    getErrorMessage(error, '创建失败，请检查区域、邮箱或用户名是否已存在')
-  )
-} finally {
-  submitting.value = false
-}
+    ElMessage.error(
+      getErrorMessage(error, '创建失败，请检查区域、邮箱或用户名是否已存在')
+    )
+  } finally {
+    submitting.value = false
+  }
 }
 
 function getErrorMessage(error, fallback = '操作失败') {
