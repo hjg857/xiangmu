@@ -72,8 +72,8 @@
                   <span class="hint-tag">填写说明</span>
                 </template>
                 <div class="hint-body">
-                  <p class="hint-text">学校是否拥有独立数据中心（独立机房），且该数据中心的建设标准是否符合 GB50174-2017《数据中心设计规范》的对应要求，按实际情况选择对应选项。</p>
-                  <p class="hint-example"><em>示例：学校建有独立机房且各项指标完全满足 GB50174-2017 B 级要求，则选择「完全符合」；学校有独立机房但仅部分指标符合 B 级要求，则选择「部分符合」；学校有独立机房但未达到 B 级要求，则选择「不符合」。</em></p>
+                  <p class="hint-text">学校数据中心的建设标准是否符合GB50174-2017《数据中心设计规范》的对应要求，按实际情况选择对应选项。</p>
+                  <p class="hint-example"><em>示例：学校建有独立机房且各项指标完全满足 GB50174-2017 B级要求，则选择「完全达到B级要求」；学校有独立机房但仅部分指标符合B级要求，则选择「部分达到B级要求」；学校有独立机房但未达到 B 级要求，则选择「未达到B级要求」。</em></p>
                   <a
                     class="pdf-link"
                     type="primary"
@@ -114,7 +114,7 @@
       <el-form-item prop="student_device_ratio">
         <template #label>
           <div class="label-with-hint">
-            <span>学校数字终端（如教学一体机、智能黑板、希沃白板）配备生机比（学生用机数量与在校生人数之比）？</span>
+            <span>学校数字终端（如教学一体机、智能黑板、希沃白板）配备生机比（在校生人数与学生用机数量之比）？</span>
             <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
               <template #reference>
                 <span class="hint-tag">填写说明</span>
@@ -136,7 +136,7 @@
       <el-form-item prop="teacher_device_ratio">
         <template #label>
           <div class="label-with-hint">
-            <span>学校数字终端（如教学一体机、智能黑板、希沃白板）配备师机比（专任教师用机数量与专任教师人数之比） ？</span>
+            <span>学校数字终端（如教学一体机、智能黑板、希沃白板）配备师机比（专任教师人数与专任教师用机数量之比） ？</span>
             <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
               <template #reference>
                 <span class="hint-tag">填写说明</span>
@@ -210,7 +210,7 @@
         <el-form-item prop="security_certified_count">
             <template #label>
               <div class="label-with-hint">
-                <span>学校自建的各类平台通过国家安保等级认证的数量？</span>
+                <span>学校部署的各类平台通过国家安保等级认证的数量？</span>
                 <el-popover placement="top-start" :width="350" trigger="hover" popper-class="custom-hint-popper">
 
                 </el-popover>
