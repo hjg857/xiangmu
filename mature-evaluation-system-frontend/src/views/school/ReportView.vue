@@ -2023,10 +2023,10 @@ const getTeacherRatioText = () => {
 }
 
 .main-title {
-  font-family: "Times New Roman", serif, "Microsoft YaHei", "微软雅黑", sans-serif;
+  font-family: "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   color: #303133;
   margin: 0 0 16px 0;
-  font-size: 30px; 
+  font-size: 30px;
   font-weight: 700 !important;
 }
 

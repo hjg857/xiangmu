@@ -16,7 +16,7 @@
     "element-china-area-data": "^6.1.0",
     "element-plus": "^2.13.1",
     "html2canvas": "^1.4.1",
-    "jspdf": "^2.5.1",
+    "jspdf": "^2.5.2",
     "pinia": "^2.1.7",
     "qrcode": "^1.5.4",
     "vue": "^3.3.8",

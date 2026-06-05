@@ -3,10 +3,12 @@
     <!-- 顶部操作区（不参与打印） -->
     <div class="toolbar no-print">
       <el-button @click="reloadAll" :loading="loading">刷新</el-button>
-      <el-button type="primary" @click="printReport">打印 / 导出 PDF</el-button>
+      <el-button type="primary" @click="exportPDF" :loading="exporting">
+        导出 PDF
+      </el-button>
     </div>
 
-    <div class="report-shell">
+    <div ref="reportRef" class="report-shell">
       <!-- 标题区 -->
       <section class="report-header">
         <h1 class="report-title">
@@ -52,8 +54,7 @@
           <div class="overview-divider"></div>
 
           <div class="core-title">
-            <span class="core-title-icon">▣</span>
-            <span>五大核心分析维度</span>
+            五大核心分析维度
           </div>
 
           <div class="core-grid">
@@ -62,12 +63,6 @@
               :key="item.key"
               class="core-card"
             >
-              <div
-                class="core-icon-box"
-                :style="{ background: item.bg, color: item.color }"
-              >
-                {{ item.icon }}
-              </div>
 
               <div class="core-name">
                 {{ item.index }}. {{ item.name }}
@@ -392,14 +387,10 @@
         class="development-item"
         :class="`development-item-${item.index}`"
       >
-        <div class="development-number">
-          {{ item.index }}
-        </div>
-
         <div class="development-content">
           <div class="development-item-title">
-            <span class="development-icon">
-              {{ getDevelopmentIcon(item.index) }}
+            <span class="development-title-index">
+              {{ item.index }}.
             </span>
             <span>{{ item.dimension }} —— {{ item.title }}</span>
           </div>
@@ -414,7 +405,6 @@
     <!-- 总体结论 -->
     <div class="development-final-box">
       <div class="development-final-title">
-        <span class="final-lightning">⚡</span>
         总体战略目标
       </div>
 
@@ -432,6 +422,8 @@
 import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
 import { ElMessage } from "element-plus";
 import * as echarts from "echarts";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 import { apiGet, apiPost } from "@/utils/api";
 import { useRegionStore } from "@/stores/region";
 
@@ -439,6 +431,8 @@ const regionStore = useRegionStore();
 
 const loading = ref(false);
 const aiLoading = ref(false);
+const exporting = ref(false);
+const reportRef = ref(null);
 
 const region = ref(null);
 const summary = ref({});
@@ -1293,8 +1287,61 @@ function getDevelopmentIcon(index) {
   return map[index] || "📌";
 }
 
-function printReport() {
-  window.print();
+async function exportPDF() {
+  if (!reportRef.value) {
+    ElMessage.warning("报告内容尚未加载完成");
+    return;
+  }
+
+  exporting.value = true;
+
+  try {
+    await nextTick();
+
+    // 先让图表自适应一次，避免导出时图表尺寸异常
+    resizeCharts();
+    await nextTick();
+
+    const reportEl = reportRef.value;
+
+    const canvas = await html2canvas(reportEl, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: "#ffffff",
+      logging: false
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    const imgWidth = pageWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position -= pageHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    const fileName = `${regionFullName.value || "区域"}数据文化成熟度评估报告.pdf`;
+    pdf.save(fileName);
+  } catch (error) {
+    console.error("导出 PDF 失败：", error);
+    ElMessage.error("导出 PDF 失败，请稍后重试");
+  } finally {
+    exporting.value = false;
+  }
 }
 
 onMounted(async () => {
@@ -2084,17 +2131,12 @@ onUnmounted(() => {
 .core-title {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  text-align: center;
   font-size: 21px;
   font-weight: 800;
   color: #1f365c;
   margin-bottom: 22px;
-}
-
-.core-title-icon {
-  color: #2f6fd6;
-  font-size: 20px;
-  line-height: 1;
 }
 
 .core-grid {
@@ -2104,7 +2146,7 @@ onUnmounted(() => {
 }
 
 .core-card {
-  min-height: 250px;
+  min-height: 210px;
   border: 1px solid #d9e3ef;
   border-radius: 16px;
   background: #fbfcfe;
@@ -2112,19 +2154,10 @@ onUnmounted(() => {
   box-sizing: border-box;
 }
 
-.core-icon-box {
-  width: 58px;
-  height: 58px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  line-height: 1;
-}
 
 .core-name {
-  margin-top: 16px;
+  margin-top: 0;
+  text-align: center;
   font-size: 17px;
   font-weight: 800;
   color: #1f2937;
@@ -2818,18 +2851,16 @@ onUnmounted(() => {
 }
 
 .development-title-wrap {
-  display: flex;
-  align-items: center;
-  margin-bottom: 18px;
-  border-left: 5px solid #28a7e8;
-  padding-left: 14px;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
 .development-title {
+  text-align: center;
   font-size: 22px;
-  font-weight: 900;
+  font-weight: 800;
   color: #1f3f66;
-  line-height: 1.2;
+  letter-spacing: 0.5px;
 }
 
 .development-card {
@@ -2853,21 +2884,46 @@ onUnmounted(() => {
 
 /* 建议列表 */
 .development-list {
-  margin-top: 22px;
+  margin-top: 16px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
 }
 
 .development-item {
+  display: block;
+  background: #ffffff;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+.development-content {
+  width: 100%;
+}
+
+.development-item-title {
   display: flex;
-  gap: 18px;
-  align-items: flex-start;
-  min-height: 112px;
-  padding: 20px 22px;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  box-sizing: border-box;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.development-title-index {
+  font-size: 15px;
+  font-weight: 900;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.development-item-text {
+  font-size: 14px;
+  line-height: 1.9;
+  color: #475569;
+  text-indent: 2em;
 }
 
 .development-item-1 {
@@ -2928,31 +2984,12 @@ onUnmounted(() => {
   background: #8b5cf6;
 }
 
-.development-content {
-  flex: 1;
-}
-
-.development-item-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #1f2937;
-  font-size: 17px;
-  font-weight: 900;
-  line-height: 1.4;
-}
 
 .development-icon {
   font-size: 17px;
   line-height: 1;
 }
 
-.development-item-text {
-  margin-top: 10px;
-  color: #475569;
-  font-size: 15px;
-  line-height: 1.85;
-}
 
 /* 底部总体目标 */
 .development-final-box {
@@ -2981,6 +3018,27 @@ onUnmounted(() => {
   color: #dbe4ef;
   font-size: 15px;
   line-height: 1.9;
+}
+
+/* ===== 各等级学校分析：整体浅色渐变背景 ===== */
+/* 初始级：纯红色 */
+.level-analysis-section.initial .level-analysis-header {
+  background: #ff7a80;
+}
+
+/* 成长级：纯橙色 */
+.level-analysis-section.growing .level-analysis-header {
+  background: #ffb14f;
+}
+
+/* 成熟级：纯蓝色 */
+.level-analysis-section.mature .level-analysis-header {
+  background: #5dade2;
+}
+
+/* 创新级：纯绿色 */
+.level-analysis-section.leading .level-analysis-header {
+  background: #63d28f;
 }
 
 /* 响应式 */
