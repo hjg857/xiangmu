@@ -239,7 +239,7 @@
             <div class="info-item">
               <span class="info-label">数据组织运行情况</span>
               <div class="info-value">
-                <p>近5年，学校组织开展数据相关会议、活动{{ institutionDetails.meeting_activity_count || 0 }}次。</p>
+                <p>近3年，学校组织开展数据相关会议、活动{{ institutionDetails.meeting_activity_count || 0 }}次。</p>
               </div>
             </div>
           </div>
@@ -270,7 +270,7 @@
               <span class="info-label">数据人员进修与培训情况</span>
               <div class="info-value">
                 <template v-if="institutionDetails.has_training">
-                  <p>1. 学校近5年组织或参与数据相关进修、培训{{ institutionDetails.training_count || 0 }}次。</p>
+                  <p>1. 学校近3年组织或参与数据相关进修、培训{{ institutionDetails.training_count || 0 }}次。</p>
                   <p>2. 相关人员获得数据相关认证或考核证书{{ getTotalCertificates() }}份。</p>
                 </template>
                 <template v-else>
@@ -336,7 +336,7 @@
               <strong>B1 数据组织机构</strong>：
               <ul>
                 <li>B11 数据领导/工作小组：根据学校数据领导/工作小组设立情况计分</li>
-                <li>B12 数据组织运行情况：根据学校近5年数据相关会议或活动开展次数计分。</li>
+                <li>B12 数据组织运行情况：根据学校近3年数据相关会议或活动开展次数计分。</li>
               </ul>
             </li>
 
@@ -679,7 +679,7 @@
             <strong>D2 数据资产积累</strong>：
             <ul>
               <li>
-                D21 数据资产总量：根据学校数据资产统一管理或统筹管理情况、校内主要数据资源统计查询能力、教学管理数据总量、师生管理数据总量、教育资源数据总量、校园管理与行政数据总量、其他类型数据总量综合计分。
+                D21 数据资产总量：根据学校数据资产统一管理情况、数据资产累积总量综合计分。若学校无法统计数据资产总量，为避免影响测评结果，此次测评将在此项赋予学校一个基准分值。
               </li>
               <li>
                 D22 人均数据资产量：根据学校数据资产总量与师生总人数之比计分。

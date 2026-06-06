@@ -673,14 +673,15 @@ const orderedLevelAnalysis = computed(() => {
 });
 
 const developmentItems = computed(() => {
-  const items = aiSuggestions.value.development?.items;
+  const items = aiSuggestions.value.development?.items
+
   if (Array.isArray(items) && items.length > 0) {
     return items.map((item, index) => ({
       index: item.index || index + 1,
       title: item.title || "发展建议",
       dimension: item.dimension || "综合维度",
       content: item.content || ""
-    }));
+    }))
   }
 
   return [
@@ -688,53 +689,42 @@ const developmentItems = computed(() => {
       index: 1,
       title: "加强数据素养培养",
       dimension: "数据素养",
-      content:
-        "当前区域发展建议正在生成或暂未获取成功，请稍后刷新页面。"
+      content: "当前区域发展建议正在生成或暂未获取成功，请稍后刷新页面。"
     },
     {
       index: 2,
       title: "完善数据治理制度",
       dimension: "数据制度",
-      content:
-        "当前区域发展建议正在生成或暂未获取成功，请稍后刷新页面。"
+      content: "当前区域发展建议正在生成或暂未获取成功，请稍后刷新页面。"
     },
     {
       index: 3,
       title: "推动数据应用落地",
       dimension: "数据行为",
-      content:
-        "当前区域发展建议正在生成或暂未获取成功，请稍后刷新页面。"
+      content: "当前区域发展建议正在生成或暂未获取成功，请稍后刷新页面。"
     },
     {
       index: 4,
       title: "提升数据资产意识",
       dimension: "数据资产",
-      content:
-        "当前区域发展建议正在生成或暂未获取成功，请稍后刷新页面。"
+      content: "当前区域发展建议正在生成或暂未获取成功，请稍后刷新页面。"
     },
     {
       index: 5,
       title: "夯实数据技术支撑",
       dimension: "数据技术",
-      content:
-        "当前区域发展建议正在生成或暂未获取成功，请稍后刷新页面。"
+      content: "当前区域发展建议正在生成或暂未获取成功，请稍后刷新页面。"
     }
-  ];
-});
+  ]
+})
 
 const defaultDevelopmentSummary = computed(() => {
-  if (aiSuggestions.value.development?.summary) {
-    return aiSuggestions.value.development.summary;
-  }
-  return `默认默认`;
-});
+  return aiSuggestions.value.development?.summary || ""
+})
 
 const defaultConclusion = computed(() => {
-  if (aiSuggestions.value.development?.conclusion) {
-    return aiSuggestions.value.development.conclusion;
-  }
-  return "默认默认";
-});
+  return aiSuggestions.value.development?.conclusion || ""
+})
 
 async function reloadAll() {
   loading.value = true;
@@ -1289,20 +1279,20 @@ function getDevelopmentIcon(index) {
 
 async function exportPDF() {
   if (!reportRef.value) {
-    ElMessage.warning("报告内容尚未加载完成");
-    return;
+    ElMessage.warning("报告内容尚未加载完成")
+    return
   }
 
-  exporting.value = true;
+  exporting.value = true
 
   try {
-    await nextTick();
+    await nextTick()
 
-    // 先让图表自适应一次，避免导出时图表尺寸异常
-    resizeCharts();
-    await nextTick();
+    // 避免图表导出时尺寸异常
+    resizeCharts()
+    await nextTick()
 
-    const reportEl = reportRef.value;
+    const reportEl = reportRef.value
 
     const canvas = await html2canvas(reportEl, {
       scale: 2,
@@ -1310,37 +1300,29 @@ async function exportPDF() {
       allowTaint: true,
       backgroundColor: "#ffffff",
       logging: false
-    });
+    })
 
-    const imgData = canvas.toDataURL("image/png");
+    const imgData = canvas.toDataURL("image/png")
 
-    const pdf = new jsPDF("p", "mm", "a4");
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
+    // A4 宽度，页面高度按内容自适应，不分页
+    const pdfWidth = 210
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width
 
-    const imgWidth = pageWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const pdf = new jsPDF({
+      orientation: "p",
+      unit: "mm",
+      format: [pdfWidth, pdfHeight]
+    })
 
-    let heightLeft = imgHeight;
-    let position = 0;
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight)
 
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-
-    while (heightLeft > 0) {
-      position -= pageHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-    }
-
-    const fileName = `${regionFullName.value || "区域"}数据文化成熟度评估报告.pdf`;
-    pdf.save(fileName);
+    const fileName = `${regionFullName.value || "区域"}数据文化成熟度评估报告.pdf`
+    pdf.save(fileName)
   } catch (error) {
-    console.error("导出 PDF 失败：", error);
-    ElMessage.error("导出 PDF 失败，请稍后重试");
+    console.error("导出 PDF 失败：", error)
+    ElMessage.error("导出 PDF 失败，请稍后重试")
   } finally {
-    exporting.value = false;
+    exporting.value = false
   }
 }
 
