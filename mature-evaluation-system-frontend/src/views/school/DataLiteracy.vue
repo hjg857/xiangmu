@@ -266,7 +266,7 @@ const isAssessmentExpired = (assessmentData) => {
   if (!assessmentData?.created_at) return false
 
   const startTime = new Date(assessmentData.created_at).getTime()
-  const expireTime = startTime + 72 * 60 * 60 * 1000
+  const expireTime = startTime + 120 * 60 * 60 * 1000
 
   return Date.now() > expireTime
 }

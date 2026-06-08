@@ -415,6 +415,9 @@
   </div>
 </section>
     </div>
+      <div class="report-footer">
+        <p class="footer-note">-本报告由中小学校数据文化成熟度评估监测系统自动生成-</p>
+      </div>
   </div>
 </template>
 
@@ -3119,6 +3122,14 @@ onUnmounted(() => {
 
 .level-analysis-section.leading .level-analysis-header {
   background: #65d18d;
+}
+
+.report-footer {
+  text-align: center;
+  padding: 40px 0;
+  color: #909399;
+  border-top: 1px solid #e4e7ed;
+  margin-top: 40px;
 }
 
 /* 响应式 */

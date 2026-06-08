@@ -359,7 +359,7 @@ const isAssessmentExpired = (assessmentData) => {
 
   if (!Number.isFinite(start)) return false
 
-  const expire = start + 72 * 60 * 60 * 1000
+  const expire = start + 120 * 60 * 60 * 1000
 
   return Date.now() > expire
 }
@@ -367,7 +367,7 @@ const isAssessmentExpired = (assessmentData) => {
 const isAssessmentReadonly = (assessmentData) => {
   if (!assessmentData) return false
 
-  // 只有整份评估最终提交完成，或超过72小时，才只读
+  // 只有整份评估最终提交完成，或超过120小时，才只读
   return assessmentData.status === 'completed' || isAssessmentExpired(assessmentData)
 }
 
@@ -377,7 +377,7 @@ const readonlyTip = computed(() => {
   }
 
   if (isAssessmentExpired(assessmentInfo.value)) {
-    return '本次评估已超过72小时填报期限，当前为只读模式，无法修改数据'
+    return '本次评估已超过120小时填报期限，当前为只读模式，无法修改数据'
   }
 
   return ''

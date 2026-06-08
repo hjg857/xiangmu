@@ -73,9 +73,9 @@ class SurveyInstanceViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(existing_instance)
             return Response(serializer.data, status=status.HTTP_200_OK)
         
-        # 计算截止时间：学校用户创建时间 + 48小时
+        # 计算截止时间：学校用户创建时间 + 120小时
         school_user = assessment.school.user
-        expired_at = timezone.now() + timedelta(hours=72)
+        expired_at = timezone.now() + timedelta(hours=120)
         
         # 创建问卷实例（不需要设置目标数量）
         instance = SurveyInstance.objects.create(
@@ -265,10 +265,10 @@ def publish_literacy_surveys(request, assessment_id):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-    # 三类问卷
+    # 两类问卷
     survey_types = ['teacher', 'student']
 
-    expired_at = timezone.now() + timedelta(hours=72)
+    expired_at = timezone.now() + timedelta(hours=120)
 
     instances = {}
     with transaction.atomic():

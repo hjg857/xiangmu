@@ -143,7 +143,7 @@
           />
           
           <p class="module-description">
-            为全面评估您所在学校“数据素养”发展水平，请您将以下问卷链接分享给学校更多教师、学生填写，问卷有限填写期限为72小时
+            为全面评估本校师生数据素养等的发展水平，请将下方问卷链接转发给校内广大师生填写。问卷有效期为120小时(5个工作日)，自链接生成起计时，到期将自动停止数据收集。
           </p> 
 
           <!-- 教师问卷 -->
@@ -236,7 +236,7 @@
                       <!-- 二维码下方提示文字 -->
                       <div class="qr-tip">
                         《教师调查问卷》<br />
-                        请在72小时内完成问卷填写！
+                        请在120小时内完成问卷填写！
                       </div>
                     </div>
                   </div>
@@ -346,7 +346,7 @@
                       <!-- 二维码下方提示文字 -->
                       <div class="qr-tip">
                         《学生调查问卷》<br />
-                        请在72小时内完成问卷填写！
+                        请在120小时内完成问卷填写！
                       </div>
                     </div>
                   </div>
@@ -819,7 +819,7 @@ const isAssessmentExpired = (assessmentData) => {
   if (!assessmentData?.created_at) return false
 
   const startTime = new Date(assessmentData.created_at).getTime()
-  const expireTime = startTime + 72 * 60 * 60 * 1000
+  const expireTime = startTime + 120 * 60 * 60 * 1000
 
   return Date.now() > expireTime
 }
@@ -929,7 +929,7 @@ const generateQr = async (url, title) => {
         ctx.font = `bold 44px "Microsoft YaHei", sans-serif`
         // 动态计算 Y 坐标，确保在标题下方合适位置
         const reminderY = textStartY + (titleLines.length * 60) + 30
-        ctx.fillText('请在72小时内完成问卷填写！', w / 2, reminderY)
+        ctx.fillText('请在120小时内完成问卷填写！', w / 2, reminderY)
 
         resolve(canvas.toDataURL('image/png', 1.0))
       }
@@ -1239,7 +1239,7 @@ const handleSubmitAssessment = async () => {
         以下问卷<b>既无回收数据也未到截止时间</b>：<br/>
         <b style="color: #f56c6c">${unreadyList.join('、')}</b>。<br/><br/>
         系统要求每类问卷至少有 <b>1 份</b>填答记录才能进行有效评估。<br/>
-        如果您无法获取填答数据，请等待<b>问卷过期（生成链接72小时后）</b>再尝试提交。<br/><br/>
+        如果您无法获取填答数据，请等待<b>问卷过期（生成链接120小时后）</b>再尝试提交。<br/><br/>
         <small style="color: #909399;">若已填写，请点击页面上方“刷新”按钮更新数据状态。</small>
       </div>`,
       '无法提交：数据不足且未过期',

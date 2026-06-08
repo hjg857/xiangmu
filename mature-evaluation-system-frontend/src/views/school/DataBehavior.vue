@@ -605,7 +605,7 @@ const isAssessmentExpired = (assessmentData) => {
 
   if (!Number.isFinite(start)) return false
 
-  const expire = start + 72 * 60 * 60 * 1000
+  const expire = start + 120 * 60 * 60 * 1000
 
   return Date.now() > expire
 }
@@ -613,7 +613,7 @@ const isAssessmentExpired = (assessmentData) => {
 const isAssessmentReadonly = (assessmentData) => {
   if (!assessmentData) return false
 
-  // 只有整份评估最终提交完成，或超过72小时，才进入只读
+  // 只有整份评估最终提交完成，或超过120小时，才进入只读
   return assessmentData.status === 'completed' || isAssessmentExpired(assessmentData)
 }
 
