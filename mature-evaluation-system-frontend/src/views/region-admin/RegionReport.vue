@@ -3035,6 +3035,27 @@ onUnmounted(() => {
   margin-top: 40px;
 }
 
+/* ===== 报告正文类文字统一两端对齐 ===== */
+.report-shell .overview-text p,
+.report-shell .core-desc,
+.report-shell .level-ai-content,
+.report-shell .development-summary-box,
+.report-shell .development-item-text,
+.report-shell .development-final-text {
+  text-align: justify;
+  text-align-last: left;
+  line-height: 1.9;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* 去掉总分前5名表格前三名的底色 */
+.top-table tbody tr.top-rank-1 td,
+.top-table tbody tr.top-rank-2 td,
+.top-table tbody tr.top-rank-3 td {
+  background: #ffffff !important;
+}
+
 /* 响应式 */
 @media (max-width: 1200px) {
   .level-rank-layout {

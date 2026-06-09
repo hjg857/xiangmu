@@ -91,18 +91,65 @@ class RegionAdminOverviewView(RegionAdminBaseAPIView):
         except ValueError as e:
             return bad(str(e), code=http_status.HTTP_403_FORBIDDEN)
 
-        schools_qs = School.objects.filter(region=region)
+        # 当前区域下的评估记录
+        assessment_qs = Assessment.objects.filter(
+            school__region=region
+        ).select_related("school")
 
-        # 是否存在评估
-        has_assessment = Exists(Assessment.objects.filter(school_id=OuterRef("pk")))
+        def normalize_school_name(name):
+            """
+            学校名称归一化，避免空格导致重复统计。
+            """
+            return str(name or "").strip().replace(" ", "")
 
-        school_count = schools_qs.count()
-        has_assessment_count = schools_qs.annotate(has_assessment=has_assessment).filter(has_assessment=True).count()
+        def get_school_key(assessment):
+            """
+            统计唯一学校。
+            优先按学校名称去重，这样同一学校多条评估记录只算一次。
+            如果学校名称为空，则退回使用 school_id。
+            """
+            school = getattr(assessment, "school", None)
 
-        # 完成数：status == completed
-        completed_count = Assessment.objects.filter(school__region=region, status="completed").count()
+            school_name = ""
+            if school:
+                school_name = (
+                    getattr(school, "name", "")
+                    or getattr(school, "school_name", "")
+                    or ""
+                )
 
-        # 有报告文件数：report_file 非空（FileField空字符串表示未上传/生成）
+            school_name = normalize_school_name(school_name)
+
+            if school_name:
+                return f"name_{school_name}"
+
+            school_id = getattr(assessment, "school_id", None)
+            if school_id:
+                return f"id_{school_id}"
+
+            return None
+
+        def count_unique_schools(qs):
+            keys = set()
+
+            for assessment in qs:
+                key = get_school_key(assessment)
+                if key:
+                    keys.add(key)
+
+            return len(keys)
+
+        # 1. 学校总数：按下方评估列表中的学校去重统计
+        school_count = count_unique_schools(assessment_qs)
+
+        # 2. 已创建评估学校数：有评估记录的学校去重统计
+        has_assessment_count = school_count
+
+        # 3. 已完成评估数：completed 状态下的学校去重统计
+        completed_qs = assessment_qs.filter(status="completed")
+        completed_count = count_unique_schools(completed_qs)
+
+        # 4. 已生成报告数：当前系统 completed 后即可查看报告，所以等于已完成评估数
         report_count = completed_count
 
         data = {
@@ -119,6 +166,7 @@ class RegionAdminOverviewView(RegionAdminBaseAPIView):
             "completed_count": completed_count,
             "report_count": report_count,
         }
+
         return ok(data)
 
 
