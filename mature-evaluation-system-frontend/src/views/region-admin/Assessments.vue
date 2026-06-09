@@ -76,7 +76,11 @@
         stripe
         @sort-change="handleSortChange"
       >
-        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column label="ID" width="80" align="center">
+  <template #default="{ $index }">
+    {{ (query.page - 1) * query.page_size + $index + 1 }}
+  </template>
+</el-table-column>
 
         <el-table-column prop="school_name" label="学校名称" min-width="220" show-overflow-tooltip />
 

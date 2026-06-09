@@ -772,7 +772,7 @@ const calcInstitutionDone = (data) => {
 
   // 选择 follow_policy 或 self_awareness 时，不需要填写文件份数和上传文件
 
-  // --- 5. B32 数据实践指导类文件：新版三选一 ---
+  // --- 5. B32 数据实践指导类文件---
   if (!isFilled(data.practice_doc_status)) return false;
 
   if (data.practice_doc_status === 'published') {
@@ -787,7 +787,7 @@ const calcInstitutionDone = (data) => {
   return true;
 };
 
-// ====== 数据素养：按你规则 collected_count>0 才算完成 ======
+// ====== 数据素养 collected_count>0 才算完成 ======
 const calcLiteracyDone = () => {
   // 逻辑：只要实例对象不为空，说明已经点击过“生成链接”按钮
   const teacherExists = !!teacherInstance.value

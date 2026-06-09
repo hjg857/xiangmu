@@ -62,7 +62,11 @@
 
       <!-- 数据表格 -->
       <el-table :data="listData" v-loading="loadingList" stripe>
-        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column label="ID" width="80" align="center">
+  <template #default="{ $index }">
+    {{ (page - 1) * pageSize + $index + 1 }}
+  </template>
+</el-table-column>
         <el-table-column prop="school_name" label="学校名称" min-width="200" />
         <el-table-column prop="school_type_display" label="学校类型" width="120" />
         <el-table-column prop="status" label="状态" width="120">

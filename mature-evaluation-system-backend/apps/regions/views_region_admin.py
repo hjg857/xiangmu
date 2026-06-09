@@ -103,9 +103,7 @@ class RegionAdminOverviewView(RegionAdminBaseAPIView):
         completed_count = Assessment.objects.filter(school__region=region, status="completed").count()
 
         # 有报告文件数：report_file 非空（FileField空字符串表示未上传/生成）
-        report_count = Assessment.objects.filter(
-            school__region=region
-        ).exclude(report_file="").count()
+        report_count = completed_count
 
         data = {
             "region": {

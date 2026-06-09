@@ -74,7 +74,11 @@
         stripe
         style="width: 100%"
       >
-        <el-table-column prop="id" label="ID" width="60" />
+        <el-table-column label="序号" width="80" align="center">
+  <template #default="{ $index }">
+    {{ (pagination.page - 1) * pagination.pageSize + $index + 1 }}
+  </template>
+</el-table-column>
         <el-table-column label="名称" min-width="220">
           <template #default="{ row }">
             <div class="name-cell">

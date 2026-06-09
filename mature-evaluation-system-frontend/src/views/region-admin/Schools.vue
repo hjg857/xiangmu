@@ -192,7 +192,11 @@
   class="table"
   header-cell-class-name="thead"
 >
-  <el-table-column prop="id" label="ID" width="70" align="center" />
+  <el-table-column label="ID" width="80" align="center">
+  <template #default="{ $index }">
+    {{ (query.page - 1) * query.page_size + $index + 1 }}
+  </template>
+</el-table-column>
 
   <el-table-column label="学校名称" min-width="170" show-overflow-tooltip>
     <template #default="{ row }">

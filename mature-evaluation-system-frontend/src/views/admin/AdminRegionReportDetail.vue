@@ -413,11 +413,12 @@
   </div>
 </div>
   </div>
-</section>
-    </div>
-      <div class="report-footer">
+        <div class="report-footer">
         <p class="footer-note">-本报告由中小学校数据文化成熟度评估监测系统自动生成-</p>
       </div>
+</section>
+    </div>
+
   </div>
 </template>
 

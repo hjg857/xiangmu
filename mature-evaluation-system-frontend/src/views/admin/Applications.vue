@@ -75,7 +75,11 @@
     <!-- 3. 申请列表 (保持原有) -->
     <el-card class="table-card">
       <el-table :data="applications" v-loading="loading" stripe style="width: 100%">
-        <el-table-column prop="id" label="ID" width="60" />
+        <el-table-column label="ID" width="60" align="center">
+  <template #default="{ $index }">
+    {{ (pagination.page - 1) * pagination.pageSize + $index + 1 }}
+  </template>
+</el-table-column>
         <el-table-column label="学校名称" min-width="200">
           <template #default="{ row }">
             {{ getApplicationName(row) }}
